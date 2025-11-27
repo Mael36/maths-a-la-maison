@@ -1,0 +1,6 @@
+{
+  "name": "Maths à la Maison",
+  "short_name": "MathsMaison",
+  "start_url": "/",
+  "display": "standalone"
+}

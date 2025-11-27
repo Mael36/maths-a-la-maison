@@ -1,0 +1,2884 @@
+{
+  "categories": {
+    "Calcul littéral": [
+      {
+        "numero": 233,
+        "consigne": "Réduire",
+        "expression": "7x × 3 + 9 + 8x² −5x + 6 −7x²",
+        "correction": "x² + 16x + 15"
+      },
+      {
+        "numero": 234,
+        "consigne": "Réduire",
+        "expression": "8x + 10 + 6x² −3x + 6 + 2x² × 4",
+        "correction": "14x² + 5x + 16"
+      },
+      {
+        "numero": 235,
+        "consigne": "Réduire",
+        "expression": "4x −8 + 9x² + 7x −10 × 7 + 17x²",
+        "correction": "26x² + 11x −78"
+      },
+      {
+        "numero": 236,
+        "consigne": "Réduire",
+        "expression": "−4x² + 5x −11 × 6 + 9x² −15x",
+        "correction": "5x² −10x −66"
+      },
+      {
+        "numero": 237,
+        "consigne": "Développer et réduire",
+        "expression": "3x(4x −2) −5x² + 7x + 6",
+        "correction": "7x² + x + 6"
+      },
+      {
+        "numero": 238,
+        "consigne": "Développer et réduire",
+        "expression": "5x(−x + 7) −4x² + 6x −18",
+        "correction": "−9x² + 41x −18"
+      },
+      {
+        "numero": 239,
+        "consigne": "Développer et réduire",
+        "expression": "11(2x −3) −x² + 7x −8",
+        "correction": "−x² + 29x −41"
+      },
+      {
+        "numero": 240,
+        "consigne": "Développer et réduire",
+        "expression": "−7(3x −9) −2(x² + 7) −x + 13",
+        "correction": "−2x² −22x + 62"
+      },
+      {
+        "numero": 241,
+        "consigne": "Développer et réduire",
+        "expression": "8(−x + 12) −3(2x² + 10) −4x −1",
+        "correction": "−6x² −12x + 65"
+      },
+      {
+        "numero": 242,
+        "consigne": "Développer et réduire",
+        "expression": "3(x + 2/3) −(4x² + 5x −6) −14x −9",
+        "correction": "−4x² −16x −1"
+      },
+      {
+        "numero": 243,
+        "consigne": "Développer et réduire",
+        "expression": "5x −6 −2x² −(7x −10) × 3x + 40",
+        "correction": "−23x² −25x + 34"
+      },
+      {
+        "numero": 244,
+        "consigne": "Développer et réduire",
+        "expression": "−6x² + 5(2x −11) −3 × 6x + 9(x² −x)",
+        "correction": "3x² −17x −55"
+      },
+      {
+        "numero": 245,
+        "consigne": "Développer et réduire",
+        "expression": "(9x −8)(7x −3)",
+        "correction": "63x² −83x + 24"
+      },
+      {
+        "numero": 246,
+        "consigne": "Développer et réduire",
+        "expression": "(−2x + 7)(6x + 5)",
+        "correction": "−12x² + 32x + 35"
+      },
+      {
+        "numero": 247,
+        "consigne": "Développer et réduire",
+        "expression": "(2x −1)(7x −3)",
+        "correction": "14x² −13x + 3"
+      },
+      {
+        "numero": 248,
+        "consigne": "Développer et réduire",
+        "expression": "−7(3x −9)(10x + 4)",
+        "correction": "−210x² + 546x + 252"
+      },
+      {
+        "numero": 441,
+        "consigne": "Développer et réduire",
+        "expression": "−(4x −11) × 2x",
+        "correction": "−8x² + 22x"
+      },
+      {
+        "numero": 442,
+        "consigne": "Développer et réduire",
+        "expression": "−(5 + 10x) × 3x",
+        "correction": "−15x −30x²"
+      },
+      {
+        "numero": 443,
+        "consigne": "Développer et réduire",
+        "expression": "(8 −9x)²",
+        "correction": "81x² −144x + 64"
+      },
+      {
+        "numero": 444,
+        "consigne": "Développer et réduire",
+        "expression": "(11 + 5x)²",
+        "correction": "25x² + 110x + 121"
+      },
+      {
+        "numero": 445,
+        "consigne": "Développer et réduire",
+        "expression": "(3 −4x)(4x + 3)",
+        "correction": "9 −16x²"
+      },
+      {
+        "numero": 446,
+        "consigne": "Développer et réduire",
+        "expression": "(5x + 7)(5x −7)",
+        "correction": "25x² −49"
+      },
+      {
+        "numero": 447,
+        "consigne": "Factoriser",
+        "expression": "5x + 10",
+        "correction": "5(x + 2)"
+      },
+      {
+        "numero": 448,
+        "consigne": "Factoriser",
+        "expression": "4x² + 4x",
+        "correction": "4x(x + 1)"
+      },
+      {
+        "numero": 449,
+        "consigne": "Factoriser",
+        "expression": "24x + 6x² −6",
+        "correction": "6(4x + x² −1)"
+      },
+      {
+        "numero": 450,
+        "consigne": "Factoriser en utilisant les identités remarquables",
+        "expression": "9 + 12x + 4x²",
+        "correction": "(3 + 2x)²"
+      },
+      {
+        "numero": 451,
+        "consigne": "Factoriser",
+        "expression": "36x² −49",
+        "correction": "(6x −7)(6x + 7)"
+      },
+      {
+        "numero": 452,
+        "consigne": "Factoriser en utilisant les identités remarquables",
+        "expression": "16 −40x + 25x²",
+        "correction": "(4 −5x)²"
+      },
+      {
+        "numero": 453,
+        "consigne": "Factoriser",
+        "expression": "9 −16x²",
+        "correction": "(3 −4x)(3 + 4x)"
+      },
+      {
+        "numero": 454,
+        "consigne": "Factoriser",
+        "expression": "100 −64x²",
+        "correction": "(10 −8x)(10 + 8x)"
+      },
+      {
+        "numero": 455,
+        "consigne": "Factoriser en utilisant l’identité remarquable a2-b2",
+        "expression": "(2 + x)² − (3 + 2x)²",
+        "correction": "((2 + x) − (3 + 2x))((2 + x) + (3 + 2x)) = (2 + x −3 −2x)(2 + x + 3 + 2x) = (−1 −x)(5 + 3x)"
+      },
+      {
+        "numero": 456,
+        "consigne": "Factoriser",
+        "expression": "25x −25x²",
+        "correction": "25x(1 −x)"
+      },
+      {
+        "numero": 457,
+        "consigne": "Quelle est la valeur de cette expression pour x = 2 ?",
+        "expression": "24x −6x² −6",
+        "correction": "24"
+      },
+      {
+        "numero": 458,
+        "consigne": "Quelle est la valeur de cette expression pour x = 3 ?",
+        "expression": "7 −4x + 5x²",
+        "correction": "38"
+      },
+      {
+        "numero": 459,
+        "consigne": "Quelle est la valeur de cette expression pour x = −1 ?",
+        "expression": "−3x + 7x² + 8",
+        "correction": "18"
+      },
+      {
+        "numero": 460,
+        "consigne": "Quelle est la valeur de cette expression pour x = −2 ?",
+        "expression": "8 −40x −25x²",
+        "correction": "−112"
+      },
+      {
+        "numero": 461,
+        "consigne": "Résoudre",
+        "expression": "9 −16x² = 0",
+        "correction": "(3 −4x)(3 + 4x) = 0 2 solutions : 3/4 et -3/4"
+      },
+      {
+        "numero": 462,
+        "consigne": "Résoudre",
+        "expression": "100 −49x² = 0",
+        "correction": "(10 −7x)(10 + 7x) = 0 2 solutions : 10/7 et -10/7"
+      },
+      {
+        "numero": 463,
+        "consigne": "Résoudre",
+        "expression": "24x −6x² = 0",
+        "correction": "6x(4 −x) = 0 2 solutions : 0 et 4"
+      },
+      {
+        "numero": 464,
+        "consigne": "Résoudre",
+        "expression": "49x² + 7x = 0",
+        "correction": "7x(7x + 1) = 0 2 solutions : 0 et -1/7"
+      },
+      {
+        "numero": 465,
+        "consigne": "Résoudre",
+        "expression": "x² = −8",
+        "correction": "Aucune solution car un nombre au carré ne peut-être négatif."
+      },
+      {
+        "numero": 466,
+        "consigne": "Résoudre",
+        "expression": "8x −12 = 10",
+        "correction": "x = 22/8 = 11/4 = 2,75"
+      },
+      {
+        "numero": 467,
+        "consigne": "Résoudre",
+        "expression": "3x + 21 = 9",
+        "correction": "x = -4"
+      },
+      {
+        "numero": 468,
+        "consigne": "Résoudre",
+        "expression": "5 −7x = 54",
+        "correction": "x = -7"
+      },
+      {
+        "numero": 469,
+        "consigne": "Résoudre",
+        "expression": "x² = −12",
+        "correction": "Aucune solution car un nombre au carré ne peut-être négatif."
+      },
+      {
+        "numero": 470,
+        "consigne": "Résoudre",
+        "expression": "4(x −8) = 6",
+        "correction": "4x −32 = 6 x = 38/4 = 9,5"
+      },
+      {
+        "numero": 471,
+        "consigne": "Résoudre",
+        "expression": "5(3x −7) = −40",
+        "correction": "15x −35 = −40 x = -5/15 = -1/3"
+      },
+      {
+        "numero": 472,
+        "consigne": "Résoudre",
+        "expression": "2x −7 = 42 + 6x",
+        "correction": "x = -49/4 = -12,25"
+      },
+      {
+        "numero": 473,
+        "consigne": "Résoudre",
+        "expression": "19 −3x = −8x + 7",
+        "correction": "x = -12/5 = -2,4"
+      },
+      {
+        "numero": 474,
+        "consigne": "Après avoir développé, résoudre",
+        "expression": "6(2x −5) + 3(x −7) = 15",
+        "correction": "x = 66/15 = 4,4"
+      },
+      {
+        "numero": 475,
+        "consigne": "Après avoir développé, résoudre",
+        "expression": "9(x + 7) −4(3x −8) = 62",
+        "correction": "x = 3"
+      },
+      {
+        "numero": 476,
+        "consigne": "Après avoir factorisé, résoudre",
+        "expression": "(3x + 1)(2x + 5) + 4(3x + 1) = 0",
+        "correction": "(3x + 1)(2x + 9) = 0 x = -1/3 ou x = -4,5"
+      },
+      {
+        "numero": 477,
+        "consigne": "Après avoir factorisé, résoudre",
+        "expression": "(x −8)(4x + 11) −7(x −8) = 0",
+        "correction": "(x −8)(4x + 4) = 0 x = -1 ou x = 8"
+      },
+      {
+        "numero": 478,
+        "consigne": "Après avoir factorisé, résoudre",
+        "expression": "(4x −1)(5x + 7) + (3x + 9)(4x −1) = 0",
+        "correction": "(4x −1)(8x + 16) = 0 x = 1/4 ou x = -2"
+      },
+      {
+        "numero": 479,
+        "consigne": "Après avoir développé, résoudre",
+        "expression": "−7(6x + 5) −4(x + 9) = −8(x −11) −7",
+        "correction": "x = -4"
+      },
+      {
+        "numero": 480,
+        "consigne": "Résoudre",
+        "expression": "(3x + 1)/5 = 7/8",
+        "correction": "x = 9/40 = 0,225"
+      }
+    ],
+    "Calculs": [
+      {
+        "numero": 281,
+        "question": "",
+        "correction": "41"
+      },
+      {
+        "numero": 282,
+        "question": "Les 24 stylos de Ambre sont de 3 sortes : les feutres, les surligneurs et les pastels. Trois quarts ne sont pas des feutres et deux tiers ne sont pas des pastels. Combien Ambre a -t-elle de surligneurs ?",
+        "correction": "10 surligneurs"
+      },
+      {
+        "numero": 283,
+        "question": "Donne l’écriture décimale de 2 × 10! + 10\" + 10#\" + 2 × 10#$",
+        "correction": "210,102"
+      },
+      {
+        "numero": 284,
+        "question": "(1 − 1/4)(1 − 2/4)(1 − 3/4)(1 − 4/4)(1 + 1/4)(1 + 2/4)(1 + 3/4)(1 + 4/4)",
+        "correction": "0"
+      },
+      {
+        "numero": 285,
+        "question": "Calculer 4x² + 7 pour x = -1",
+        "correction": "4 × (−1)² + 7 = 11"
+      },
+      {
+        "numero": 286,
+        "question": "Calculer −5 x −2 pour x = -2",
+        "correction": "−5 × (−2) −2 = 8"
+      },
+      {
+        "numero": 287,
+        "question": "9 + 4,5 × (−2)",
+        "correction": "0"
+      },
+      {
+        "numero": 288,
+        "question": "(−5)² + 6 × (−4)",
+        "correction": "25 – 24 = 1"
+      },
+      {
+        "numero": 369,
+        "question": "Calculer (4 + 3)² −12 × 5",
+        "correction": "49 – 60 = -11"
+      },
+      {
+        "numero": 370,
+        "question": "Calculer (−5)² + 3 × (−4)",
+        "correction": "25 −12 = 13"
+      },
+      {
+        "numero": 371,
+        "question": "Calculer −7² −11 × 2",
+        "correction": "−49 −22 = −71"
+      },
+      {
+        "numero": 372,
+        "question": "Calculer 3³ −13 × (−3)",
+        "correction": "27 + 39 = 66"
+      },
+      {
+        "numero": 373,
+        "question": "Calculer −4² + 12 − (13 −6) × (5 + 6)",
+        "correction": "−16 + 12 −7 × 11 = −4 −77 = −81"
+      },
+      {
+        "numero": 374,
+        "question": "Calculer 10 × 3 ÷ 5 × 4",
+        "correction": "10 × 3 ÷ 5 × 4 = 12"
+      },
+      {
+        "numero": 375,
+        "question": "Calculer 3^0 + 32 ÷ 4",
+        "correction": "1 + 8 = 9"
+      },
+      {
+        "numero": 376,
+        "question": "Calculer (7 + (10 −6)) × 5 ÷ 11 × (−4)",
+        "correction": "11 × 5 ÷ 11 × (−4) = −20"
+      },
+      {
+        "numero": 377,
+        "question": "Calculer et simplifier 13/49 × 7/3",
+        "correction": "13/21"
+      },
+      {
+        "numero": 378,
+        "question": "Calculer et simplifier 3/35 × −7/4",
+        "correction": "−3/20"
+      },
+      {
+        "numero": 379,
+        "question": "Calculer et simplifier 2 × 5/16",
+        "correction": "5/8"
+      },
+      {
+        "numero": 380,
+        "question": "Calculer et simplifier 4 ÷ 10/−16",
+        "correction": "−2/5"
+      },
+      {
+        "numero": 381,
+        "question": "Calculer et simplifier 9/5 ÷ 18/8",
+        "correction": "4/5"
+      },
+      {
+        "numero": 382,
+        "question": "Calculer 10 × (-8,09)",
+        "correction": "−80,9"
+      },
+      {
+        "numero": 383,
+        "question": "Calculer -7,2 × 5",
+        "correction": "-36"
+      },
+      {
+        "numero": 384,
+        "question": "Calculer 874 × (-0,1)",
+        "correction": "-87,4"
+      },
+      {
+        "numero": 385,
+        "question": "Calculer et simplifier 15/72 −5/8",
+        "correction": "−31/72"
+      },
+      {
+        "numero": 386,
+        "question": "Calculer et simplifier 3/35 + −7/5",
+        "correction": "−48/35"
+      },
+      {
+        "numero": 387,
+        "question": "Calculer et simplifier 2 + 5/16",
+        "correction": "37/16"
+      },
+      {
+        "numero": 388,
+        "question": "Calculer et simplifier 1 −10/−16",
+        "correction": "−3/8"
+      },
+      {
+        "numero": 389,
+        "question": "Calculer et simplifier 9/5 + 18/8 × 2/3",
+        "correction": "11/4"
+      },
+      {
+        "numero": 390,
+        "question": "Calculer -50 × (-60)",
+        "correction": "3 000"
+      },
+      {
+        "numero": 391,
+        "question": "Calculer 43,98 × (-0,1)",
+        "correction": "-4,398"
+      },
+      {
+        "numero": 392,
+        "question": "Calculer -(-10) × (-43,9)",
+        "correction": "-439"
+      },
+      {
+        "numero": 401,
+        "question": "Calculer √ 0,24",
+        "correction": "0,49"
+      },
+      {
+        "numero": 402,
+        "question": "Calculer √ −4,5",
+        "correction": "Aucune solution"
+      },
+      {
+        "numero": 403,
+        "question": "Calculer √ 0,032",
+        "correction": "0,179"
+      },
+      {
+        "numero": 404,
+        "question": "Calculer √ −37,5",
+        "correction": "Aucune solution"
+      },
+      {
+        "numero": 405,
+        "question": "Calculer √64 + √25",
+        "correction": "13"
+      },
+      {
+        "numero": 406,
+        "question": "Calculer −√81 + √16",
+        "correction": "−5"
+      },
+      {
+        "numero": 407,
+        "question": "Calculer −√9 − √100",
+        "correction": "−13"
+      },
+      {
+        "numero": 408,
+        "question": "Calculer √49/2",
+        "correction": "3,5"
+      },
+      {
+        "numero": 409,
+        "question": "Calculer √ 1,5",
+        "correction": "1,224"
+      },
+      {
+        "numero": 410,
+        "question": "Calculer √ −45",
+        "correction": "Aucune solution"
+      },
+      {
+        "numero": 411,
+        "question": "Calculer √ 3,6",
+        "correction": "1,897"
+      },
+      {
+        "numero": 412,
+        "question": "Calculer √ −630",
+        "correction": "Aucune solution"
+      },
+      {
+        "numero": 413,
+        "question": "Calculer −6 × 150",
+        "correction": "−900"
+      },
+      {
+        "numero": 414,
+        "question": "Calculer 11 × 2 300",
+        "correction": "25 300"
+      },
+      {
+        "numero": 415,
+        "question": "Calculer 6,2 × 1 100",
+        "correction": "6 820"
+      },
+      {
+        "numero": 416,
+        "question": "Quel est le nombre qui, multiplié par 11, donne 3 ?",
+        "correction": "3/11"
+      },
+      {
+        "numero": 417,
+        "question": "Quel est le nombre qui, multiplié par -17, donne 5 ?",
+        "correction": "−5/17"
+      },
+      {
+        "numero": 418,
+        "question": "Quel est le nombre qui, ajouté à -2, donne 19 ?",
+        "correction": "21"
+      },
+      {
+        "numero": 419,
+        "question": "Quel est le nombre qui, ajouté à -7, donne -3 ?",
+        "correction": "4"
+      },
+      {
+        "numero": 420,
+        "question": "Quel est le nombre qui, ajouté à -4, donne -32 ?",
+        "correction": "−28"
+      },
+      {
+        "numero": 421,
+        "question": "Déterminer la valeur de x x/11 = 14/77",
+        "correction": "2/11"
+      },
+      {
+        "numero": 422,
+        "question": "Déterminer la valeur de x x/3,6 = 7/9",
+        "correction": "2,8"
+      },
+      {
+        "numero": 423,
+        "question": "Déterminer la valeur de x 4,8/x = −6/10",
+        "correction": "−8"
+      },
+      {
+        "numero": 424,
+        "question": "Déterminer la valeur de x 6,1/−3 = x/1,2",
+        "correction": "−2,44"
+      },
+      {
+        "numero": 425,
+        "question": "Calculer -112",
+        "correction": "−112"
+      },
+      {
+        "numero": 426,
+        "question": "Calculer (-12)2",
+        "correction": "144"
+      },
+      {
+        "numero": 427,
+        "question": "Calculer (-2)4",
+        "correction": "16"
+      },
+      {
+        "numero": 428,
+        "question": "Calculer −5^3",
+        "correction": "−125"
+      },
+      {
+        "numero": 429,
+        "question": "Calculer 4 × 10^−3",
+        "correction": "0,004"
+      },
+      {
+        "numero": 430,
+        "question": "Calculer 5,7 × 10^2",
+        "correction": "570"
+      },
+      {
+        "numero": 431,
+        "question": "Écrire le résultat sous la forme d’une puissance 10^5 / 10^−2",
+        "correction": "10^7"
+      },
+      {
+        "numero": 432,
+        "question": "Écrire le résultat sous la forme d’une puissance (10^−6)^5",
+        "correction": "10^−30"
+      },
+      {
+        "numero": 433,
+        "question": "Combien y a-t-il de semaines dans 3 années ?",
+        "correction": "156"
+      },
+      {
+        "numero": 434,
+        "question": "Convertir 12,56 dm en m",
+        "correction": "1,256 m"
+      },
+      {
+        "numero": 435,
+        "question": "Convertir 135 m2 en cm2",
+        "correction": "1 350 000 cm2"
+      },
+      {
+        "numero": 436,
+        "question": "Convertir 374,56 m en hm",
+        "correction": "3,7456 hm"
+      },
+      {
+        "numero": 437,
+        "question": "Convertir 523 731,9 dm2 en dam2",
+        "correction": "52,37319 dam2"
+      },
+      {
+        "numero": 438,
+        "question": "Convertir 3,2 m3 en L",
+        "correction": "3 200 L"
+      },
+      {
+        "numero": 439,
+        "question": "Convertir 162,84 dam3 en m3",
+        "correction": "162 840 m3"
+      },
+      {
+        "numero": 440,
+        "question": "Convertir 4 908,4 mm3 en cm3",
+        "correction": "4,9084 cm3"
+      }
+    ],
+    "Fonctions": [
+      {
+        "numero": 481,
+        "question": "Peut-on avoir plusieurs antécédents par une fonction ?",
+        "correction": "Oui, comme pour la fonction carrée"
+      },
+      {
+        "numero": 482,
+        "question": "Peut-on avoir plusieurs images par une fonction ?",
+        "correction": "Non, l’image est unique."
+      },
+      {
+        "numero": 483,
+        "question": "Soit f la fonction définie par f(x) = 8x −9. Quelle est l’image de 10 par la fonction f?",
+        "correction": "71"
+      },
+      {
+        "numero": 484,
+        "question": "Soit f la fonction définie par f(x) = 6x + 4. Quelle est l’image de -5 par la fonction f?",
+        "correction": "−26"
+      },
+      {
+        "numero": 485,
+        "question": "Soit f la fonction définie par f(x) = −5x + 11. Calculer un antécédent de −4 par la fonction f.",
+        "correction": "3"
+      },
+      {
+        "numero": 486,
+        "question": "Soit f la fonction définie par f(x) = −7x −2. Calculer un antécédent de -58 par la fonction f.",
+        "correction": "8"
+      },
+      {
+        "numero": 487,
+        "question": "Quel est l’antécédent de -1 par la fonction h: x → −2,5 x −6 ?",
+        "correction": "−2"
+      },
+      {
+        "numero": 488,
+        "question": "Quelle est l’image de -1 par la fonction 5: x → −2,5 x² + 8 ?",
+        "correction": "5,5"
+      },
+      {
+        "numero": 489,
+        "question": "Quelle est l’image de 4 par cette fonction dont voici la représentation graphique ?",
+        "correction": "5"
+      },
+      {
+        "numero": 490,
+        "question": "Quelle est l’image de 0 par cette fonction dont voici la représentation graphique ?",
+        "correction": "2"
+      },
+      {
+        "numero": 491,
+        "question": "Quel est l’antécédent de -2 par cette fonction dont voici la représentation graphique ?",
+        "correction": "1"
+      },
+      {
+        "numero": 492,
+        "question": "Quel est l’antécédent de 2 par cette fonction dont voici la représentation graphique ?",
+        "correction": "0"
+      },
+      {
+        "numero": 493,
+        "question": "Quelle est l’image de -2 par cette fonction dont voici la représentation graphique ?",
+        "correction": "−1"
+      },
+      {
+        "numero": 494,
+        "question": "Est-ce la représentation graphique d’une fonction affine ? Justifier.",
+        "correction": "Oui, car c’est une droite."
+      },
+      {
+        "numero": 495,
+        "question": "Est-ce la représentation graphique d’une fonction linéaire ? Justifier.",
+        "correction": "Non car c’est une droite mais qui ne passe pas par l’origine."
+      },
+      {
+        "numero": 496,
+        "question": "Est-ce la représentation graphique d’une fonction affine ? Justifier.",
+        "correction": "Non car ce n’est pas une droite."
+      },
+      {
+        "numero": 497,
+        "question": "Quelle est l’image de 0 par cette fonction dont voici la représentation graphique ?",
+        "correction": "0"
+      },
+      {
+        "numero": 498,
+        "question": "Quelle est l’image de 2 par cette fonction dont voici la représentation graphique ?",
+        "correction": "4"
+      },
+      {
+        "numero": 499,
+        "question": "Quels sont les antécédents de 3 par cette fonction dont voici la représentation graphique ?",
+        "correction": "1 et 3"
+      },
+      {
+        "numero": 500,
+        "question": "Quels sont les antécédents de 0 par cette fonction dont voici la représentation graphique ?",
+        "correction": "0 et 4"
+      },
+      {
+        "numero": 501,
+        "question": "Est-ce la représentation graphique d’une fonction affine ? Justifier.",
+        "correction": "Non car ce n’est pas une droite."
+      },
+      {
+        "numero": 502,
+        "question": "Voici le tableau de valeurs d’une fonction f. Quelle est l’image de 5 par f ? x 3 5 2 7 f(x) 5 7 4 1",
+        "correction": "7"
+      },
+      {
+        "numero": 503,
+        "question": "Voici le tableau de valeurs d’une fonction f. Quelle est l’antécédent de 5 par f ? x 3 5 2 7 f(x) 5 7 4 1",
+        "correction": "3"
+      },
+      {
+        "numero": 504,
+        "question": "Que représentent a et b dans l’expression de la fonction affine f(x) = ax + b ?",
+        "correction": "a est le coefficient directeur b est l’ordonnée à l’origine."
+      },
+      {
+        "numero": 505,
+        "question": "Le point A(-3 ; -1) est-il sur la représentation graphique de cette fonction f : x-> −3x −1 ?",
+        "correction": "f(-3) = 8 A n’est pas sur la représentation graphique de f."
+      },
+      {
+        "numero": 506,
+        "question": "Le point A(2 ; -7) est-il sur la représentation graphique de cette fonction f : x-> −3x −1 ?",
+        "correction": "f(2) = -7 A est sur la représentation graphique de f."
+      },
+      {
+        "numero": 507,
+        "question": "Quelle est l’expression de cette fonction dont voici la représentation graphique ?",
+        "correction": "f(x) = 1/3 x −1"
+      },
+      {
+        "numero": 508,
+        "question": "Quelle est l’expression de cette fonction dont voici la représentation graphique ?",
+        "correction": "f(x) = 4/5 x −2"
+      },
+      {
+        "numero": 509,
+        "question": "Quelle est l’expression de cette fonction dont voici la représentation graphique ?",
+        "correction": "f(x) = −1/2 x + 2"
+      },
+      {
+        "numero": 510,
+        "question": "Parmi ces fonctions, quelles sont celles qui sont des fonctions linéaires? • f: x -> 3x2 - 8 • g: x -> 9x • h: x -> -10 • i: x -> 17 - 4x • j: x -> x/11 • k: x -> 13/x",
+        "correction": "g et j"
+      },
+      {
+        "numero": 511,
+        "question": "Parmi ces fonctions, quelles sont celles qui sont des fonctions affines? • f: x -> 3x2 - 8 • g: x -> 9x • h: x -> -10 • i: x -> 17 - 4x • j: x -> x/11 • k: x -> 13/x",
+        "correction": "g, h, i et j"
+      },
+      {
+        "numero": 512,
+        "question": "Quelle est l’expression de cette fonction dont voici la représentation graphique ?",
+        "correction": "f(x) = −1/4 x"
+      }
+    ],
+    "Géométrie": [
+      {
+        "numero": 49,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?",
+        "correction": "DE/DG = DF/DH = EF/GH"
+      },
+      {
+        "numero": 50,
+        "question": "Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?",
+        "correction": "DE/DC = DA/DB = EA/CB"
+      },
+      {
+        "numero": 51,
+        "question": "(EF) et (GH) sont-elles parallèles ?",
+        "correction": "0,5 ≈ 0,55 Non"
+      },
+      {
+        "numero": 52,
+        "question": "(EF) et (GH) sont-elles parallèles ?",
+        "correction": "0,8 Oui"
+      },
+      {
+        "numero": 53,
+        "question": "(AB) et (EC) sont-elles parallèles ?",
+        "correction": "1/2 ≠ 2/3 Non"
+      },
+      {
+        "numero": 54,
+        "question": "(AB) et (EC) sont-elles parallèles ?",
+        "correction": "2/3 Oui"
+      },
+      {
+        "numero": 55,
+        "question": "Citer la formule pour calculer le périmètre d’un disque",
+        "correction": "2 × π × r"
+      },
+      {
+        "numero": 56,
+        "question": "Quelle est la définition de 2 triangles égaux ?",
+        "correction": "Deux triangles sont égaux s’ils ont les longueurs des côtés homologues de même mesure."
+      },
+      {
+        "numero": 41,
+        "question": "Citer les propriétés des triangles isocèles (axe(s) et centre de symétrie, côtés, angles)",
+        "correction": "1 axe de symétrie : la médiatrice de sa base 0 centre de symétrie 2 côtés de même longueur 2 angles à sa base de même mesure"
+      },
+      {
+        "numero": 42,
+        "question": "Citer les propriétés des triangles équilatéraux (axe(s) et centre de symétrie, côtés, angles)",
+        "correction": "3 axes de symétrie : les médiatrices de ses côtés 0 centre de symétrie 3 côtés de même longueur 3 angles de même mesure"
+      },
+      {
+        "numero": 43,
+        "question": "Citer les propriétés des rectangles (axe(s) et centre de symétrie, côtés, angles, diagonales)",
+        "correction": "2 axes de symétrie : la médiatrice des côtés 1 centre de symétrie Côtés opposés 2 à 2 parallèles et de même longueur. 4 angles droits Diagonales qui se coupent en leur milieu et qui sont de même longueur"
+      },
+      {
+        "numero": 44,
+        "question": "Citer les propriétés d’un triangle rectangle (axe(s) et centre de symétrie, côtés, angles)",
+        "correction": "0 axe de symétrie 0 centre de symétrie 0 côté de même longueur 1 angle droit"
+      },
+      {
+        "numero": 45,
+        "question": "Citer les propriétés des losanges (axe(s) et centre de symétrie, côtés, angles, diagonales)",
+        "correction": "2 axes de symétrie : les diagonales 1 centre de symétrie Côtés opposés 2 à 2 parallèles. 4 côtés de même longueur Diagonales qui se coupent en leur milieu et qui sont perpendiculaires"
+      },
+      {
+        "numero": 46,
+        "question": "Citer les propriétés des carrés (axe(s) et centre de symétrie, côtés, angles, diagonales)",
+        "correction": "4 axes de symétrie : la médiatrice des côtés et les diagonales 1 centre de symétrie Côtés opposés 2 à 2 parallèles 4 côtés de même longueur Les diagonales se coupent en leur milieu, sont de même longueur et sont perpendiculaires 4 angles droits"
+      },
+      {
+        "numero": 47,
+        "question": "Citer les propriétés des parallélogrammes (axe(s) et centre de symétrie, côtés, angles, diagonales)",
+        "correction": "0 axe de symétrie 1 centre de symétrie Côtés opposés 2 à 2 parallèles et de même longueur. Diagonales qui se coupent en leur milieu"
+      },
+      {
+        "numero": 48,
+        "question": "Que faut-il au losange pour obtenir un carré ?",
+        "correction": "Le losange doit avoir un 1 angle droit ou des diagonales de même longueur"
+      },
+      {
+        "numero": 73,
+        "question": "Quelle est la longueur MN ?",
+        "correction": "√20"
+      },
+      {
+        "numero": 74,
+        "question": "Quelle est la longueur AB ?",
+        "correction": "√980"
+      },
+      {
+        "numero": 75,
+        "question": "Quelle est la mesure de l’angle MNO arrondie au degré ?",
+        "correction": "53°"
+      },
+      {
+        "numero": 76,
+        "question": "Quelle est la mesure de l’angle NMO arrondie au degré ?",
+        "correction": "37°"
+      },
+      {
+        "numero": 77,
+        "question": "On se place dans un triangle rectangle. Parmi ces résultats, lesquels sont impossibles ? Justifier. a/ cos (angle) ≈ 1,4 b/ cos (105) c/ cos (angle) ≈ - 0,5 d/ cos (angle) ≈ 0,99",
+        "correction": "a, b, c"
+      },
+      {
+        "numero": 78,
+        "question": "Voici l’extrait du tableur dans le logiciel de géométrie géogebra. Que faut-il saisir comme formule dans B2 et dans B3 ?",
+        "correction": "B2 : YL / LS B3 : YS / SL"
+      },
+      {
+        "numero": 79,
+        "question": "Déterminer l’arrondi au mm près de DB.",
+        "correction": "149 mm"
+      },
+      {
+        "numero": 80,
+        "question": "Déterminer l’arrondi au mm près de AB",
+        "correction": "130 mm"
+      },
+      {
+        "numero": 65,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DH ?",
+        "correction": "3,6"
+      },
+      {
+        "numero": 66,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DG ?",
+        "correction": "2,2"
+      },
+      {
+        "numero": 67,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quelle est la longueur EF ?",
+        "correction": "2,1"
+      },
+      {
+        "numero": 68,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quelle est la longueur GH ?",
+        "correction": "4"
+      },
+      {
+        "numero": 69,
+        "question": "Sachant que (AB) et (EC) sont parallèles, quelle est la longueur ED ?",
+        "correction": "48"
+      },
+      {
+        "numero": 70,
+        "question": "Sachant que (AB) et (EC) sont parallèles, quelle est la longueur EC ?",
+        "correction": "12,5"
+      },
+      {
+        "numero": 71,
+        "question": "Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?",
+        "correction": "Oui, 45/42 = 46/40 = 65/20"
+      },
+      {
+        "numero": 72,
+        "question": "Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?",
+        "correction": "Non"
+      },
+      {
+        "numero": 57,
+        "question": "Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?",
+        "correction": "DE/DG = DF/DH = EF/GH"
+      },
+      {
+        "numero": 58,
+        "question": "Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?",
+        "correction": "DE/DC = DA/DB = EA/CB"
+      },
+      {
+        "numero": 59,
+        "question": "(EF) et (GH) sont-elles parallèles ?",
+        "correction": "0,5 ≠ 0,6 Non"
+      },
+      {
+        "numero": 60,
+        "question": "(EF) et (GH) sont-elles parallèles ?",
+        "correction": "0,8 Oui"
+      },
+      {
+        "numero": 61,
+        "question": "(AB) et (EC) sont-elles parallèles ?",
+        "correction": "1/2 ≠ 2/3 Non"
+      },
+      {
+        "numero": 62,
+        "question": "(AB) et (EC) sont-elles parallèles ?",
+        "correction": "2/3 Oui"
+      },
+      {
+        "numero": 63,
+        "question": "Citer la formule pour calculer le périmètre d’un disque",
+        "correction": "2 × π × r"
+      },
+      {
+        "numero": 64,
+        "question": "Quelle est la définition de 2 triangles égaux ?",
+        "correction": "Deux triangles sont égaux s’ils ont les longueurs des côtés homologues de même mesure."
+      },
+      {
+        "numero": 33,
+        "question": "Comment caractériser 2 angles correspondants formés par 2 droites (d) et (d’) et la sécante (d’’) ?",
+        "correction": "L’un des 2 angles est entre (d) et (d’) et l’autre est à l’extérieur, ils sont du même côté de la sécante (d″) et ils n’ont pas le même sommet."
+      },
+      {
+        "numero": 34,
+        "question": "Les angles alternes internes ou correspondants sont-ils toujours de même mesure ? Justifier.",
+        "correction": "Non, il faut qu’ils soient formés par des droites parallèles."
+      },
+      {
+        "numero": 35,
+        "question": "Quelle est la définition de la médiatrice d’un segment ?",
+        "correction": "C’est une droite qui passe par le milieu d’un segment perpendiculairement."
+      },
+      {
+        "numero": 36,
+        "question": "Quelle est la définition de la bissectrice d’un angle ?",
+        "correction": "C’est une droite qui partage un angle en 2 angles adjacents de même mesure."
+      },
+      {
+        "numero": 37,
+        "question": "Quelle est la définition de la hauteur d’un triangle ?",
+        "correction": "C’est une droite qui passe par un sommet du triangle et qui passe perpendiculairement au côté opposé."
+      },
+      {
+        "numero": 38,
+        "question": "Quelle est la définition de la médiane d’un triangle ?",
+        "correction": "C’est une droite qui passe par un sommet du triangle et qui passe par le milieu de son côté opposé."
+      },
+      {
+        "numero": 39,
+        "question": "Quelle est la définition précise d’un triangle isocèle ?",
+        "correction": "C’est un polygone à 3 sommets (ou 3 côtés) qui a 2 côtés de même longueur."
+      },
+      {
+        "numero": 40,
+        "question": "Quelle est la définition précise d’un triangle équilatéral ?",
+        "correction": "C’est un polygone à 3 sommets (ou 3 côtés) qui a 3 côtés de même longueur."
+      },
+      {
+        "numero": 25,
+        "question": "Quelle est la condition pour pouvoir appliquer le théorème de Pythagore ?",
+        "correction": "Il faut se situer dans un triangle rectangle."
+      },
+      {
+        "numero": 26,
+        "question": "ABC est un triangle rectangle en C. Quelle est l’égalité de Pythagore ?",
+        "correction": "AB² = AC² + BC²"
+      },
+      {
+        "numero": 27,
+        "question": "Quelle est la mesure de chaque angle dans un triangle équilatéral ?",
+        "correction": "60°"
+      },
+      {
+        "numero": 28,
+        "question": "ABC est un triangle rectangle en C. Quelle est la formule permettant de calculer le cosinus de l’angle CAB ?",
+        "correction": "cos (CAB) = AC/AB"
+      },
+      {
+        "numero": 29,
+        "question": "ABC est un triangle rectangle en C. Quelle est la formule permettant de calculer le sinus de l’angle CAB ?",
+        "correction": "sin (CAB) = BC/AB"
+      },
+      {
+        "numero": 30,
+        "question": "ABC est un triangle rectangle en C. Quelle est la formule permettant de calculer la tangente de l’angle CAB ?",
+        "correction": "tan (CAB) = BC/AC"
+      },
+      {
+        "numero": 31,
+        "question": "Quelle propriété possède 2 angles opposés par le sommet ?",
+        "correction": "Ils sont de même mesure."
+      },
+      {
+        "numero": 32,
+        "question": "Comment caractériser 2 angles alternes internes formés par 2 droites (d) et (d’) et la sécante (d’’) ?",
+        "correction": "Les 2 angles sont entre (d) et (d’), ils sont de part et d’autre de la sécante (d″) et ils n’ont pas le même sommet"
+      },
+      {
+        "numero": 17,
+        "question": "Que signifie : 2 angles sont complémentaires ?",
+        "correction": "La somme de leur mesure est égale à 90°."
+      },
+      {
+        "numero": 18,
+        "question": "Que signifie : 2 angles sont supplémentaires ?",
+        "correction": "La somme de leur mesure est égale à 180°."
+      },
+      {
+        "numero": 19,
+        "question": "Quelle est la définition d’un parallélogramme ?",
+        "correction": "C’est un quadrilatère qui a ses côtés opposés 2 à 2 parallèles"
+      },
+      {
+        "numero": 20,
+        "question": "Quelle est la définition d’un losange ?",
+        "correction": "C’est un quadrilatère qui a ses 4 côtés de même longueur (ou un parallélogramme avec 2 côtés consécutifs de même longueur)"
+      },
+      {
+        "numero": 21,
+        "question": "Quelle est la définition d’un rectangle ?",
+        "correction": "C’est un quadrilatère qui a 4 angles droits. (ou un parallélogramme avec 1 angle droit)"
+      },
+      {
+        "numero": 22,
+        "question": "Quelle est la définition d’un carré ?",
+        "correction": "C’est un quadrilatère qui a ses 4 côtés de même longueur et 4 angles droits. (ou un parallélogramme avec 2 côtés consécutifs de même longueur et 1 angle droit)"
+      },
+      {
+        "numero": 23,
+        "question": "Combien vaut la somme des mesures des 3 angles d’un triangle ?",
+        "correction": "180°"
+      },
+      {
+        "numero": 24,
+        "question": "Citer l’inégalité triangulaire : quand est-ce qu’un triangle est constructible ?",
+        "correction": "La somme des longueurs des 2 plus petits côtés d’un triangle doit être supérieure à la longueur du plus grand côté."
+      }
+    ],
+    "Informatique": [
+      {
+        "numero": 521,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer le nombre 1 au carré ?",
+        "correction": "=A2^2 ou = A2*A2 Ou = PUISSANCE(A2 ;2)"
+      },
+      {
+        "numero": 522,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer la somme des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "=A2+B2+C2 ou = SOMME(A2 :C2)"
+      },
+      {
+        "numero": 523,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer la moyenne des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MOYENNE(A2 :C2)"
+      },
+      {
+        "numero": 524,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer la médiane des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MEDIANE(A2 :C2)"
+      },
+      {
+        "numero": 525,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer l’étendue de la série composée des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MAX(A2 :C2) - MIN(A2 :C2)"
+      },
+      {
+        "numero": 526,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer la différence entre le nombre 3 et le nombre 2 ?",
+        "correction": "= C2 – B2"
+      },
+      {
+        "numero": 527,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer le quotient du nombre 3 par le nombre 1 ?",
+        "correction": "= C2 / A2"
+      },
+      {
+        "numero": 528,
+        "question": "Quelle formule faut-il inscrire dans la cellule D2 pour calculer le produit du nombre 2 et du nombre 1 ?",
+        "correction": "= A2 * B2"
+      },
+      {
+        "numero": 529,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 10 au départ ?",
+        "correction": "655"
+      },
+      {
+        "numero": 530,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 40 au départ ?",
+        "correction": "30"
+      },
+      {
+        "numero": 531,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 60 au départ ?",
+        "correction": "312"
+      },
+      {
+        "numero": 532,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 30 au départ ?",
+        "correction": "87"
+      },
+      {
+        "numero": 533,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 6 au départ ?",
+        "correction": "146"
+      },
+      {
+        "numero": 534,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 22 au départ ?",
+        "correction": "28"
+      },
+      {
+        "numero": 535,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 200 au départ ?",
+        "correction": "2100"
+      },
+      {
+        "numero": 536,
+        "question": "Quel nombre obtient-on avec ce programme si l’on choisit 100 au départ ?",
+        "correction": "900"
+      },
+      {
+        "numero": 537,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer le nombre 2 au carré ?",
+        "correction": "=B2^2 ou = B2*B2 Ou = PUISSANCE(B2 ;2)"
+      },
+      {
+        "numero": 538,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer la somme des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "=B1+B2+B3 ou = SOMME(B1 :B3)"
+      },
+      {
+        "numero": 539,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer la moyenne des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MOYENNE(B1 :B3)"
+      },
+      {
+        "numero": 540,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer la médiane des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MEDIANE(B1 :B3)"
+      },
+      {
+        "numero": 541,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer l’étendue de la série composée des nombre 1, nombre 2 et nombre 3 ?",
+        "correction": "= MAX(B1 :B3) - MIN(B1 :B3)"
+      },
+      {
+        "numero": 542,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer la différence entre le nombre 3 et le nombre 2 ?",
+        "correction": "= B3 – B2"
+      },
+      {
+        "numero": 543,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer le quotient du nombre 3 par le nombre 1 ?",
+        "correction": "= B3 / B1"
+      },
+      {
+        "numero": 544,
+        "question": "Quelle formule faut-il inscrire dans la cellule B4 pour calculer le produit du nombre 2 et du nombre 1 ?",
+        "correction": "= B1 * B2"
+      },
+      {
+        "numero": 545,
+        "question": "Que faut-il rajouter dans le bloc pour se diriger vers l’Est ?",
+        "correction": "S’orienter à 90"
+      },
+      {
+        "numero": 546,
+        "question": "Que faut-il rajouter dans le bloc pour se diriger vers le Nord ?",
+        "correction": "S’orienter à 0"
+      },
+      {
+        "numero": 547,
+        "question": "Que faut-il rajouter dans le bloc pour se diriger vers le Sud ?",
+        "correction": "S’orienter à 180"
+      },
+      {
+        "numero": 548,
+        "question": "Que faut-il rajouter dans le bloc pour se diriger vers l’Ouest ?",
+        "correction": "S’orienter à -90"
+      },
+      {
+        "numero": 549,
+        "question": "Compléter le script pour qu’il trace un triangle équilatéral de côté 80 pas.",
+        "correction": " (image of script)"
+      },
+      {
+        "numero": 550,
+        "question": "Compléter le script pour qu’il trace un carré de côté 100 pas.",
+        "correction": " (image of script)"
+      },
+      {
+        "numero": 551,
+        "question": "Compléter le script pour qu’il trace cet escalier dont la hauteur des marches est 50 pas et la profondeur 70 pas.",
+        "correction": " (image of script)"
+      },
+      {
+        "numero": 552,
+        "question": "Compléter le script pour qu’il trace un pentagone régulier de côté de longueur 50 pas.",
+        "correction": " (image of script)"
+      }
+    ],
+    "Logique": [
+      {
+        "numero": 249,
+        "question": "Trouve le nombre qui complète cette suite logique. 1 ; 3 ; 7 ; 15 ; 31 ; 63 ; ?",
+        "correction": "127"
+      },
+      {
+        "numero": 250,
+        "question": "Trouve le nombre qui complète cette suite logique. 2 ; 3 ; 6 ; 18 ; 108 ; ?",
+        "correction": "1944"
+      },
+      {
+        "numero": 251,
+        "question": "Trouve le nombre qui complète cette suite logique. 25 ; 36 ; 49 ; 64 ; 81 ; 100 ; ?",
+        "correction": "121"
+      },
+      {
+        "numero": 252,
+        "question": "Un bœuf vaut 20 chèvres. Une chèvre vaut 5 poulets. Une souris vaut 13 œufs. Un poulet vaut 4 douzaines d’œufs. Combien d’œufs vaut 1 bœuf ?",
+        "correction": "4800"
+      },
+      {
+        "numero": 253,
+        "question": "Derrière une palissade, se cachent des lapins et des poules. On peut voir 54 pattes et 20 têtes. Combien y a –t-il de lapins et de poules ?",
+        "correction": "7 lapins et 13 poules"
+      },
+      {
+        "numero": 254,
+        "question": "La prof de maths a été enlevée ! La police a trois suspects, deux mentent toujours et un seul dit toujours la vérité. Ambre : « Timothée n'est pas un menteur » Timothée : « Je n'ai pas enlevé la prof.» Malo : « Ambre n'a pas enlevé la prof » Qui a enlevé la prof de maths ???",
+        "correction": "Timothée"
+      },
+      {
+        "numero": 255,
+        "question": "Laquelle de ces cinq formes proposées ne permet pas de compléter l’assemblage pour obtenir un pavé droit ? A B C D E",
+        "correction": "D"
+      },
+      {
+        "numero": 256,
+        "question": "On commande à une entreprise cent plaques de rue numérotées de 1 à 100. Combien de fois le chiffre 5 apparaîtra?",
+        "correction": "20"
+      },
+      {
+        "numero": 257,
+        "question": "Chez Roland, les raquettes et les balles s’achètent en « Nadales ». 50 Nadales = 120 Nadales = Combien de Nadales coûte une balle ?",
+        "correction": "20"
+      },
+      {
+        "numero": 258,
+        "question": "Remplacer les points d’interrogation par les valeurs manquantes : (image)",
+        "correction": "(image)"
+      },
+      {
+        "numero": 259,
+        "question": "Quelle est la mesure de l’angle formé par les aiguilles ?",
+        "correction": "120°"
+      },
+      {
+        "numero": 260,
+        "question": "On forme la figure A en posant côte à côte 3 bandes de papier de 4 cm de large. Chaque bande dépasse la précédente de 25 cm. On forme la figure B en changeant l’ordre des bandes. De combien le périmètre de B dépasse-t-il celui de A ? A B",
+        "correction": "50 cm"
+      },
+      {
+        "numero": 261,
+        "question": "76 personnes passent par des chemins dessinés ci-contre. Quand un chemin se divise en deux, le groupe de personnes arrivant se partage équitablement en deux. Combien de personnes vont arriver au stand A ?",
+        "correction": "57"
+      },
+      {
+        "numero": 262,
+        "question": "3 × 2023 = 2019 + 2029 + ! alors ! = ???",
+        "correction": "2021"
+      },
+      {
+        "numero": 263,
+        "question": "Les sommets du petit carré se trouvent au milieu des côtés du grand carré. L’aire du petit carré est de 49 m², quelle est l’aire du grand carré ?",
+        "correction": "98 m²"
+      },
+      {
+        "numero": 264,
+        "question": "Ma montre digitale vient juste d’afficher 12 :43. Dans combien de minutes verrai-je pour la première fois les mêmes quatre chiffres (pas forcément dans le même ordre) à l’affichage ?",
+        "correction": "41"
+      },
+      {
+        "numero": 265,
+        "question": "Les cinq signes représentent cinq chiffres différents. Que représente le signe φ ? δ + δ + δ = ξ σ + σ + σ = β ξ + β = φ",
+        "correction": "9"
+      },
+      {
+        "numero": 266,
+        "question": "La figure ci-contre montre un pentagone étoilé. Quatre angles sont marqués. Si AB = 110°, BC = 92° et CD = 57°, combien mesure l’angle DE?",
+        "correction": "39°"
+      },
+      {
+        "numero": 267,
+        "question": "Combien vaut la fraction !\"!#$!\"!#$!\"!#$!\"!#%!\"!# !\"!#$!\"!# ?",
+        "correction": "3/2"
+      },
+      {
+        "numero": 268,
+        "question": "Un homard vaut 30 langoustes. Une araignée vaut 10 bigorneaux. Une langouste vaut 7 gambas. Une gambas vaut 5 douzaines d’huitres. Combien d’huitres vaut un homard ?",
+        "correction": "12600"
+      },
+      {
+        "numero": 269,
+        "question": "Ma montre digitale vient juste d’afficher 10 :53. Dans combien de minutes verrai-je pour la première fois les mêmes quatre chiffres (pas forcément dans le même ordre) à l’affichage ?",
+        "correction": "132"
+      },
+      {
+        "numero": 270,
+        "question": "2 poussins marchent devant 1 poussin. 2 poussins marchent derrière 1 poussin. 1 poussin est au milieu. Combien y a-t-il de poussins ?",
+        "correction": "3"
+      },
+      {
+        "numero": 271,
+        "question": "Quel est l’intrus ? Justifier. (images)",
+        "correction": "c/ car ce n’est pas une perspective cavalière d’un solide."
+      },
+      {
+        "numero": 272,
+        "question": "Un tournoi de tennis entre 12 joueurs est organisé. Le principe est l’élimination directe : un joueur qui a perdu un match ne peut participer à d’autres matchs. Quel est le nombre de parties jouées ?",
+        "correction": "11"
+      },
+      {
+        "numero": 273,
+        "question": "Harry, Hermione et Ron jettent des sorts (Endoloris, Stupéfix et Incendio) dans 3 lieux différents (Poudlard, chaudron baveur et terrain de Quidditch). L’un d’eux jette le sort Incendio dans Poudlard. Une heure plus tard, Hermione s’exerce dans le chaudron baveur. Pendant ce temps, Ron envoie stupéfix. Retrouve le prénom, le sort et le lieu correspondant à chacun.",
+        "correction": "Harry avec Incendio à Poudlard Hermione avec Endoloris au chaudron baveur Ron avec Stupéfix au terrain de Quidditch."
+      },
+      {
+        "numero": 274,
+        "question": "Salla a 3 ans de plus que Valentine qui a elle-même 3 ans de moins que Joe et 3 ans de plus que Ambre. Ambre a 4 ans de moins que Huguette. Quelles sont les 2 personnes qui ont 1 an d’écart ?",
+        "correction": "Salla et Huguette"
+      },
+      {
+        "numero": 275,
+        "question": "Voici le patron d’un solide, combien a-t-il d’arêtes ?",
+        "correction": "15"
+      },
+      {
+        "numero": 276,
+        "question": "Combien d’heures font dix trois quarts d’heure ?",
+        "correction": "7,5"
+      },
+      {
+        "numero": 277,
+        "question": "Sachant que A ∈ [LM] et que CAB = 30°. Quelle est la mesure de l’angle DAB ?",
+        "correction": "45°"
+      },
+      {
+        "numero": 278,
+        "question": "2134 2 chiffres corrects mais pas à la bonne place 9826 1 chiffre correct et à la bonne place 7059 2 chiffres sont corrects, 1 à la bonne place. 6427 Aucun chiffre n’est correct 5813 2 chiffres corrects et à la bonne place. Quel ce nombre mystérieux ?",
+        "correction": "9013"
+      },
+      {
+        "numero": 279,
+        "question": "Trouve le nombre qui complète cette suite logique. 1/3 ; 1 ; 5/3 ; ?",
+        "correction": "3"
+      },
+      {
+        "numero": 280,
+        "question": "Dans ce cadre carré se trouve des carrés gris. Quel est le pourcentage de noir dans ce cadre ?",
+        "correction": "32%"
+      },
+      {
+        "numero": 561,
+        "question": "9285 1 chiffre correct mais pas à la bonne place 1937 2 chiffres corrects mais pas à la bonne place 5201 1 chiffre correct et à la bonne place. 6507 Aucun chiffre n’est correct 8524 2 chiffres corrects mais pas à la bonne place. Quel ce code mystérieux ?",
+        "correction": "3841"
+      },
+      {
+        "numero": 562,
+        "question": "Combien de boule(s) verte(s) seront sur ce dernier plateau ?",
+        "correction": "1"
+      },
+      {
+        "numero": 563,
+        "question": "Résoudre cette énigme. (image)",
+        "correction": "50 g"
+      },
+      {
+        "numero": 564,
+        "question": "Sur un carré jaune, on a placé un carré bleu d’aire 25 cm2, un carré rouge et un carré vert d’aire 4 cm2. L’aire du carré jaune visible est 62 cm2. Déterminer l’aire du carré rouge.",
+        "correction": "9 cm²"
+      },
+      {
+        "numero": 565,
+        "question": "Quelle est l’aire de ce triangle ?",
+        "correction": "4,5 cm2"
+      },
+      {
+        "numero": 566,
+        "question": " (image)",
+        "correction": "42°"
+      },
+      {
+        "numero": 567,
+        "question": " (image)",
+        "correction": "14 cm"
+      },
+      {
+        "numero": 568,
+        "question": "Il est 19 h 20. Quel est l’angle formé entre les 2 aiguilles ?",
+        "correction": "100°"
+      }
+    ],
+    "Nombres": [
+      {
+        "numero": 513,
+        "question": "Simplifier 340/2 754 (sans calculatrice)",
+        "correction": "10/81"
+      },
+      {
+        "numero": 514,
+        "question": "Quel est le plus petit multiple commun de 8 et de 10 ?",
+        "correction": "40"
+      },
+      {
+        "numero": 515,
+        "question": "Quel est le plus petit multiple commun de 9 et de 12 ?",
+        "correction": "36"
+      },
+      {
+        "numero": 516,
+        "question": "Sans poser de division, quel est le reste de la division euclidienne de 1 609 par 16 ? (sans calculatrice)",
+        "correction": "9"
+      },
+      {
+        "numero": 517,
+        "question": "Vrai ou faux ? « Tous les nombres premiers sont impairs ».",
+        "correction": "Faux, 2 est pair"
+      },
+      {
+        "numero": 518,
+        "question": "Sans poser les calculs, le nombre 7 267 est-il divisible par 6 ? Justifier",
+        "correction": "Non, pas pair"
+      },
+      {
+        "numero": 519,
+        "question": "Sans poser les calculs, le nombre 3 768 est-il divisible par 6 ? Justifier",
+        "correction": "Oui"
+      },
+      {
+        "numero": 520,
+        "question": "Citer les 4 mots de vocabulaire liés à cette division euclidienne. 26 ÷ 3 = 8 reste 2",
+        "correction": "dividende, diviseur, quotient, reste"
+      },
+      {
+        "numero": 361,
+        "question": "Une guirlande électrique est constituée de lumières bleues et blanches. Les lumières bleues s'allument toutes les 5 s et les blanches toutes les 3 s. À un instant donné, on voit les lumières bleues et blanches allumées en même temps. 1/ Au bout de combien de temps ce phénomène se reproduira-t-il la prochaine fois ? 2/ Les lumières bleues et blanches se seront allumées combien de fois ?",
+        "correction": "15 s, 3 et 5 fois"
+      },
+      {
+        "numero": 362,
+        "question": "Un professeur organise une sortie pédagogique à la cité de la voile pour ses élèves de 3ème. Il est accompagné de 168 garçons et de 180 filles. Il souhaite répartir tous les élèves en réalisant un maximum de groupes contenant tous le même nombre de garçons et le même nombre de filles. Comment répartir les élèves ? Combien de groupes y aura-t-il ?",
+        "correction": "12 groupes de 14 garçons et 15 filles"
+      },
+      {
+        "numero": 363,
+        "question": "Qu’est-ce que l’opposé d’un nombre ?",
+        "correction": "−a"
+      },
+      {
+        "numero": 364,
+        "question": "Qu’est-ce que l’inverse d’un nombre ?",
+        "correction": "1/a"
+      },
+      {
+        "numero": 365,
+        "question": "Un nombre décimal est-il un nombre entier ? Justifier.",
+        "correction": "Non"
+      },
+      {
+        "numero": 366,
+        "question": "Parmi les réponses suivantes, quelle(s) est ou sont les décompositions en produit de facteurs premiers ? a. 22 x 53 x 7 b. 5 x 172 x 23 x 31 c. 23 x 114 x 17 x 39",
+        "correction": "a et b"
+      },
+      {
+        "numero": 367,
+        "question": "Décomposer en produit de facteurs premiers 360",
+        "correction": "2^3 x 3^2 x 5"
+      },
+      {
+        "numero": 368,
+        "question": "Décomposer en produit de facteurs premiers 2 530",
+        "correction": "2 x 5 x 11 x 23"
+      },
+      {
+        "numero": 353,
+        "question": "Quel est le plus grand diviseur commun entre 210 et 330 ?",
+        "correction": "30"
+      },
+      {
+        "numero": 354,
+        "question": "Comment savoir si un nombre est divisible par 17 ?",
+        "correction": "Division euclidienne reste 0"
+      },
+      {
+        "numero": 355,
+        "question": "Vrai ou faux ? Si on divise le numérateur et le dénominateur d’une fraction par un diviseur commun, alors on obtient une fraction irréductible.",
+        "correction": "Faux"
+      },
+      {
+        "numero": 356,
+        "question": "73 est-il un nombre premier ?",
+        "correction": "Oui"
+      },
+      {
+        "numero": 357,
+        "question": "289 est-il un nombre premier ? Justifier",
+        "correction": "Non, 17x17"
+      },
+      {
+        "numero": 358,
+        "question": "Est-ce que 3 245 719 est divisible par 3 ?",
+        "correction": "Non"
+      },
+      {
+        "numero": 359,
+        "question": "Est-ce que 3 245 719 est divisible par 4 ?",
+        "correction": "Non"
+      },
+      {
+        "numero": 360,
+        "question": "Est-ce que 3 245 719 est divisible par 9 ?",
+        "correction": "Non"
+      },
+      {
+        "numero": 345,
+        "question": "Qu’est-ce qu’un nombre premier ?",
+        "correction": "2 diviseurs : 1 et lui-même"
+      },
+      {
+        "numero": 346,
+        "question": "Un nombre entier est-il un nombre décimal ?",
+        "correction": "Oui"
+      },
+      {
+        "numero": 347,
+        "question": "Donner la décomposition en produits de facteurs premiers de 90",
+        "correction": "2 x 3^2 x 5"
+      },
+      {
+        "numero": 348,
+        "question": "1 est-il un nombre premier ?",
+        "correction": "Non"
+      },
+      {
+        "numero": 349,
+        "question": "Vrai ou faux ? Tous les nombres pairs sont des nombres qui ne sont pas premiers.",
+        "correction": "Faux, 2 est premier"
+      },
+      {
+        "numero": 350,
+        "question": "Donner la décomposition en produits de facteurs premiers de 147",
+        "correction": "3 x 7^2"
+      },
+      {
+        "numero": 351,
+        "question": "Donner 3 multiples de 21 compris entre 25 et 100.",
+        "correction": "42, 63, 84"
+      },
+      {
+        "numero": 352,
+        "question": "Donner tous les diviseurs de 42",
+        "correction": "1, 2, 3, 6, 7, 14, 21, 42"
+      },
+      {
+        "numero": 337,
+        "question": "Encadrer par deux entiers consécutifs √19",
+        "correction": "4 < √19 < 5"
+      },
+      {
+        "numero": 338,
+        "question": "Donner une valeur approchée par défaut de √32 au dixième près.",
+        "correction": "5,6"
+      },
+      {
+        "numero": 339,
+        "question": "Donner une valeur arrondie au millième près de 4/7",
+        "correction": "0,571"
+      },
+      {
+        "numero": 340,
+        "question": "Donner une valeur approchée par excès au centième près de 13/14",
+        "correction": "0,93"
+      },
+      {
+        "numero": 341,
+        "question": "Comment détecte-t-on un nombre divisible par 2 ? (Citer son critère de divisibilité)",
+        "correction": "Termine par 0,2,4,6,8"
+      },
+      {
+        "numero": 342,
+        "question": "Comment détecte-t-on un nombre divisible par 3 ? (Citer son critère de divisibilité)",
+        "correction": "Somme des chiffres dans table de 3"
+      },
+      {
+        "numero": 343,
+        "question": "Comment détecte-t-on un nombre divisible par 9 ? (Citer son critère de divisibilité)",
+        "correction": "Somme des chiffres dans table de 9"
+      },
+      {
+        "numero": 344,
+        "question": "Comment détecte-t-on un nombre divisible par 4 ? (Citer son critère de divisibilité)",
+        "correction": "2 derniers chiffres dans table de 4"
+      }
+    ],
+    "Transformation": [
+      {
+        "numero": 145,
+        "question": "Quel effet a une homothétie de rapport -2 sur une figure ?",
+        "correction": "Agrandie x2 et retournée"
+      },
+      {
+        "numero": 146,
+        "question": "Quel effet a une homothétie de rapport 1 sur une figure ?",
+        "correction": "Identique"
+      },
+      {
+        "numero": 147,
+        "question": "Quel effet a une homothétie de rapport –0,25 sur une figure ?",
+        "correction": "Réduite /4 et retournée"
+      },
+      {
+        "numero": 148,
+        "question": "Quel effet a une homothétie de rapport -1 sur une figure ?",
+        "correction": "Retournée"
+      },
+      {
+        "numero": 149,
+        "question": "Comment différencier une homothétie qui agrandit, d’une homothétie qui réduit une figure ?",
+        "correction": "Rapport >1 ou <-1 pour agrandir, entre 0 et 1 ou -1 et 0 pour réduire"
+      },
+      {
+        "numero": 150,
+        "question": "Une figure subit une homothétie de rapport k. Comment évolue son aire ?",
+        "correction": "Multipliée par k²"
+      },
+      {
+        "numero": 151,
+        "question": "Un solide est agrandi de rapport k. Comment évolue son volume ?",
+        "correction": "Multiplié par k³"
+      },
+      {
+        "numero": 152,
+        "question": "Une figure subit une homothétie de rapport 10. Quel effet ça a sur les angles ?",
+        "correction": "Aucun"
+      },
+      {
+        "numero": 137,
+        "question": "Soit le point A et son symétrique A’ par rapport à la droite (d). Que représente la droite (d) par rapport à [AA’] ?",
+        "correction": "Médiatrice"
+      },
+      {
+        "numero": 138,
+        "question": "Soit le point A et son symétrique A’ par rapport au centre O. Que représente le point 0 par rapport à [AA’] ?",
+        "correction": "Milieu"
+      },
+      {
+        "numero": 139,
+        "question": "Comment vérifier que 2 figures sont symétriques par rapport à une droite (d) ?",
+        "correction": "Plier le long de (d) et superposer"
+      },
+      {
+        "numero": 140,
+        "question": "Comment vérifier que 2 figures sont symétriques par rapport à un point 0 ?",
+        "correction": "Demi-tour autour de O et superposer"
+      },
+      {
+        "numero": 141,
+        "question": "Que faut-il annoncer pour définir une rotation ?",
+        "correction": "Centre, angle, sens"
+      },
+      {
+        "numero": 142,
+        "question": "Que faut-il annoncer pour définir une translation ?",
+        "correction": "Direction, longueur, sens"
+      },
+      {
+        "numero": 143,
+        "question": "Quel effet a une homothétie de rapport 2 sur une figure ?",
+        "correction": "Agrandie x2"
+      },
+      {
+        "numero": 144,
+        "question": "Quel effet a une homothétie de rapport 0,5 sur une figure ?",
+        "correction": "Réduite /2"
+      },
+      {
+        "numero": 161,
+        "question": "Est-ce une frise, un pavage ou une rosace ?",
+        "correction": "Pavage"
+      },
+      {
+        "numero": 162,
+        "question": "Par quelle transformation avons-nous obtenu cette rosace ? La décrire.",
+        "correction": "Rotation 22,5°"
+      },
+      {
+        "numero": 163,
+        "question": "Par quelle transformation avons-nous obtenu cette rosace ? La décrire.",
+        "correction": "Rotation 30°"
+      },
+      {
+        "numero": 164,
+        "question": "Vrai ou faux ? Justifier. Si A’ et B’ sont les images respectives de A et B par la même translation alors A’B’AB est un parallélogramme.",
+        "correction": "Faux, A’B’BA est un parallélogramme"
+      },
+      {
+        "numero": 165,
+        "question": "Vrai ou faux ? Justifier. Un rectangle a un centre de symétrie et 2 axes de symétrie qui sont les diagonales.",
+        "correction": "Faux, axes sont médiatrices des côtés"
+      },
+      {
+        "numero": 166,
+        "question": "Un rectangle de longueur 4 cm et de largeur 3 cm est transformé par une homothétie de rapport -2. Quelle est l’aire de la figure obtenue ?",
+        "correction": "48 cm²"
+      },
+      {
+        "numero": 167,
+        "question": "Soit ABC un triangle équilatéral. Quel est l’angle de rotation de centre C qui transforme A en B ?",
+        "correction": "60°"
+      },
+      {
+        "numero": 168,
+        "question": "Soit ABCD un rectangle de centre E. Quelle est l’image de A par la translation qui transforme E en C ?",
+        "correction": "B"
+      },
+      {
+        "numero": 153,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Homothétie centre A rapport -2"
+      },
+      {
+        "numero": 154,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Symétrie axe (AC)"
+      },
+      {
+        "numero": 155,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Symétrie centre B"
+      },
+      {
+        "numero": 156,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Translation de BC"
+      },
+      {
+        "numero": 157,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Rotation centre C angle 45° anti-horaire"
+      },
+      {
+        "numero": 158,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Homothétie centre B rapport 3"
+      },
+      {
+        "numero": 159,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Homothétie centre C rapport 0,5"
+      },
+      {
+        "numero": 160,
+        "question": "Décrire la transformation qui permet de passer de ABC à A’B’C’ ?",
+        "correction": "Rotation centre A angle 90° horaire"
+      }
+    ],
+    "Communiquer": [
+      {
+        "numero": 185,
+        "question": "Énoncer la signification de tous les codages. (image)",
+        "correction": "2 côtés et 2 angles égaux"
+      },
+      {
+        "numero": 186,
+        "question": "Énoncer la signification de tous les codages. (image)",
+        "correction": "NM = ML ; LK = KM CAB = CBA"
+      },
+      {
+        "numero": 187,
+        "question": "Énoncer la signification de tous les codages. (image)",
+        "correction": "KJ = 3 cm LM = KL ; angles 90°"
+      },
+      {
+        "numero": 188,
+        "question": "Énoncer la signification de tous les codages. (image)",
+        "correction": "HJ = 4 cm; HK = 2 cm M milieu de [LI] IK = 7 cm ; angles 90°"
+      },
+      {
+        "numero": 189,
+        "question": "Énoncer la signification de tous les codages. (image)",
+        "correction": "HJ = 4 cm; HK = 2 cm M milieu de [LI] IK = 7 cm ; angles 90°"
+      },
+      {
+        "numero": 190,
+        "question": "Décrire par une phrase en employant les mots de vocabulaire qui conviennent la notation suivante : f(2) = 3",
+        "correction": "L’image de 2 par f est 3"
+      },
+      {
+        "numero": 191,
+        "question": "Décrire par une phrase en employant les mots de vocabulaire qui conviennent la notation suivante : f (-4) = 7",
+        "correction": "L’image de -4 par f est 7"
+      },
+      {
+        "numero": 192,
+        "question": "Décrire par une phrase en employant les mots de vocabulaire qui conviennent la notation suivante : h : -5 → 12",
+        "correction": "L’image de -5 par h est 12"
+      },
+      {
+        "numero": 177,
+        "question": "Donner l’écriture scientifique de : 129,06 × 10−5",
+        "correction": "1,2906 × 10−3"
+      },
+      {
+        "numero": 178,
+        "question": "Vrai ou faux ? Justifier. 1 ÷ 3 = 0,333",
+        "correction": "Faux, ≈ 0,333"
+      },
+      {
+        "numero": 179,
+        "question": "Calculer 7^−3 ?",
+        "correction": "1/343"
+      },
+      {
+        "numero": 180,
+        "question": "Calculer 2^4 ?",
+        "correction": "16"
+      },
+      {
+        "numero": 181,
+        "question": "A quels préfixes correspondent 10^6 et 10^-6 ? Donner les notations correspondantes",
+        "correction": "méga M micro μ"
+      },
+      {
+        "numero": 182,
+        "question": "A quels préfixes correspondent 10^3 et 10^-3 ? Donner les notations correspondantes",
+        "correction": "kilo k milli m"
+      },
+      {
+        "numero": 183,
+        "question": "A quels préfixes correspondent 10^9 et 10^-9 ? Donner les notations correspondantes",
+        "correction": "giga G nano n"
+      },
+      {
+        "numero": 184,
+        "question": "Qu’est-ce qu’une écriture scientifique ?",
+        "correction": "Produit d’un nombre entre 1 et 10 par puissance de 10"
+      },
+      {
+        "numero": 217,
+        "question": "Donner l’opposé de 32",
+        "correction": "-32"
+      },
+      {
+        "numero": 218,
+        "question": "Donner l’opposé de −154",
+        "correction": "154"
+      },
+      {
+        "numero": 219,
+        "question": "Donner l’opposé de l’inverse 7",
+        "correction": "−1/7"
+      },
+      {
+        "numero": 220,
+        "question": "Donner l’opposé de l’inverse −11/7",
+        "correction": "−7/11"
+      },
+      {
+        "numero": 221,
+        "question": "Donner l’inverse de 4",
+        "correction": "1/4"
+      },
+      {
+        "numero": 222,
+        "question": "Donner l’inverse de −10/3",
+        "correction": "−3/10"
+      },
+      {
+        "numero": 223,
+        "question": "Donner l’inverse de l’opposé −5/7",
+        "correction": "7/5"
+      },
+      {
+        "numero": 224,
+        "question": "Donner l’inverse de l’opposé 18",
+        "correction": "−1/18"
+      },
+      {
+        "numero": 169,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : (AB)",
+        "correction": "La droite passant par A et B"
+      },
+      {
+        "numero": 170,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : [AB]",
+        "correction": "Le segment d’extrémités A et B"
+      },
+      {
+        "numero": 171,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : [AB)",
+        "correction": "La demi-droite d’origine A passant par B"
+      },
+      {
+        "numero": 172,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : AB",
+        "correction": "La longueur du segment [AB]"
+      },
+      {
+        "numero": 173,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : (AB) ⊥ (CD)",
+        "correction": "Droite (AB) perpendiculaire à (CD)"
+      },
+      {
+        "numero": 174,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : (AB) // (CD)",
+        "correction": "Droite (AB) parallèle à (CD)"
+      },
+      {
+        "numero": 175,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : B ∈ (CD)",
+        "correction": "B appartient à la droite (CD)"
+      },
+      {
+        "numero": 176,
+        "question": "Décrire par les mots de vocabulaire précis cette notation mathématique : B ∉ (CD)",
+        "correction": "B n’appartient pas à la droite (CD)"
+      }
+    ],
+    "Espace": [
+      {
+        "numero": 129,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de sa base",
+        "correction": "Pyramide base parallélogramme"
+      },
+      {
+        "numero": 130,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de sa base",
+        "correction": "Pyramide base hexagone"
+      },
+      {
+        "numero": 131,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de sa base",
+        "correction": "Pyramide base triangle"
+      },
+      {
+        "numero": 132,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de sa base",
+        "correction": "Cône base disque"
+      },
+      {
+        "numero": 133,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de ses bases",
+        "correction": "Cylindre bases disques"
+      },
+      {
+        "numero": 134,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de ses bases",
+        "correction": "Prisme bases triangles"
+      },
+      {
+        "numero": 135,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de ses bases",
+        "correction": "Prisme bases quadrilatères"
+      },
+      {
+        "numero": 136,
+        "question": "Quel est le nom de ce solide ? Et donner la nature de ses bases",
+        "correction": "Prisme bases hexagones"
+      },
+      {
+        "numero": 121,
+        "question": "Combien de sommets possède la pyramide à base heptagonale ?",
+        "correction": "8"
+      },
+      {
+        "numero": 122,
+        "question": "Combien de sommets possède le prisme droit à base hexagonale ?",
+        "correction": "12"
+      },
+      {
+        "numero": 123,
+        "question": "Combien de faces possède le prisme droit à base décagonale ?",
+        "correction": "12"
+      },
+      {
+        "numero": 124,
+        "question": "Quel est le volume exact du cône dont sa base a pour rayon 10 cm et sa hauteur 30 cm ?",
+        "correction": "1000 π cm3"
+      },
+      {
+        "numero": 125,
+        "question": "Quel est le volume exact de la sphère de rayon 30 cm ?",
+        "correction": "36000 π cm3"
+      },
+      {
+        "numero": 126,
+        "question": "Quel est le volume exact de la pyramide à base carrée de longueur de côté 5 cm et de hauteur 6 cm ?",
+        "correction": "50 cm3"
+      },
+      {
+        "numero": 127,
+        "question": "Quel est le volume exact du cylindre de diamètre 8 cm et de hauteur 2 cm ?",
+        "correction": "32 π cm3"
+      },
+      {
+        "numero": 128,
+        "question": "Quel est le volume exact du prisme droit dont la hauteur mesure 2 cm et dont la base est un triangle rectangle dont les dimensions sont 3cm, 4 cm et 5 cm ?",
+        "correction": "12 cm3"
+      },
+      {
+        "numero": 113,
+        "question": "Qu’est-ce qu’une sphère ?",
+        "correction": "Ensemble de points à même distance du centre"
+      },
+      {
+        "numero": 114,
+        "question": "Quelle formule permet de calculer le volume d’un cône ?",
+        "correction": "π r² h /3"
+      },
+      {
+        "numero": 115,
+        "question": "Quelle formule permet de calculer le volume d’une pyramide ?",
+        "correction": "Aire base x h /3"
+      },
+      {
+        "numero": 116,
+        "question": "Quelle formule permet de calculer le volume d’une boule ?",
+        "correction": "4/3 π r³"
+      },
+      {
+        "numero": 117,
+        "question": "Quelle formule permet de calculer le volume d’un cylindre ?",
+        "correction": "π r² h"
+      },
+      {
+        "numero": 118,
+        "question": "Quelle formule permet de calculer le volume d’un cube ?",
+        "correction": "a^3"
+      },
+      {
+        "numero": 119,
+        "question": "Combien de faces latérales possède la pyramide à base octogonale ?",
+        "correction": "8"
+      },
+      {
+        "numero": 120,
+        "question": "Combien de sommet(s) possède la sphère de centre O ?",
+        "correction": "Aucun"
+      },
+      {
+        "numero": 105,
+        "question": "Comment s’appelle la mesure de l’angle qui permet de situer un point sur une parallèle ?",
+        "correction": "Latitude"
+      },
+      {
+        "numero": 106,
+        "question": "Quelle est la section d’un cylindre par un plan parallèle à son axe ? Donner les caractéristiques connues.",
+        "correction": "Rectangle de longueur h"
+      },
+      {
+        "numero": 107,
+        "question": "Quelle est la section d’une pyramide par un plan parallèle à sa base pentagonale ? Donner les caractéristiques connues.",
+        "correction": "Pentagone réduit"
+      },
+      {
+        "numero": 108,
+        "question": "Quelle est la section d’un cône par un plan parallèle à sa base ? Donner les caractéristiques connues.",
+        "correction": "Disque réduit"
+      },
+      {
+        "numero": 109,
+        "question": "Quelle est la section d’un cylindre par un plan perpendiculaire à son axe ? Donner les caractéristiques connues.",
+        "correction": "Disque de rayon r"
+      },
+      {
+        "numero": 110,
+        "question": "Quelle est la section d’une sphère par un plan passant par son centre ? Donner les caractéristiques connues.",
+        "correction": "Disque de rayon r"
+      },
+      {
+        "numero": 111,
+        "question": "Quelle est la section d’un pavé droit par un plan parallèle à une arête ? Donner les caractéristiques connues.",
+        "correction": "Rectangle de longueur l'arête"
+      },
+      {
+        "numero": 112,
+        "question": "Quelle est la section d’un pavé droit par un plan parallèle à une face ? Donner les caractéristiques connues.",
+        "correction": "Rectangle même dimensions que la face"
+      },
+      {
+        "numero": 97,
+        "question": "Qu’est-ce qu’un parallélépipède rectangle ?",
+        "correction": "6 faces rectangulaires"
+      },
+      {
+        "numero": 98,
+        "question": "Qu’est-ce qu’un prisme droit ?",
+        "correction": "2 bases polygonales, faces latérales rectangles"
+      },
+      {
+        "numero": 99,
+        "question": "Qu’est-ce qu’un cube ?",
+        "correction": "6 faces carrées"
+      },
+      {
+        "numero": 100,
+        "question": "Qu’est-ce qu’un cylindre ?",
+        "correction": "2 bases disques, face latérale rectangle"
+      },
+      {
+        "numero": 101,
+        "question": "Qu’est-ce qu’une pyramide ?",
+        "correction": "Base polygonale, faces latérales triangles sommet commun"
+      },
+      {
+        "numero": 102,
+        "question": "Qu’est-ce qu’un cône ?",
+        "correction": "Base disque, face latérale secteur de disque"
+      },
+      {
+        "numero": 103,
+        "question": "Quelle formule permet de calculer le volume d’un pavé droit ?",
+        "correction": "L x l x h"
+      },
+      {
+        "numero": 104,
+        "question": "Quelle formule permet de calculer le volume d’un prisme droit ?",
+        "correction": "Aire base x h"
+      },
+      {
+        "numero": 89,
+        "question": "Quelles sont les coordonnées de ce point ?",
+        "correction": "(60° E; 40° S)"
+      },
+      {
+        "numero": 90,
+        "question": "Quelles sont les coordonnées de ce point ?",
+        "correction": "(30° O; 60° S)"
+      },
+      {
+        "numero": 91,
+        "question": "Comment s’appelle le méridien qui a pour longitude 0° ?",
+        "correction": "Méridien de Greenwich"
+      },
+      {
+        "numero": 92,
+        "question": "Quelles sont les coordonnées du point D?",
+        "correction": "(0 ; 0 ; 2)"
+      },
+      {
+        "numero": 93,
+        "question": "Quelles sont les coordonnées du point B?",
+        "correction": "(3 ; 0 ; 0)"
+      },
+      {
+        "numero": 94,
+        "question": "Quelles sont les coordonnées du point E?",
+        "correction": "(0 ; 4 ; 0)"
+      },
+      {
+        "numero": 95,
+        "question": "Quelles sont les coordonnées du point F?",
+        "correction": "(3 ; 0 ; 2)"
+      },
+      {
+        "numero": 96,
+        "question": "Quelles sont les coordonnées du point G?",
+        "correction": "(3 ; 4 ; 2)"
+      },
+      {
+        "numero": 81,
+        "question": "Comment s’appellent ces lignes imaginaires ?",
+        "correction": "Méridiens"
+      },
+      {
+        "numero": 82,
+        "question": "Comment s’appelle la mesure indiquée sur ces lignes imaginaires ?",
+        "correction": "Longitude"
+      },
+      {
+        "numero": 83,
+        "question": "Comment s’appelle le méridien qui a pour longitude 0° ?",
+        "correction": "Méridien de Greenwich"
+      },
+      {
+        "numero": 84,
+        "question": "Comment s’appellent ces lignes imaginaires ?",
+        "correction": "Parallèles"
+      },
+      {
+        "numero": 85,
+        "question": "Comment s’appelle la parallèle qui a pour latitude 0° ?",
+        "correction": "Équateur"
+      },
+      {
+        "numero": 86,
+        "question": "Les lieux situés sur le même méridien ont la même longitude. Vrai ou faux ?",
+        "correction": "Vrai"
+      },
+      {
+        "numero": 87,
+        "question": "Les lieux situés sur la même parallèle ont la même longitude. Vrai ou faux ?",
+        "correction": "Faux"
+      },
+      {
+        "numero": 88,
+        "question": "Quelles sont les coordonnées de ce point ?",
+        "correction": "(60° E ; 40° N)"
+      }
+    ],
+    "Proportionnalité": [
+      {
+        "numero": 393,
+        "question": "Dans une classe de 30 élèves, il y a 14 garçons. Quel est le ratio garçons : filles ? Donner ce ratio il plus simplifié possible.",
+        "correction": "7:8"
+      },
+      {
+        "numero": 394,
+        "question": "Pour une citronnade, on utilise 1,25 litres d’eau glacée, 250 mL de sucre et 500 mL de jus de citron. Quel est le ratio eau : citron : sucre ? Donner ce ratio il plus simplifié possible.",
+        "correction": "5:2:1"
+      },
+      {
+        "numero": 395,
+        "question": "Lorsqu’on multiplie un tarif par 0,7. Appliquons-nous une réduction ou une augmentation ? De quel pourcentage s’agit-il ?",
+        "correction": "Réduction de 30%"
+      },
+      {
+        "numero": 396,
+        "question": "Lorsqu’on multiplie un tarif par 1,08. Appliquons-nous une réduction ou une augmentation ? De quel pourcentage s’agit-il ?",
+        "correction": "Augmentation de 8%"
+      },
+      {
+        "numero": 397,
+        "question": "Un article passe de 35 € à 25 €. Quel est le pourcentage de réduction ? Arrondir à l’unité",
+        "correction": "29%"
+      },
+      {
+        "numero": 398,
+        "question": "Un article passe de 25 € à 35 €. Quel est le pourcentage d’augmentation ?",
+        "correction": "40%"
+      },
+      {
+        "numero": 399,
+        "question": "Un article passe de 116 € à 89 €. Quel est le pourcentage de réduction ? Arrondir à l’unité",
+        "correction": "23%"
+      },
+      {
+        "numero": 400,
+        "question": "Un article passe de 89 € à 116 €. Quel est le pourcentage d’augmentation ? Arrondir à l’unité",
+        "correction": "30%"
+      },
+      {
+        "numero": 201,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 5 10 15 Grandeur 2 15 20 25",
+        "correction": "Non"
+      },
+      {
+        "numero": 202,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier. Grandeur 1 5 10 15 Grandeur 2 20 40 60",
+        "correction": "Oui"
+      },
+      {
+        "numero": 203,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 1 5,5 11 Grandeur 2 4 22 40",
+        "correction": "Non"
+      },
+      {
+        "numero": 204,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 6 7 10 Grandeur 2 30 42 70",
+        "correction": "Non"
+      },
+      {
+        "numero": 205,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 2 8,5 10,5 Grandeur 2 6 25,5 31,5",
+        "correction": "Oui"
+      },
+      {
+        "numero": 206,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 5,25 7,3 10,5 Grandeur 2 15,25 17,3 30",
+        "correction": "Non"
+      },
+      {
+        "numero": 207,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 2 6 8 Grandeur 2 3,4 10,2 13,6",
+        "correction": "Oui"
+      },
+      {
+        "numero": 208,
+        "question": "Le tableau suivant est-il un tableau de proportionnalité ? Justifier Grandeur 1 5 10 15 Grandeur 2 49 98 137",
+        "correction": "Non"
+      },
+      {
+        "numero": 9,
+        "question": "Convertir 1,6 h en minutes",
+        "correction": "96 min"
+      },
+      {
+        "numero": 10,
+        "question": "À quelle vitesse moyenne (en km/h) roule-t-on si on parcourt 100 m en 15 sec ?",
+        "correction": "24 km/h"
+      },
+      {
+        "numero": 11,
+        "question": "Quel est le coefficient multiplicateur dans une augmentation de 20 % ?",
+        "correction": "1,2"
+      },
+      {
+        "numero": 12,
+        "question": "Quel est le coefficient multiplicateur dans une réduction de 60 % ?",
+        "correction": "0,4"
+      },
+      {
+        "numero": 13,
+        "question": "Quel est le coefficient multiplicateur dans une augmentation de 65 % ?",
+        "correction": "1,65"
+      },
+      {
+        "numero": 14,
+        "question": "Quel est le coefficient multiplicateur dans une réduction de 35 % ?",
+        "correction": "0,65"
+      },
+      {
+        "numero": 15,
+        "question": "Timothée décide de partager ses cartes pokemon à Elimane et César selon le ratio 6 : 2. Timothée a 40 cartes, combien doit-il en donner à Elimane et César ?",
+        "correction": "30 et 10"
+      },
+      {
+        "numero": 16,
+        "question": "Timothée décide de partager ses billes à Elimane et César selon le ratio 15 : 3. Timothée a 120 billes, combien doit-il en donner à Elimane et César ?",
+        "correction": "100 et 20"
+      },
+      {
+        "numero": 209,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 5 11 b Grandeur 2 35 a 63",
+        "correction": "a=77 b=9"
+      },
+      {
+        "numero": 210,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 a 12 13,1 Grandeur 2 5,5 60 b",
+        "correction": "a=1,1 b=65,5"
+      },
+      {
+        "numero": 211,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 a 1,5 9 Grandeur 2 84 b 72",
+        "correction": "a=10,5 b=12"
+      },
+      {
+        "numero": 212,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 a 1 3 Grandeur 2 9,6 b 3,6",
+        "correction": "a=8 b=1,2"
+      },
+      {
+        "numero": 213,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 100 40 b Grandeur 2 0,25 a 0,35",
+        "correction": "a=0,1 b=140"
+      },
+      {
+        "numero": 214,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 6 1 b Grandeur 2 4,5 a 11,25",
+        "correction": "a=0,75 b=15"
+      },
+      {
+        "numero": 215,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 a 18 3 Grandeur 2 36 b 7,2",
+        "correction": "a=15 b=43,2"
+      },
+      {
+        "numero": 216,
+        "question": "Compléter ce tableau de proportionnalité par les valeurs qui conviennent. Grandeur 1 1 9 b Grandeur 2 a 4,32 4,8",
+        "correction": "a=0,48 b=10"
+      },
+      {
+        "numero": 313,
+        "question": "Dans une entreprise les salaires ont augmenté de 5%. Soit x le salaire d’une personne avant l’augmentation. Exprimer le nouveau salaire N en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "N(x) = 1,05 x Oui, 1,05"
+      },
+      {
+        "numero": 314,
+        "question": "Pendant les soldes, un magasin vend tous ses articles avec 40 % de remise. Soit x le prix d’un article avant la réduction. Exprimer le nouveau tarif T en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "T(x) = 0,6 x Oui, 0,6"
+      },
+      {
+        "numero": 315,
+        "question": "Un magasin propose une réduction sur chacun de ses articles de 10 €. Soit x le prix d’un article avant la réduction. Exprimer le nouveau tarif T en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "T(x) = x -10 Non"
+      },
+      {
+        "numero": 316,
+        "question": "Des parents décident d’augmenter de 2 € chaque mois l’argent de poche de leur enfant. Soit x le montant de l’argent de poche du mois en cours. Exprimer le montant M de l’argent de poche du mois suivant en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "M(x) = x +2 Non"
+      },
+      {
+        "numero": 317,
+        "question": "La température en degré Fahrenheit (°F) est obtenue en multipliant par 1,8 la température exprimée en degré Celsius (°C) puis en ajoutant 32. Soit x la température exprimée en degré Celsius. Exprimer la température T en degré Fahrenheit en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "T(x) = 1,8 x +32 Non"
+      },
+      {
+        "numero": 318,
+        "question": "Un cinéma propose une carte annuelle avec une cotisation de 7 € puis 4 € par séance. Soit x le nombre de places de cinéma achetées pendant l’année. Exprimer la dépense annuelle D en fonction de x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "D(x) = 4 x +7 Non"
+      },
+      {
+        "numero": 319,
+        "question": "Le fer à repasser de Joé a une puissance de 2 300 Watts. Exprimer l’énergie E consommée en Wh en fonction du temps de son utilisation x en heures. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "E(x) = 2300 x Oui, 2300"
+      },
+      {
+        "numero": 320,
+        "question": "Une toile rectangulaire d’un peintre a été agrandie par 5. Exprimer l’aire A de la toile agrandie en fonction de l’aire de la toile initiale x. Est-ce une situation de proportionnalité ? (Si oui, donner son coefficient de proportionnalité)",
+        "correction": "A(x) = 25 x Oui, 25"
+      },
+      {
+        "numero": 193,
+        "question": "Le lundi, à l’ouverture du magasin, un article de sport est vendu 60 €. Le mardi, son prix baisse de 30 %. Le mercredi, il remonte de 40 %. Quel est le dernier prix de l’article.",
+        "correction": "58,8 €"
+      },
+      {
+        "numero": 194,
+        "question": "Un club de natation rassemble 600 licenciés : 240 femmes et 360 hommes. 40 % des femmes et 60 % des hommes font de la compétition. Quel est le pourcentage de licenciés qui font de la compétition ?",
+        "correction": "52%"
+      },
+      {
+        "numero": 195,
+        "question": "Dans sa bibliothèque, Malo possède 80 livres et 60 bandes dessinées. Malo donne 30 % de ses livres et 45 % de ces BD à l’école. Quel pourcentage de sa bibliothèque Malo a-t-il donné ? arrondir à l’unité.",
+        "correction": "36%"
+      },
+      {
+        "numero": 196,
+        "question": "Le lundi, à l’ouverture du magasin, un article de sport est vendu 90 €. Le mardi, son prix augmente de 30 %. Le mercredi, il baisse de 30 %. Quel est le dernier prix de l’article ?",
+        "correction": "81,9 €"
+      },
+      {
+        "numero": 197,
+        "question": "Le club de tennis rassemble 800 licenciés : 270 femmes et 530 hommes. 30 % des femmes et 40 % des hommes font de la compétition. Quel est le pourcentage de licenciés qui font de la compétition ?",
+        "correction": "36,625%"
+      },
+      {
+        "numero": 198,
+        "question": "Le club de gym rassemble 500 licenciés : 380 femmes et 120 hommes. 60 % des femmes et 80 % des hommes font de la compétition. Quel est le pourcentage de licenciés qui font de la compétition ?",
+        "correction": "64,8%"
+      },
+      {
+        "numero": 199,
+        "question": "Timothée souhaite acheter 2 pneus. Quelle est l’offre la plus avantageuse ? Offre A : - 25 % sur chaque pneu acheté. Offre B : - 50 % sur le second pneu acheté.",
+        "correction": "Même"
+      },
+      {
+        "numero": 200,
+        "question": "Ambre souhaite acheter un blouson de ski affiché à 148,50 €. Il y a une promotion, elle ne paye finalement que 103,95€ Quel a été le pourcentage de remise de ce blouson ?",
+        "correction": "30%"
+      },
+      {
+        "numero": 1,
+        "question": "Convertir 0,3 h en minutes",
+        "correction": "18 min"
+      },
+      {
+        "numero": 2,
+        "question": "À quelle vitesse moyenne roule-t-on si on parcourt 120 km en 1h30 ?",
+        "correction": "80 km/h"
+      },
+      {
+        "numero": 3,
+        "question": "Quel pourcentage représente 120 élèves sur 300 ?",
+        "correction": "40%"
+      },
+      {
+        "numero": 4,
+        "question": "Convertir 4,2 h en heures et minutes",
+        "correction": "4h 12 min"
+      },
+      {
+        "numero": 5,
+        "question": "Calculer 20 % de 150 €",
+        "correction": "30 €"
+      },
+      {
+        "numero": 6,
+        "question": "Un cycliste parcourt 4 km en 12 min. À quelle vitesse moyenne roule-t-il ?",
+        "correction": "20 km/h"
+      },
+      {
+        "numero": 7,
+        "question": "Quel pourcentage représente 3 élèves sur 4 ?",
+        "correction": "75%"
+      },
+      {
+        "numero": 8,
+        "question": "Convertir 5h06 min en heures.",
+        "correction": "5,1 h"
+      },
+      {
+        "numero": 225,
+        "question": "Que signifie que le plan est à l’échelle 1/100 000 ?",
+        "correction": "1 cm = 100 000 cm = 1 km"
+      },
+      {
+        "numero": 226,
+        "question": "Que signifie que le plan est à l’échelle 1/1 000 000 ?",
+        "correction": "1 cm = 10 km"
+      },
+      {
+        "numero": 227,
+        "question": "Que signifie cette échelle ? (image)",
+        "correction": "1 cm = 1 μm"
+      },
+      {
+        "numero": 228,
+        "question": "Que signifie cette échelle ? (image)",
+        "correction": "Réduction x2200"
+      },
+      {
+        "numero": 229,
+        "question": "On a les données suivantes : Distance sur le plan : 7 cm Distance en réalité : 3,50 m Quelle est l’échelle de ce plan ?",
+        "correction": "1/50"
+      },
+      {
+        "numero": 230,
+        "question": "Quelle serait la taille réelle du virus de la grippe si on a ces données ? taille du segment = 2,6 cm taille du virus sur la photo = 4,6 cm",
+        "correction": "124 μm"
+      },
+      {
+        "numero": 231,
+        "question": "On a les données suivantes : Distance sur le plan : 4,5 cm Distance en réalité : 225 m Quelle est l’échelle de ce plan ?",
+        "correction": "1/5 000"
+      },
+      {
+        "numero": 232,
+        "question": "On a les données suivantes : Distance sur la photo : 12 cm Distance en réalité : 0,04 mm Quelle est l’échelle de ce plan ?",
+        "correction": "3 000"
+      }
+    ],
+    "Stats ou probas": [
+      {
+        "numero": 329,
+        "question": "On place dans un sac opaque, 3 boules bleues numérotées de 1 à 3 et 5 boules vertes numérotées de 1 à 5 indiscernables au toucher. Quelle est la probabilité d’obtenir un numéro pair ?",
+        "correction": "3/8"
+      },
+      {
+        "numero": 330,
+        "question": "On place dans un sac opaque, 3 boules bleues numérotées de 1 à 3 et 5 boules vertes numérotées de 1 à 5 indiscernables au toucher. Quelle est la probabilité d’obtenir un numéro impair ?",
+        "correction": "5/8"
+      },
+      {
+        "numero": 331,
+        "question": "On place dans un sac opaque, 3 boules bleues numérotées de 1 à 3 et 5 boules vertes numérotées de 1 à 5 indiscernables au toucher. Quelle est la probabilité d’obtenir une boule verte ?",
+        "correction": "5/8"
+      },
+      {
+        "numero": 332,
+        "question": "On place dans un sac opaque, 3 boules bleues numérotées de 1 à 3 et 5 boules vertes numérotées de 1 à 5 indiscernables au toucher. Quelle est la probabilité d’obtenir le numéro 4 ?",
+        "correction": "1/8"
+      },
+      {
+        "numero": 333,
+        "question": "On place dans un sac opaque, 2 boules bleues numérotées de 1 à 2 et 3 boules vertes numérotées de 1 à 3 indiscernables au toucher. On tire une boule, on regarde la couleur puis sans la remettre dans le sac, on tire une seconde boule et on regarde la couleur Quelle est la probabilité d’avoir 2 couleurs différentes ?",
+        "correction": "3/5"
+      },
+      {
+        "numero": 334,
+        "question": "On écrit sur des jetons différents mais indiscernables au toucher les lettres suivantes : P, Y, T, H, A, G, O, R, E Quelle est la probabilité d’obtenir une voyelle ?",
+        "correction": "4/9"
+      },
+      {
+        "numero": 335,
+        "question": "On écrit sur des jetons différents mais indiscernables au toucher les lettres suivantes : M, A, T, H, E M, A, T, I, Q, U, E, S Quelle est la probabilité d’obtenir une consonne ?",
+        "correction": "7/13"
+      },
+      {
+        "numero": 336,
+        "question": "Nous possédons un cadenas permettant de choisir un code à 3 chiffres. Quelle est la probabilité d’obtenir un code à 3 chiffres identiques ?",
+        "correction": "1/100"
+      },
+      {
+        "numero": 321,
+        "question": "Parmi les nombres suivants, lesquels ne peuvent pas représenter une probabilité ? 0,8 ; 15/4 ; 13 ; - 0,5 ; 75/100 ; 1,2",
+        "correction": "15/4 ; 13 ; -0,5 ; 1,2"
+      },
+      {
+        "numero": 322,
+        "question": "Un dé numéroté de 1 à 6 est lancé. Quelles sont les issues possibles ?",
+        "correction": "1 à 6"
+      },
+      {
+        "numero": 323,
+        "question": "Qu’est-ce qu’une situation d’équiprobabilité ?",
+        "correction": "Toutes issues même probabilité"
+      },
+      {
+        "numero": 324,
+        "question": "Qu’est-ce qu’un évènement certain ?",
+        "correction": "Probabilité 1"
+      },
+      {
+        "numero": 325,
+        "question": "Qu’est-ce qu’un évènement impossible ?",
+        "correction": "Probabilité 0"
+      },
+      {
+        "numero": 326,
+        "question": "Lors d’un lancer de dé numéroté de 1 à 6 Soit A l’évènement « obtenir un nombre pair ». Quel est son évènement contraire ?",
+        "correction": "Obtenir impair"
+      },
+      {
+        "numero": 327,
+        "question": "Lors d’un lancer de dé numéroté de 1 à 6 Soit A l’évènement « obtenir un nombre pair ». Soit B l’évènement « obtenir 3 ». Que peut-on dire de ces 2 évènements ?",
+        "correction": "Incompatibles"
+      },
+      {
+        "numero": 328,
+        "question": "Si la probabilité d’un évènement est 0,6. Quelle est la probabilité de son évènement contraire ?",
+        "correction": "0,4"
+      },
+      {
+        "numero": 305,
+        "question": "Maël a reçu 4 notes en anglais lors de ce trimestre : 11/20 (coefficient 2); 14/20 (coefficient 1); 12/20 (coefficient 2) et 17/20 (coefficient 3) Quelle est sa moyenne trimestrielle en anglais ?",
+        "correction": "13,875"
+      },
+      {
+        "numero": 306,
+        "question": "Trouver la valeur manquante dans cette série pour que la médiane soit 10 : 15 ; ? ; 8 ; 11 ; 20 ; 6",
+        "correction": "9"
+      },
+      {
+        "numero": 307,
+        "question": "Pour un spectacle de gym, l’entrée est payante suivant 3 catégories d’âge les moins de 10 ans, les 11 à 18 ans et les adultes. Quel est le prix moyen d’une entrée ? (effectifs 60,40,10 prix 2,4,5)",
+        "correction": "3 €"
+      },
+      {
+        "numero": 308,
+        "question": "Pour un spectacle de gym, l’entrée est payante suivant 3 catégories d’âge les moins de 10 ans, les 11 à 18 ans et les adultes. Quel est le prix médian d’une entrée ?",
+        "correction": "2 €"
+      },
+      {
+        "numero": 309,
+        "question": "Pour un spectacle de gym, l’entrée est payante suivant 3 catégories d’âge les moins de 10 ans, les 11 à 18 ans et les adultes. Quelle est l’étendue du tarif des entrées ?",
+        "correction": "3 €"
+      },
+      {
+        "numero": 310,
+        "question": "Dans ce tableur d’effectifs, quelle formule faut-il saisir pour obtenir l’effectif total dans D1 ?",
+        "correction": "=SOMME(A1:C1)"
+      },
+      {
+        "numero": 311,
+        "question": "Trouver la valeur manquante dans cette série pour que l’étendue soit 10 : 15 ; ? ; 8 ; 11 ; 20 ; 6",
+        "correction": "16"
+      },
+      {
+        "numero": 312,
+        "question": "Trouver la valeur manquante dans cette série pour que la moyenne soit 13 : 15 ; ? ; 8 ; 11 ; 20 ; 6",
+        "correction": "18"
+      },
+      {
+        "numero": 297,
+        "question": "Qu’est-ce que l’étendue d’une série ?",
+        "correction": "Max - min"
+      },
+      {
+        "numero": 298,
+        "question": "Voici des températures relevées en degrés Celsius: 13°C ; 21°C ; 19°C ; 18°C ; 27°C et 15°C Quelle est l’étendue de cette série ? Interpréter cette étendue.",
+        "correction": "14°C"
+      },
+      {
+        "numero": 299,
+        "question": "Voici des températures relevées en degrés Celsius: 13°C ; 21°C ; 19°C ; 18°C ; 27°C et 15°C Quelle est la température médiane de ces relevés ? Interpréter cette médiane.",
+        "correction": "18,5°C"
+      },
+      {
+        "numero": 300,
+        "question": "Voici des températures relevées en degrés Celsius: 13°C ; 21°C ; 19°C ; 18°C ; 28°C et 15°C Quelle est la température moyenne de ces relevés ?",
+        "correction": "19°C"
+      },
+      {
+        "numero": 301,
+        "question": "Toutes les notes d’Eléonore sont comprises entre 8 et 12, sa moyenne est… a/ 12 b/ 4 c/ 10 d/ Comprise entre 8 et 12",
+        "correction": "d"
+      },
+      {
+        "numero": 302,
+        "question": "Vrai ou faux ? « Si on ajoute 5 à chaque valeur d’une série, alors son étendue augmente de 5 ».",
+        "correction": "Faux"
+      },
+      {
+        "numero": 303,
+        "question": "Vrai ou faux ? « Si on ajoute 5 à chaque valeur d’une série, alors sa moyenne augmente de 5 ».",
+        "correction": "Vrai"
+      },
+      {
+        "numero": 304,
+        "question": "Vrai ou faux ? « Si on ajoute 5 à chaque valeur d’une série, alors sa médiane augmente de 5 ».",
+        "correction": "Vrai"
+      },
+      {
+        "numero": 289,
+        "question": "Qu’est-ce que l’effectif d’une valeur dans une série statistique ?",
+        "correction": "Nombre de fois où la valeur apparaît"
+      },
+      {
+        "numero": 290,
+        "question": "Comment calcule-t-on la fréquence d’une valeur dans une série statistique ?",
+        "correction": "Effectif / total"
+      },
+      {
+        "numero": 291,
+        "question": "Comment calcule-t-on la moyenne d’une série statistique ?",
+        "correction": "Somme / total"
+      },
+      {
+        "numero": 292,
+        "question": "Voici la série de notes sur 15 d’un élève : 15 ; 12 ; 3 ; 14 ; 5 ; 11 ; 10. Quelle est la moyenne de ses notes ? Que signifie cette moyenne ?",
+        "correction": "10/15"
+      },
+      {
+        "numero": 293,
+        "question": "Comment détermine-t-on la médiane d’une série statistique ?",
+        "correction": "Valeur centrale ou moyenne des deux centrales"
+      },
+      {
+        "numero": 294,
+        "question": "Voici la série de notes sur 15 d’un élève : 15 ; 12 ; 3 ; 14 ; 5 ; 11 ; 10. Quelle est la médiane de ses notes ? Que signifie cette médiane ?",
+        "correction": "11/15"
+      },
+      {
+        "numero": 295,
+        "question": "Voici la répartition des âges des membres d’un club de voile juniors. Quel est l’âge médian des membres ? Age 13 14 16 18 19 Effectif 10 15 6 14 5 Interpréter cette médiane.",
+        "correction": "15 ans"
+      },
+      {
+        "numero": 296,
+        "question": "Voici la répartition des âges des membres d’un club de voile juniors. Quel est l’âge moyen des membres ? Age 13 15 16 18 19 Effectif 6 5 10 14 15",
+        "correction": "17 ans"
+      }
+    ]
+  }
+}

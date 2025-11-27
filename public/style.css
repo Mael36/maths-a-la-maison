@@ -1,0 +1,25 @@
+/* ...existing code... */
+body { font-family: sans-serif; margin: 20px; }
+#menu { max-width: 520px; margin: 0 auto; text-align: center; }
+#menu input { margin: 6px; padding: 8px; width: 180px; }
+#menu button { margin: 6px; padding: 8px 12px; cursor: pointer; }
+
+#game { max-width: 800px; margin: 10px auto; text-align: center; }
+#playersList { margin: 10px 0; text-align: left; min-height: 60px; }
+#board { position: relative; display: inline-block; margin: 12px; }
+#boardImg { display:block; }
+#pions { position: absolute; left: 0; top: 0; pointer-events: none; }
+
+/* style d'un pion */
+.pawn {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+#controls { margin: 10px; }
+button { pointer-events: auto; cursor: pointer; }
+/* ...existing code... */

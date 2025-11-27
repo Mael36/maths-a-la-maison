@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maths à la Maison</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div id="menu">
+    <h1>Maths à la Maison</h1>
+    <input id="playerName" placeholder="Ton nom">
+    <button onclick="createRoom()">Créer Partie</button>
+    <input id="roomCodeInput" placeholder="Code room">
+    <button onclick="joinRoom()">Rejoindre</button>
+    <button id="startGame" style="display: none;">Lancer la partie</button>
+  </div>
+  <div id="game" style="display:none;">
+    <h2 id="roomCode"></h2>
+    <button id="startButton" style="display:none;">Démarrer</button>
+    <div id="playersList"></div>
+    <div id="board">
+      <!-- utiliser plateau.png -->
+      <img id="boardImg" src="assets/plateau.png" alt="Plateau" style="width:400px; border-radius:50%;">
+      <div id="pions"></div>
+    </div>
+    <div id="actionInfo">
+      <span id="actionDesc"></span><span id="actionTimer" style="font-weight:bold;margin-left:8px;color:#c00"></span>
+    </div>
+
+    <!-- bouton lancer le dé -->
+    <div id="controls">
+      <button id="rollButton" disabled>Lancer le dé</button>
+    </div>
+
+    <div id="questionContainer" style="display:none;">
+      <h2 id="questionTheme"></h2>
+      <p id="questionText"></p>
+      <input id="answerInput" type="text">
+      <button onclick="submitAnswer()">Répondre</button>
+    </div>
+
+    <div id="game">
+      <div id="question">
+        <h2 id="questionTheme"></h2>
+        <p id="questionText"></p>
+      </div>
+    </div>
+  </div>
+  <div id="game">
+    <h2>Joueurs</h2>
+    <ul id="playerList"></ul>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
