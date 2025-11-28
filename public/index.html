@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maths à la Maison</title>
+  <title>Maths à la Maison – Jeu en ligne</title>
   <link rel="stylesheet" href="style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
+  <!-- MENU -->
   <div id="menu">
     <h1>Maths à la Maison</h1>
     <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
@@ -19,6 +20,7 @@
     <div id="info"></div>
   </div>
 
+  <!-- JEU -->
   <div id="game" style="display:none; padding:20px;">
     <h2>Salle : <span id="roomDisplay"></span></h2>
 
@@ -50,7 +52,7 @@
       <h3 id="themeTitle"></h3>
       <p id="questionText"></p>
       <input type="text" id="answerInput" placeholder="Ta réponse">
-      <button id="submitBtn" onclick="sendAnswer()">Envoyer</button>
+      <button onclick="sendAnswer()">Envoyer</button>
     </div>
 
     <div id="results"></div>
