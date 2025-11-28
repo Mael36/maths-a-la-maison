@@ -116,117 +116,74 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit('rolled', { roll });
   });
 
-  socket.on('move', ({ code, steps, direction }) => {
-    const room = rooms[code];
-    if (!room || room.activePlayers[0] !== socket.id) return;
+  // ... (le début reste identique jusqu'à socket.on('move'))
 
-    const player = getPlayer(room, socket.id);
-    if (direction === 'left') {
-      player.pos = (player.pos - steps + BOARD_LENGTH) % BOARD_LENGTH;
-    } else {
-      player.pos = (player.pos + steps) % BOARD_LENGTH;
-    }
+socket.on('move', ({code, position}) => {
+  const room = rooms[code];
+  if (!room || !room.activePlayers.includes(socket.id)) return;
 
-    const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
-    room.currentAction = action;
+  const player = getPlayer(room, socket.id);
+  player.pos = position;
 
-    const cell = BOARD[player.pos];
-    const theme = cell.type === 'theme' ? cell.name : THEMES[Math.floor(Math.random() * THEMES.length)];
-    const q = getRandomQuestion(theme);
+  // Piocher action
+  const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+  room.currentAction = action;
 
-    if (!q) {
-      io.to(code).emit('noQuestion');
-      endTurn(room);
-      return;
-    }
+  // Choisir thème + question
+  const theme = THEMES[Math.floor(Math.random() * THEMES.length)] || "Général";
+  const q = getRandomQuestion(theme);
+  if (!q) return endTurn(room);
 
-    room.currentQuestion = q.question;
-    room.currentCorrection = q.correction.trim().toLowerCase();
-    room.pendingAnswers = new Map();
+  room.currentQuestion = q.question;
+  room.currentCorrection = q.correction.trim().toLowerCase();
+  room.pendingAnswers = new Map();
+  room.activePlayers = action.everybody ? room.players.map(p=>p.id) : [socket.id];
 
-    io.to(code).emit('actionDrawn', { player: player.name, action: action.name, desc: action.desc, timer: action.flash || null });
+  io.to(code).emit('actionDrawn', { action: action.name, timer: action.flash || null });
+  io.to(code).emit('players', room.players);
 
-    // Timer
-    const timerDuration = action.flash || 60;
-    let time = timerDuration;
-    const timerInterval = setInterval(() => {
-      time--;
-      io.to(code).emit('timerUpdate', { time });
-      if (time <= 0) {
-        clearInterval(timerInterval);
-        if (room.currentQuestion) {
-          io.to(room.code).emit('timeOut', { message: 'Temps écoulé !' });
-          room.pendingAnswers.forEach((_, id) => {
-            room.pendingAnswers.set(id, { correct: false, player: getPlayer(room, id).name });
-          });
-          applyActionResults(room, action);
-          endTurn(room);
-        }
-      }
-    }, 1000);
-    room.timer = timerInterval;
-
-    if (action.everybody) {
-      room.activePlayers = room.players.map(p => p.id);
-      io.to(code).emit('question', { theme, question: q.question, everybody: true });
-    } else if (action.callFriend || action.forYou || action.freeChoice) {
-      io.to(socket.id).emit('choosePlayerOrAction', { type: action.callFriend || action.forYou ? 'player' : 'action' });
-    } else {
-      room.activePlayers = [socket.id];
-      io.to(socket.id).emit('question', { theme, question: q.question });
-    }
-
-    io.to(code).emit('players', room.players);
-  });
-
-  socket.on('answer', ({ code, answer }) => {
-    const room = rooms[code];
-    if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
-
-    const player = getPlayer(room, socket.id);
-    const correct = (answer + "").trim().toLowerCase() === room.currentCorrection;
-    room.pendingAnswers.set(socket.id, { correct, player: player.name });
-
-    const action = room.currentAction;
-
-    if (!action.everybody || room.pendingAnswers.size === room.activePlayers.length) {
-      if (room.timer) clearInterval(room.timer);
-      applyActionResults(room, action);
+  // Timer
+  const duration = action.flash || 60;
+  room.timer = setTimeout(() => {
+    if (room.currentQuestion) {
+      io.to(code).emit('timeOut', { message: 'Temps écoulé !' });
+      applyActionResults(room, action, false);
       endTurn(room);
     }
-  });
+  }, duration * 1000);
 
-  function applyActionResults(room, action) {
-    room.activePlayers.forEach(id => {
-      const res = room.pendingAnswers.get(id) || { correct: false, player: getPlayer(room, id).name };
-      const player = getPlayer(room, id);
+  // Poser la question
+  const questionData = { theme, question: q.question };
+  if (action.everybody) io.to(code).emit('question', questionData);
+  else io.to(socket.id).emit('question', questionData);
+});
 
-      if (res.correct) {
-        let points = action.multiplier || 1;
-        if (action.plusOrMinus) points = 2;
-        player.score += points;
-        if (action.doubleOrQuits) player.score *= 2;
-        if (action.teleport && id === room.activePlayers[0]) {
-          io.to(id).emit('teleportChoice');
-        }
-      } else {
-        if (action.plusOrMinus) player.score = Math.max(0, player.score - 1);
-        if (action.noWay) {
-          room.players.forEach(p => { if (p.id !== id) p.score += 1; });
-        }
-        if (action.doubleOrQuits) player.score = 0;
-      }
-    });
+socket.on('answer', ({code, answer}) => {
+  const room = rooms[code];
+  if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
 
-    io.to(room.code).emit('results', {
-      action: action.name,
-      results: room.activePlayers.map(id => ({
-        player: room.pendingAnswers.get(id)?.player,
-        correct: room.pendingAnswers.get(id)?.correct,
-        score: getPlayer(room, id).score
-      }))
-    });
+  const correct = (answer+"").trim().toLowerCase() === room.currentCorrection;
+  room.pendingAnswers.set(socket.id, { correct, player: getPlayer(room, socket.id).name });
+
+  if (!room.currentAction.everybody || room.pendingAnswers.size === room.activePlayers.length) {
+    clearTimeout(room.timer);
+    applyActionResults(room, room.currentAction, correct);
+    endTurn(room);
   }
+});
+
+function applyActionResults(room, action, correct) {
+  room.activePlayers.forEach(id => {
+    const res = room.pendingAnswers.get(id) || { correct: false };
+    const player = getPlayer(room, id);
+    if (res.correct) {
+      player.score += action.multiplier || 1;
+    } else if (action.noWay) {
+      room.players.forEach(p => { if (p.id !== id) p.score += 1; });
+    }
+  });
+  io.to(room.code).emit('results', { message: correct ? 'Bonne réponse ! +1 point' : 'Mauvaise réponse' });
+}
 
   function endTurn(room) {
     io.to(room.code).emit('actionClear');
@@ -257,3 +214,4 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
+
