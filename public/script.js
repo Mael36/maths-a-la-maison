@@ -256,4 +256,71 @@ socket.on('teleport', () => {
     socket.emit('move', { code: currentRoom, steps: 0, direction: 'right', teleportTo: +pos });
   }
 });
+  
+// === GRILLE DES ACTIONS + TIMER FLASH ===
+function createActionGrid() {
+  if (document.getElementById('actionGrid')) return;
+
+  const grid = document.createElement('div');
+  grid.id = 'actionGrid';
+  grid.style.cssText = `position:absolute;top:8px;left:8px;z-index:999;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;background:rgba(240,248,255,0.97);padding:14px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);border:3px solid #1976d2;font-size:11px;max-width:480px;backdrop-filter:blur(8px);`;
+
+  ACTIONS.forEach(action => {
+    const card = document.createElement('div');
+    card.className = 'actionCard';
+    card.innerHTML = `<div style="font-weight:bold;color:#1976d2;margin-bottom:4px;">${action.name}</div><div style="font-size:10px;line-height:1.3;">${action.desc}</div>`;
+    card.title = action.desc;
+    grid.appendChild(card);
+  });
+
+  const board = document.getElementById('board');
+  board.style.position = 'relative';
+  board.appendChild(grid);
+
+  // Timer Flash visible
+  const timerDiv = document.createElement('div');
+  timerDiv.id = 'flashTimer';
+  timerDiv.style.cssText = `position:absolute;top:10px;right:10px;background:#d32f2f;color:white;padding:10px 20px;border-radius:50px;font-size:20px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:none;z-index:1000;`;
+  board.appendChild(timerDiv);
+}
+
+socket.on('gameStart', () => setTimeout(createActionGrid, 600));
+
+socket.on('actionDrawn', (data) => {
+  document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
+  const card = Array.from(document.querySelectorAll('.actionCard')).find(c => c.textContent.includes(data.action));
+  if (card) card.classList.add('currentAction');
+
+  const timer = document.getElementById('flashTimer');
+  if (data.timer) {
+    timer.style.display = 'block';
+    timer.textContent = `${data.timer}s`;
+  } else {
+    timer.style.display = 'none';
+  }
+});
+
+socket.on('timerUpdate', ({ time }) => {
+  const timer = document.getElementById('flashTimer');
+  timer.textContent = `${time}s`;
+  if (time <= 10) timer.style.background = '#b71c1c';
+});
+
+socket.on('choosePlayerOrAction', ({ type }) => {
+  if (type === 'player') {
+    alert("Clique sur le nom d’un joueur dans la liste pour le choisir !");
+  } else {
+    const list = ACTIONS.map(a => a.name).join('\n');
+    const choice = prompt(`Choisis une action :\n${list}`);
+    if (choice) socket.emit('actionChosen', { code: currentRoom, actionName: choice });
+  }
+});
+
+socket.on('teleportChoice', () => {
+  const pos = prompt("Téléportation ! Choisis une case (0 à 31) :");
+  if (pos && !isNaN(pos) && pos >= 0 && pos < 32) {
+    // Le serveur gère le déplacement
+  }
+});
 })();
+
