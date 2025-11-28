@@ -1,42 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maths à la Maison – Jeu en ligne</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maths à la Maison - Jeu en ligne</title>
+  <link rel="stylesheet" href="style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+  <!-- MENU PRINCIPAL -->
   <div id="menu">
-    <h1>Maths à la Maison</h1>
-    <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur" />
-    <button onclick="createGame()">Créer une partie</button>
-    <div>OU</div>
-    <input type="text" id="roomCode" placeholder="Code de la salle" maxlength="4" />
-    <button onclick="joinGame()">Rejoindre</button>
-    <div id="codeDisplay"></div>
+    <h1>🎯 Maths à la Maison</h1>
+    <p>Le jeu de société de maths en ligne</p>
+    
+    <div style="margin:20px 0;">
+      <input id="playerName" type="text" placeholder="Ton prénom" maxlength="20" value="Joueur">
+      <br><br>
+      <button onclick="createRoom()" style="background:#4caf50; padding:12px 24px; font-size:1.1em;">🎲 Créer une partie</button>
+    </div>
+    
+    <div style="border-top:1px solid #ddd; padding-top:20px;">
+      <p><strong>OU rejoindre une partie existante :</strong></p>
+      <input id="roomCodeInput" type="text" placeholder="Code de la salle (AAAA)" maxlength="4" style="text-transform:uppercase;">
+      <br><br>
+      <button onclick="joinRoom()" style="background:#2196f3; padding:12px 24px; font-size:1.1em;">🚀 Rejoindre</button>
+    </div>
+    
+    <div id="roomInfo" style="margin-top:20px; color:#666; font-style:italic;"></div>
   </div>
 
+  <!-- JEU PRINCIPAL -->
   <div id="game" style="display:none;">
-    <div id="board">
-      <img src="assets/plateau.png" alt="Plateau" id="plateau" />
-      <div id="pions"></div>
-      <div id="flashTimer">30s</div>
+    <div style="text-align:center; margin:20px;">
+      <h2 id="roomCodeDisplay"></h2>
+      <div id="gameInfo" style="color:#666; margin:10px;"></div>
     </div>
 
-    <div id="sidebar">
-      <h2>Joueurs</h2>
-      <div id="playerList"></div>
-      <button id="rollBtn" onclick="rollDice()" style="display:none;">Lancer le dé</button>
-      <div id="questionBox" style="display:none;">
-        <h3 id="theme"></h3>
-        <p id="questionText"></p>
-        <input type="text" id="answerInput" placeholder="Ta réponse" />
-        <button onclick="sendAnswer()">Valider</button>
-      </div>
-      <div id="results"></div>
+    <!-- PLATEAU AVEC ACTIONS -->
+    <div id="gameBoard">
+      <img id="boardImg" src="assets/plateau.png" alt="Plateau de jeu" />
+      <div id="pions"></div>
+      <div id="actionGrid"></div>
+      <div id="flashTimer" style="display:none;">30s</div>
     </div>
+
+    <!-- CONTRÔLES DU JEU -->
+    <div id="controls" style="margin:20px; text-align:center;">
+      <button id="rollButton" onclick="rollDice()" disabled style="padding:15px 30px; font-size:1.3em; background:#ff9800; color:white;">🎲 Lancer le dé</button>
+      <div id="directionChoices" style="margin-top:15px;">
+        <button class="dirBtn" onclick="chooseDirection('left')" disabled style="margin:5px; padding:10px 20px;">← GAUCHE</button>
+        <button class="dirBtn" onclick="chooseDirection('right')" disabled style="margin:5px; padding:10px 20px;">DROITE →</button>
+      </div>
+    </div>
+
+    <!-- LISTE DES JOUEURS -->
+    <div id="playersContainer">
+      <h3>👥 Joueurs</h3>
+      <div id="playerList"></div>
+    </div>
+
+    <!-- ZONE DE QUESTION -->
+    <div id="questionContainer" style="display:none; background:white; margin:20px; padding:25px; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.2);">
+      <h3 id="questionTheme" style="color:#1976d2;"></h3>
+      <div id="questionText" style="font-size:1.2em; margin:15px 0;"></div>
+      <input id="answerInput" type="text" placeholder="Ta réponse..." style="width:70%; padding:12px; font-size:1.1em; border:2px solid #ddd; border-radius:8px;">
+      <button onclick="submitAnswer()" style="padding:12px 24px; margin-left:10px; background:#4caf50; color:white; border:none; border-radius:8px; cursor:pointer;">✅ Valider</button>
+    </div>
+
+    <!-- RÉSULTATS -->
+    <div id="results" style="margin:20px; text-align:center;"></div>
   </div>
 
   <script src="script.js"></script>
