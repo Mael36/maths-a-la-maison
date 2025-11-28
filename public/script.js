@@ -1,41 +1,32 @@
 const socket = io();
 let room = null;
 let lastRoll = 0;
+let currentQuestion = null;
+let countdownInterval = null;
 
 const $ = id => document.getElementById(id);
 
 const ACTIONS = [
-  {name:"Flash",flash:30,desc:"Réponds en moins de 30 secondes !"},
-  {name:"Battle on left",battleLeft:true,desc:"Plus rapide que ton voisin de gauche"},
-  {name:"Battle on right",battleRight:true,desc:"Plus rapide que ton voisin de droite"},
-  {name:"Call a friend",callFriend:true,desc:"Choisis un partenaire → +1 point chacun"},
-  {name:"For you",forYou:true,desc:"Désigne un joueur qui répond à ta place"},
-  {name:"Second life",secondLife:true,desc:"Deuxième chance si tu échoues"},
-  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
-  {name:"Double",multiplier:2,desc:"×2 les points"},
-  {name:"Téléportation",teleport:true,desc:"Réussite → +1 point + tu choisis la prochaine case"},
-  {name:"+1 ou -1",plusOrMinus:true,desc:"Réussite → +2 / Échec → -1"},
-  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
-  {name:"Double or quits",doubleOrQuits:true,desc:"Tout doubler ou tout perdre"},
-  {name:"It's your choice",freeChoice:true,desc:"Choisis l'action que tu veux !"},
-  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
-  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
-  {name:"Quadruple",multiplier:4,desc:"×4 les points"}
+  {name:"Flash",flash:30,desc:"30 secondes !"}, {name:"Battle on left",battleLeft:true},
+  {name:"Battle on right",battleRight:true}, {name:"Call a friend",callFriend:true},
+  {name:"For you",forYou:true}, {name:"Second life",secondLife:true},
+  {name:"No way",noWay:true}, {name:"Double",multiplier:2},
+  {name:"Téléportation",teleport:true}, {name:"+1 ou -1",plusOrMinus:true},
+  {name:"Everybody",everybody:true}, {name:"Double or quits",doubleOrQuits:true},
+  {name:"It's your choice",freeChoice:true}, {name:"Everybody",everybody:true},
+  {name:"No way",noWay:true}, {name:"Quadruple",multiplier:4}
 ];
 
-// GRILLE 4×4
 function createActionGrid() {
   if ($('actionGrid').children.length) return;
   ACTIONS.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
-    card.innerHTML = `<strong>${a.name}</strong><br><small>${a.desc}</small>`;
-    card.title = a.desc;
+    card.innerHTML = `<strong>${a.name}</strong><br><small>${a.desc || ''}</small>`;
     $('actionGrid').appendChild(card);
   });
 }
 
-// PIONS PARFAITS
 function updatePawns(players) {
   const container = $('pions');
   const img = $('plateau');
@@ -58,34 +49,25 @@ function updatePawns(players) {
   });
 }
 
-// FONCTIONS
 window.createRoom = () => socket.emit('create', $('playerName').value || 'Hôte');
 window.joinRoom = () => {
   const code = $('roomCode').value.trim().toUpperCase();
   if(!code) return alert('Entre un code !');
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
-window.rollDice = () => {
-  if (!room) return alert("Erreur : pas de salle");
-  socket.emit('roll', room);
-  $('rollBtn').disabled = true;
-  $('rollBtn').textContent = "Dé lancé...";
-};
-window.chooseDir = (dir) => {
-  if (!room || lastRoll === 0) return alert("Lance d'abord le dé !");
-  socket.emit('move', { code: room, steps: lastRoll, direction: dir });  // ← steps ajouté
-  $('directions').style.display = 'none';
-  lastRoll = 0; // reset
+window.rollDice = () => socket.emit('roll', room);
+window.chooseDir = dir => socket.emit('move', {code:room, steps:lastRoll, direction:dir});
+window.sendAnswer = () => {
+  const ans = $('answerInput').value.trim();
+  if (!ans || !currentQuestion) return;
+  socket.emit('answer', {code: room, answer: ans});
+  $('answerInput').value = '';
 };
 
-// Démarrer la partie
 $('startBtn').onclick = () => socket.emit('start', room);
 
-// SOCKET
 socket.on('created', code => { room=code; showGame(code); });
 socket.on('joined', code => { room=code; showGame(code); });
-socket.on('error', msg => alert(msg));
-
 function showGame(code) {
   $('menu').style.display = 'none';
   $('game').style.display = 'block';
@@ -98,26 +80,17 @@ socket.on('players', players => {
   updatePawns(players);
 });
 
-socket.on('gameStart', () => {
-  $('startBtn').style.display = 'none';
-  alert('La partie est lancée !');
-});
+socket.on('gameStart', () => { $('startBtn').style.display = 'none'; });
 
 socket.on('yourTurn', () => {
   $('rollBtn').disabled = false;
   $('rollBtn').textContent = "Lancer le dé";
-  alert("À toi de jouer ! Lance le dé !");
 });
 
 socket.on('rolled', ({roll}) => {
-  lastRoll = roll;                                      // ← LIGNE AJOUTÉE
+  lastRoll = roll;
   $('directions').style.display = 'block';
   alert(`Tu as fait ${roll} ! Choisis GAUCHE ou DROITE`);
-});
-
-socket.on('rolledInfo', ({player, roll}) => {
-  // Optionnel : pour que tout le monde voie qui a lancé quoi
-  console.log(`${player} a lancé ${roll}`);
 });
 
 socket.on('actionDrawn', data => {
@@ -126,18 +99,45 @@ socket.on('actionDrawn', data => {
   if(idx>=0) document.querySelectorAll('.actionCard')[idx].classList.add('currentAction');
 
   if(data.timer){
-    let t = data.timer;
     $('flashTimer').style.display = 'block';
+    let t = data.timer;
     $('flashTimer').textContent = t+'s';
     const int = setInterval(()=>{ t--; $('flashTimer').textContent = t+'s'; if(t<=0) clearInterval(int); },1000);
-  } else $('flashTimer').style.display = 'none';
+  }
 });
 
 socket.on('question', q => {
+  currentQuestion = q;
   $('themeTitle').textContent = 'Thème : ' + q.theme;
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
+
+  // Timer 60s ou 30s pour Flash
+  const timeLeft = q.action?.flash ? 30 : 60;
+  $('countdown').textContent = timeLeft;
+  $('timerDisplay').style.display = 'block';
+
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(() => {
+    let sec = +$('countdown').textContent;
+    sec--;
+    $('countdown').textContent = sec;
+    if (sec <= 0) {
+      clearInterval(countdownInterval);
+      $('questionBox').style.display = 'none';
+      $('timerDisplay').style.display = 'none';
+      $('timeUp').style.display = 'block';
+      setTimeout(() => $('timeUp').style.display = 'none', 4000);
+      socket.emit('timeUp', {code: room});
+    }
+  }, 1000);
 });
 
-
+socket.on('questionEnd', () => {
+  clearInterval(countdownInterval);
+  $('questionBox').style.display = 'none';
+  $('timerDisplay').style.display = 'none';
+  $('timeUp').style.display = 'block';
+  setTimeout(() => $('timeUp').style.display = 'none', 4000);
+});
