@@ -1,6 +1,5 @@
 (() => {
   const socket = io();
-
   let currentRoom = null;
   let myName = '';
   let amHost = false;
@@ -13,9 +12,9 @@
   function showGame(room, isHost) {
     $('menu').style.display = 'none';
     $('game').style.display = 'block';
-    $('roomCode').textContent = room;
+    $('roomCodeDisplay').textContent = `Salle : ${room}`;
     amHost = !!isHost;
-    $('startButton').style.display = amHost ? 'inline-block' : 'none';
+    currentRoom = room;
   }
 
   function renderPawns(players) {
@@ -31,296 +30,171 @@
     const radius = w * 0.38;
     players.forEach((p, i) => {
       const pos = (typeof p.pos === 'number') ? p.pos : 0;
-      // centrer sur la case : ajouter 0.5 pour aller au milieu de la case, pas entre deux
       const angle = ((pos + 0.5) / BOARD_LENGTH) * Math.PI * 2 - Math.PI/2;
       const x = cx + Math.cos(angle) * radius;
       const y = cy + Math.sin(angle) * radius;
       const dot = document.createElement('div');
       dot.className = 'pawn';
       dot.style.background = COLORS[i % COLORS.length];
-      dot.style.left = x + 'px';
-      dot.style.top = y + 'px';
-      dot.title = p.name;
+      dot.style.left = (x - 22) + 'px';
+      dot.style.top = (y - 22) + 'px';
+      dot.title = `${p.name} (${p.score || 0} pts)`;
+      dot.innerHTML = i + 1;
       pions.appendChild(dot);
     });
   }
 
-  // action display + timer
-  let _actionTimerInterval = null;
-  function clearActionDisplay() {
-    if (_actionTimerInterval) { clearInterval(_actionTimerInterval); _actionTimerInterval = null; }
-    $('actionDesc').textContent = '';
-    $('actionTimer').textContent = '';
+  // === GRILLE DES 16 ACTIONS ===
+  function createActionGrid() {
+    if (document.getElementById('actionGrid')) return;
+    const grid = document.createElement('div');
+    grid.id = 'actionGrid';
+
+    ACTIONS.forEach(action => {
+      const card = document.createElement('div');
+      card.className = 'actionCard';
+      card.innerHTML = `
+        <div class="actionIcon">${action.name}</div>
+        <div class="actionDesc">${action.desc}</div>
+      `;
+      card.title = action.desc;
+      grid.appendChild(card);
+    });
+
+    $('gameBoard').appendChild(grid);
   }
 
-  // fonctions globales utilisées par index.html
-  window.createRoom = function() {
-    const name = ($('playerName') && $('playerName').value.trim()) || 'Hôte';
+  // === FONCTIONS DU JEU ===
+  window.createRoom = () => {
+    const name = $('playerName').value.trim() || 'Hôte';
     myName = name;
     socket.emit('create', name);
   };
 
-  window.joinRoom = function() {
-    const name = ($('playerName') && $('playerName').value.trim()) || 'Joueur';
-    const code = ($('roomCodeInput') && $('roomCodeInput').value.trim()) || '';
-    if (!code) { alert('Entrez un code de salle.'); return; }
+  window.joinRoom = () => {
+    const name = $('playerName').value.trim() || 'Joueur';
+    const code = $('roomCodeInput').value.trim().toUpperCase();
+    if (!code) return alert('Entre le code de la salle !');
     myName = name;
     socket.emit('join', { code, name });
   };
 
-  window.submitAnswer = function() {
-    const ans = ($('answerInput') && $('answerInput').value) || '';
-    if (!currentRoom) { alert('Pas dans une salle'); return; }
-    socket.emit('answer', { code: currentRoom, answer: ans });
-    if ($('answerInput')) $('answerInput').value = '';
-    $('questionContainer').style.display = 'none';
+  window.rollDice = () => {
+    if (!currentRoom) return;
+    socket.emit('roll', currentRoom);
+    $('rollButton').disabled = true;
   };
 
-  // roll button -> demande au serveur de lancer le dé
-  function enableRoll() {
-    const rollBtn = $('rollButton');
-    if (rollBtn) rollBtn.disabled = false;
-  }
-  function disableRoll() {
-    const rollBtn = $('rollButton');
-    if (rollBtn) rollBtn.disabled = true;
-  }
+  window.chooseDirection = (dir) => {
+    if (!currentRoom) return;
+    socket.emit('move', { code: currentRoom, steps: +$('controls').dataset.lastRoll || 1, direction: dir });
+    document.querySelectorAll('.dirBtn').forEach(btn => btn.disabled = true);
+  };
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const sb = $('startButton');
-    if (sb) sb.addEventListener('click', () => {
-      if (!currentRoom) return;
-      socket.emit('start', currentRoom);
-    });
+  window.submitAnswer = () => {
+    const ans = $('answerInput').value.trim();
+    if (!ans || !currentRoom) return;
+    socket.emit('answer', { code: currentRoom, answer: ans });
+    $('answerInput').value = '';
+  };
 
-    const rollBtn = $('rollButton');
-    if (rollBtn) {
-      rollBtn.addEventListener('click', () => {
-        if (!currentRoom) { alert('Pas dans une salle'); return; }
-        socket.emit('roll', currentRoom);
-        disableRoll();
-      });
-    }
-
-    // boutons direction créés dynamiquement (left / right)
-    const controls = $('controls');
-    if (controls) {
-      const dirDiv = document.createElement('div');
-      dirDiv.id = 'dirChoices';
-      ['left', 'right'].forEach(d => {
-        const b = document.createElement('button');
-        b.textContent = d === 'left' ? 'Gauche' : 'Droite';
-        b.className = 'dirBtn';
-        b.style.margin = '4px';
-        b.disabled = true;
-        b.addEventListener('click', () => {
-          // steps kept from last rolled value stored on client
-          const steps = +controls.dataset.lastRoll || 1;
-          socket.emit('move', { code: currentRoom, steps, direction: d });
-          // disable choices until next turn
-          document.querySelectorAll('.dirBtn').forEach(btn => btn.disabled = true);
-        });
-        dirDiv.appendChild(b);
-      });
-      controls.appendChild(dirDiv);
-    }
-  });
-
-  // SOCKET handlers
+  // === SOCKET EVENTS ===
   socket.on('connect', () => { myId = socket.id; });
 
   socket.on('created', (code) => {
     currentRoom = code;
     showGame(code, true);
-    alert('Salle créée: ' + code);
+    $('roomInfo').innerHTML = `<h3>🎉 Salle créée : <strong>${code}</strong></h3><p>Partage ce code avec tes amis !</p>`;
   });
 
   socket.on('joined', (code) => {
     currentRoom = code;
     showGame(code, false);
-    alert('Rejoint: ' + code);
+    $('roomInfo').innerHTML = `<h3>✅ Rejoint : <strong>${code}</strong></h3>`;
   });
 
   socket.on('players', (players) => {
-    const playerList = $('playerList');
-    playerList.innerHTML = '';
-    players.forEach(player => {
-      const li = document.createElement('li');
-      li.textContent = `${player.name} - Score: ${player.score || 0} - Position: ${player.pos || 0}`;
-      playerList.appendChild(li);
+    const list = $('playerList');
+    list.innerHTML = '';
+    players.forEach(p => {
+      const div = document.createElement('div');
+      div.innerHTML = `<strong>${p.name}</strong> - ${p.score || 0} pts - Case ${p.pos || 0}`;
+      list.appendChild(div);
     });
     renderPawns(players);
   });
 
-  socket.on('gameStart', (info) => {
-    alert('Partie démarrée');
+  socket.on('gameStart', () => {
+    $('startButton').style.display = 'none';
+    $('rollButton').style.display = 'inline-block';
+    createActionGrid();
+    alert('🎮 Partie lancée ! Premier joueur, lance le dé.');
   });
 
-  // serveur signale que c'est ton tour : activer roll
   socket.on('yourTurn', () => {
-    enableRoll();
-    alert("C'est ton tour. Clique sur 'Lancer le dé'.");
+    $('rollButton').disabled = false;
+    alert('🎲 C\'est ton tour ! Lance le dé.');
   });
 
-  // serveur renvoie le résultat du lancer
   socket.on('rolled', ({ roll }) => {
-    const controls = $('controls');
-    if (controls) controls.dataset.lastRoll = roll;
-    // activer choix direction
+    $('controls').dataset.lastRoll = roll;
     document.querySelectorAll('.dirBtn').forEach(btn => btn.disabled = false);
-    alert('Tu as fait ' + roll + '. Choisis Gauche ou Droite.');
+    alert(`Tu as fait ${roll} ! Choisis GAUCHE ← ou DROITE →`);
   });
 
-  // info publique sur le roll
-  socket.on('rolledInfo', (info) => {
-    // console.log(info);
+  socket.on('rolledInfo', ({ player, roll }) => {
+    console.log(`${player} a fait ${roll}`);
   });
 
-  socket.on('turn', (data) => {
-    // mise à jour sommaire (position + action info)
-    // joueurs seront mis à jour via event players
-  });
-
-  // réception d'une action tirée
   socket.on('actionDrawn', (data) => {
-    // data: { player, action, timer }
-    $('actionDesc').textContent = `${data.player} → ${data.action}`;
-    // ne pas clear automatiquement ici : attendre actionClear du serveur
-    if (data.timer && Number(data.timer) > 0) {
-      let remaining = Number(data.timer);
-      $('actionTimer').textContent = ` (${remaining}s)`;
-      if (_actionTimerInterval) clearInterval(_actionTimerInterval);
-      _actionTimerInterval = setInterval(() => {
-        remaining--;
-        if (remaining <= 0) {
-          clearActionDisplay();
-        } else {
-          $('actionTimer').textContent = ` (${remaining}s)`;
-        }
+    const timer = $('flashTimer');
+    if (data.timer) {
+      timer.style.display = 'block';
+      let time = data.timer;
+      timer.textContent = `${time}s`;
+      const int = setInterval(() => {
+        time--;
+        timer.textContent = `${time}s`;
+        if (time <= 0) clearInterval(int);
       }, 1000);
+    } else {
+      timer.style.display = 'none';
     }
+
+    // Surligner l'action
+    setTimeout(() => {
+      document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
+      const cards = document.querySelectorAll('.actionCard');
+      const index = ACTIONS.findIndex(a => a.name === data.action);
+      if (cards[index]) cards[index].classList.add('currentAction');
+    }, 100);
   });
 
-  // serveur ordonne de retirer l'affichage de l'action (après résolution)
-  socket.on('actionClear', () => {
-    clearActionDisplay();
-  });
-
-  // afficher la question (visible au joueur ciblé, everybody=true pour tous)
   socket.on('question', (data) => {
-    const { theme, question } = data;
-    $('questionTheme').textContent = `Thème : ${theme}`;
-    $('questionText').textContent = question;
+    $('questionTheme').textContent = `Thème : ${data.theme}`;
+    $('questionText').textContent = data.question;
     $('questionContainer').style.display = 'block';
     $('answerInput').focus();
+    $('answerInput').value = '';
   });
 
-  socket.on('noQuestion', () => {
-    alert("Aucune question disponible pour cette case.");
+  socket.on('results', (data) => {
+    $('results').innerHTML = `<h3>🎯 Résultats : ${data.action}</h3>`;
+    data.results.forEach(r => {
+      const emoji = r.correct ? '✅' : '❌';
+      $('results').innerHTML += `<div>${emoji} ${r.player} : ${r.score} pts</div>`;
+    });
+    setTimeout(() => $('questionContainer').style.display = 'none', 3000);
   });
 
-  socket.on('result', (res) => {
-    alert(`${res.player} — ${res.correct ? 'Bonne réponse' : 'Mauvaise réponse'} — score: ${res.score}`);
+  socket.on('actionClear', () => {
+    $('flashTimer').style.display = 'none';
+    document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
   });
 
-  socket.on('actionDrawn', (d) => {
-    // double affichage minimal
-    $('actionInfo').textContent = `${d.player} → ${d.action}`;
-    setTimeout(() => $('actionInfo').textContent = '', 3000);
+  // === ÉVÉNEMENTS DOM ===
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = $('startButton');
+    if (startBtn) startBtn.addEventListener('click', () => socket.emit('start', currentRoom));
   });
-  
-  socket.on('choosePlayer', ({ action }) => {
-  alert(`Action: ${action}\nChoisis un joueur (clique sur son nom dans la liste)`);
-  document.querySelectorAll('#playerList li').forEach(li => {
-    li.style.cursor = 'pointer';
-    li.onclick = () => {
-      const targetName = li.textContent.split(' - ')[0];
-      const target = players.find(p => p.name === targetName);
-      if (target) {
-        socket.emit('playerChosen', { code: currentRoom, targetId: target.id });
-        li.onclick = null;
-      }
-    };
-  });
-});
-
-socket.on('chooseAction', ({ actions }) => {
-  const list = actions.map(a => `${a.name}: ${a.desc}`).join('\n');
-  const choice = prompt(`Choisis une action:\n\n${list}`);
-  if (choice) socket.emit('actionChosen', { code: currentRoom, actionName: choice.split(':')[0].trim() });
-});
-
-socket.on('teleport', () => {
-  const pos = prompt("Téléportation ! Choisis une case (0 à 31):");
-  if (pos && !isNaN(pos)) {
-    socket.emit('move', { code: currentRoom, steps: 0, direction: 'right', teleportTo: +pos });
-  }
-});
-  
-// === GRILLE DES ACTIONS + TIMER FLASH ===
-function createActionGrid() {
-  if (document.getElementById('actionGrid')) return;
-
-  const grid = document.createElement('div');
-  grid.id = 'actionGrid';
-  grid.style.cssText = `position:absolute;top:8px;left:8px;z-index:999;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;background:rgba(240,248,255,0.97);padding:14px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);border:3px solid #1976d2;font-size:11px;max-width:480px;backdrop-filter:blur(8px);`;
-
-  ACTIONS.forEach(action => {
-    const card = document.createElement('div');
-    card.className = 'actionCard';
-    card.innerHTML = `<div style="font-weight:bold;color:#1976d2;margin-bottom:4px;">${action.name}</div><div style="font-size:10px;line-height:1.3;">${action.desc}</div>`;
-    card.title = action.desc;
-    grid.appendChild(card);
-  });
-
-  const board = document.getElementById('board');
-  board.style.position = 'relative';
-  board.appendChild(grid);
-
-  // Timer Flash visible
-  const timerDiv = document.createElement('div');
-  timerDiv.id = 'flashTimer';
-  timerDiv.style.cssText = `position:absolute;top:10px;right:10px;background:#d32f2f;color:white;padding:10px 20px;border-radius:50px;font-size:20px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:none;z-index:1000;`;
-  board.appendChild(timerDiv);
-}
-
-socket.on('gameStart', () => setTimeout(createActionGrid, 600));
-
-socket.on('actionDrawn', (data) => {
-  document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  const card = Array.from(document.querySelectorAll('.actionCard')).find(c => c.textContent.includes(data.action));
-  if (card) card.classList.add('currentAction');
-
-  const timer = document.getElementById('flashTimer');
-  if (data.timer) {
-    timer.style.display = 'block';
-    timer.textContent = `${data.timer}s`;
-  } else {
-    timer.style.display = 'none';
-  }
-});
-
-socket.on('timerUpdate', ({ time }) => {
-  const timer = document.getElementById('flashTimer');
-  timer.textContent = `${time}s`;
-  if (time <= 10) timer.style.background = '#b71c1c';
-});
-
-socket.on('choosePlayerOrAction', ({ type }) => {
-  if (type === 'player') {
-    alert("Clique sur le nom d’un joueur dans la liste pour le choisir !");
-  } else {
-    const list = ACTIONS.map(a => a.name).join('\n');
-    const choice = prompt(`Choisis une action :\n${list}`);
-    if (choice) socket.emit('actionChosen', { code: currentRoom, actionName: choice });
-  }
-});
-
-socket.on('teleportChoice', () => {
-  const pos = prompt("Téléportation ! Choisis une case (0 à 31) :");
-  if (pos && !isNaN(pos) && pos >= 0 && pos < 32) {
-    // Le serveur gère le déplacement
-  }
-});
 })();
-
