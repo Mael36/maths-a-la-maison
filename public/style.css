@@ -1,42 +1,45 @@
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:Arial,sans-serif; background:#e8f5e9; color:#1b5e20; text-align:center; padding:20px; }
-#menu, #game { background:white; margin:20px auto; padding:30px; border-radius:20px; max-width:900px; box-shadow:0 10px 40px rgba(0,0,0,0.15); }
-h1 { font-size:3em; color:#2e7d32; }
-input, button { padding:12px 20px; margin:10px; font-size:1.1em; border-radius:10px; }
-button { background:#4caf50; color:white; border:none; cursor:pointer; font-weight:bold; }
-button:disabled { background:#aaa; cursor:not-allowed; }
-button:hover:not(:disabled) { background:#388e3c; }
+body { font-family: Arial, sans-serif; background:#e8f5ff; color:#0d47a1; text-align:center; padding:20px; }
+h1 { font-size:3em; margin:30px; color:#1976d2; }
+input, button { padding:12px 20px; margin:10px; font-size:1.2em; border-radius:10px; border:none; }
+button { background:#1976d2; color:white; cursor:pointer; min-width:200px; }
+button:disabled { background:#999; cursor:not-allowed; }
+#menu, #game { max-width:900px; margin:0 auto; }
 
-#board { position:relative; margin:30px auto; width:90vw; max-width:750px; }
-#plateau { width:100%; border-radius:50%; box-shadow:0 15px 50px rgba(0,0,0,0.3); }
-#pions { position:absolute; top:0; left:0; widthhull:100%; height:100%; pointer-events:none; }
-.pion { position:absolute; width:50px; height:50px; border-radius:50%; color:white; font-weight:bold; font-size:18px; line-height:50px; border:4px solid white; box-shadow:0 6px 20px rgba(0,0,0,0.5); transform:translate(-50%,-50%); transition:all 0.8s ease; }
+#boardContainer { position:relative; display:inline-block; margin:30px; }
+#plateau { width:90vw; max-width:800px; border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
 
-/* GRILLE 4×4 DES 16 ACTIONS – SANS IMAGES, MAIS MAGNIFIQUE */
+#pions { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+.pawn {
+  position:absolute; width:50px; height:50px; border-radius:50%; border:5px solid white;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5); font-weight:bold; color:white; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+  transform:translate(-50%,-50%); transition:all 0.8s ease;
+}
+
+/* GRILLE 4×4 DES ACTIONS – SANS IMAGES */
 #actionGrid {
-  position:absolute; top:15px; left:15px; z-index:10;
+  position:absolute; top:15px; left:15px; z-index:999;
   display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
   background:rgba(255,255,255,0.97); padding:18px; border-radius:20px;
-  border:4px solid #2e7d32; box-shadow:0 10px 40px rgba(0,0,0,0.3);
-  max-width:520px; font-size:10px; backdrop-filter:blur(10px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.3); border:4px solid #1976d2;
+  max-width:560px; font-size:11px; backdrop-filter:blur(10px);
 }
 .actionCard {
-  background:linear-gradient(135deg,#e8f5e9,#c8e6c9); border-radius:14px; padding:10px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.2); transition:all 0.3s; cursor:default;
-  border:2px solid #81c784;
+  background:white; border:2px solid #90caf9; border-radius:12px; padding:10px;
+  text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.15); transition:all 0.3s;
 }
-.actionCard strong { display:block; font-size:12px; color:#1b5e20; margin-bottom:4px; }
-.actionCard:hover { transform:translateY(-5px); box-shadow:0 10px 25px rgba(76,175,80,0.4); }
-.currentAction { background:linear-gradient(135deg,#fff59d,#ffb74d)!important; border:4px solid gold!important; transform:scale(1.1); box-shadow:0 0 30px gold!important; animation:pulse 1.5s infinite; z-index:20; }
+.actionCard:hover { transform:translateY(-6px); border-color:#1976d2; }
+.currentAction {
+  background:#fff8e1; border:4px solid gold; transform:scale(1.1);
+  box-shadow:0 0 30px gold; animation:pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{box-shadow:0 0 30px gold;} 50%{box-shadow:0 0 50px gold;} }
 
 #flashTimer {
   position:absolute; top:20px; right:20px; background:#d32f2f; color:white;
   padding:15px 30px; border-radius:50px; font-size:28px; font-weight:bold;
-  box-shadow:0 8px 25px rgba(211,47,47,0.5); display:none; z-index:100;
-  animation:pulse 1s infinite;
+  box-shadow:0 8px 25px rgba(0,0,0,0.4); display:none; z-index:1000;
 }
-
-#players > div { background:#e8f5e9; padding:12px; margin:8px; border-radius:10px; border-left:5px solid #4caf50; font-weight:bold; }
-#question { background:white; padding:25px; border-radius:16px; margin:20px; box-shadow:0 8px 30px rgba(0,0,0,0.15); }
-
-@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+#players div { padding:12px; margin:8px; background:#e3f2fd; border-radius:10px; font-weight:bold; }
+#questionBox { background:white; padding:25px; border-radius:16px; margin:20px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
