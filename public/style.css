@@ -1,45 +1,47 @@
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: Arial, sans-serif; background:#e8f5ff; color:#0d47a1; text-align:center; padding:20px; }
-h1 { font-size:3em; margin:30px; color:#1976d2; }
-input, button { padding:12px 20px; margin:10px; font-size:1.2em; border-radius:10px; border:none; }
-button { background:#1976d2; color:white; cursor:pointer; min-width:200px; }
-button:disabled { background:#999; cursor:not-allowed; }
-#menu, #game { max-width:900px; margin:0 auto; }
+body { font-family:Arial,sans-serif; background:#e3f2fd; color:#1565c0; min-height:100vh; }
+#menu { background:white; padding:40px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); max-width:500px; margin:50px auto; text-align:center; }
+h1 { font-size:3.5em; color:#1976d2; margin:20px; }
+input, button { padding:14px 20px; margin:10px; font-size:1.2em; border-radius:12px; border:none; }
+button { background:#1976d2; color:white; cursor:pointer; }
+button:hover { filter:brightness(1.1); }
+#startGameBtn { background:#4caf50 !important; font-size:1.5em !important; padding:18px 50px !important; }
 
 #boardContainer { position:relative; display:inline-block; margin:30px; }
-#plateau { width:90vw; max-width:800px; border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+#plateau { width:90vw; max-width:850px; border-radius:50%; box-shadow:0 15px 50px rgba(0,0,0,0.4); }
 
+/* PIONS PARFAITEMENT CENTRÉS */
 #pions { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
 .pawn {
-  position:absolute; width:50px; height:50px; border-radius:50%; border:5px solid white;
-  box-shadow:0 6px 20px rgba(0,0,0,0.5); font-weight:bold; color:white; font-size:18px;
+  position:absolute; width:56px; height:56px; border-radius:50%; border:5px solid white;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5); font-weight:bold; color:white; font-size:20px;
   display:flex; align-items:center; justify-content:center;
-  transform:translate(-50%,-50%); transition:all 0.8s ease;
+  transform:translate(-50%,-50%); transition:all 0.9s cubic-bezier(0.2,0.8,0.2,1);
 }
 
-/* GRILLE 4×4 DES ACTIONS – SANS IMAGES */
+/* GRILLE 4×4 BIEN PLACÉE EN HAUT À GAUCHE */
 #actionGrid {
-  position:absolute; top:15px; left:15px; z-index:999;
-  display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
-  background:rgba(255,255,255,0.97); padding:18px; border-radius:20px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.3); border:4px solid #1976d2;
-  max-width:560px; font-size:11px; backdrop-filter:blur(10px);
+  position:absolute; top:20px; left:20px; z-index:999;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  background:rgba(255,255,255,0.98); padding:22px; border-radius:24px;
+  box-shadow:0 15px 50px rgba(0,0,0,0.3); border:5px solid #1976d2;
+  max-width:580px; backdrop-filter:blur(12px);
 }
 .actionCard {
-  background:white; border:2px solid #90caf9; border-radius:12px; padding:10px;
-  text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.15); transition:all 0.3s;
+  background:white; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  transition:all 0.4s; cursor:default; text-align:center; height:135px;
 }
-.actionCard:hover { transform:translateY(-6px); border-color:#1976d2; }
+.actionCard img { width:100%; height:90px; object-fit:cover; }
+.actionCard .title { padding:8px; background:#1976d2; color:white; font-weight:bold; font-size:11px; }
+.actionCard:hover { transform:translateY(-6px); }
 .currentAction {
-  background:#fff8e1; border:4px solid gold; transform:scale(1.1);
-  box-shadow:0 0 30px gold; animation:pulse 1.5s infinite;
+  border:5px solid gold; transform:scale(1.1); box-shadow:0 0 50px gold;
+  z-index:1000; animation:goldPulse 1.5s infinite;
 }
-@keyframes pulse { 0%,100%{box-shadow:0 0 30px gold;} 50%{box-shadow:0 0 50px gold;} }
+@keyframes goldPulse { 0%,100%{box-shadow:0 0 50px gold;} 50%{box-shadow:0 0 70px gold;} }
 
 #flashTimer {
   position:absolute; top:20px; right:20px; background:#d32f2f; color:white;
-  padding:15px 30px; border-radius:50px; font-size:28px; font-weight:bold;
-  box-shadow:0 8px 25px rgba(0,0,0,0.4); display:none; z-index:1000;
+  padding:18px 35px; border-radius:50px; font-size:30px; font-weight:bold;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5); display:none; z-index:1000;
 }
-#players div { padding:12px; margin:8px; background:#e3f2fd; border-radius:10px; font-weight:bold; }
-#questionBox { background:white; padding:25px; border-radius:16px; margin:20px; box-shadow:0 8px 30px rgba(0,0,0,0.2); }
