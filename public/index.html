@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maths à la Maison – Jeu en ligne</title>
+  <title>Maths à la Maison</title>
   <link rel="stylesheet" href="style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-  <!-- MENU -->
   <div id="menu">
     <h1>Maths à la Maison</h1>
     <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
@@ -17,45 +16,41 @@
     <p>OU</p>
     <input type="text" id="roomCode" placeholder="Code (ex: ABCD)" maxlength="4">
     <button onclick="joinRoom()">Rejoindre</button>
-    <div id="info"></div>
   </div>
 
-  <!-- JEU -->
-  <div id="game" style="display:none; padding:20px;">
+  <div id="game" style="display:none; padding:20px; text-align:center;">
     <h2>Salle : <span id="roomDisplay"></span></h2>
-
-    <button id="startBtn" style="padding:16px 40px; font-size:1.4em; background:#4caf50; color:white; border:none; border-radius:12px; margin:10px;">
-      Démarrer la partie
-    </button>
+    <button id="startBtn">Démarrer la partie</button>
 
     <div id="boardContainer">
       <img src="assets/plateau.png" id="plateau" alt="Plateau">
       <div id="pions"></div>
+      <div id="possibleCases"></div>
       <div id="flashTimer">30s</div>
     </div>
 
     <div id="actionGrid"></div>
 
-    <div id="controls" style="margin:20px;">
-      <button id="rollBtn" onclick="rollDice()" disabled style="padding:18px 40px; font-size:1.6em; background:#ff9800; color:white;">
-        Lancer le dé
-      </button>
-      <div id="directions" style="display:none; margin:20px;">
+    <div id="controls">
+      <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
+      <div id="directions" style="display:none; margin:30px;">
         <button onclick="chooseDir('left')">GAUCHE</button>
         <button onclick="chooseDir('right')">DROITE</button>
       </div>
     </div>
 
-    <div id="players" style="margin:20px;"></div>
+    <div id="players"></div>
 
-    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-width:700px; margin:30px auto;">
+    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.3); max-width:700px; margin:30px auto;">
       <h3 id="themeTitle"></h3>
-      <p id="questionText"></p>
-      <input type="text" id="answerInput" placeholder="Ta réponse">
-      <button onclick="sendAnswer()">Envoyer</button>
+      <p id="questionText" style="font-size:1.4em;"></p>
+      <div style="margin:20px 0;">
+        <input type="text" id="answerInput" placeholder="Ta réponse ici">
+        <button onclick="sendAnswer()" style="padding:12px 30px; background:#4caf50; color:white; border:none; border-radius:12px; margin-left:10px;">Envoyer</button>
+      </div>
     </div>
 
-    <div id="results"></div>
+    <div id="results" style="font-size:1.3em; margin:20px;"></div>
   </div>
 
   <script src="script.js"></script>
