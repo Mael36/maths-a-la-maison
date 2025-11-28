@@ -5,35 +5,44 @@ let board = null;
 
 const $ = id => document.getElementById(id);
 
+// 16 vraies cartes Action (images dans public/actions/)
+const ACTIONS = [
+  {name:"Flash", img:"actions/flash.jpg", text:"Tu dois répondre en moins de 30 secondes !"},
+  {name:"Battle on left", img:"actions/battle_left.jpg", text:"Plus rapide que ton voisin de gauche"},
+  {name:"Battle on right", img:"actions/battle_right.jpg", text:"Plus rapide que ton voisin de droite"},
+  {name:"Call a friend", img:"actions/call_friend.jpg", text:"Choisis un partenaire → +1 point chacun"},
+  {name:"For you", img:"actions/for_you.jpg", text:"Désigne qui répond à ta place"},
+  {name:"Second life", img:"actions/second_life.jpg", text:"Deuxième chance si tu échoues"},
+  {name:"No way", img:"actions/no_way.jpg", text:"Bonne réponse obligatoire, sinon +1 pt à tous les autres"},
+  {name:"Double", img:"actions/double.jpg", text:"×2 les points"},
+  {name:"Téléportation", img:"actions/teleport.jpg", text:"Tu choisis la prochaine case"},
+  {name:"+1 ou -1", img:"actions/plus_minus.jpg", text:"+2 si bonne / -1 si fausse"},
+  {name:"Everybody", img:"actions/everybody.jpg", text:"Tout le monde joue !"},
+  {name:"Double or quits", img:"actions/double_quits.jpg", text:"Tout doubler ou tout perdre"},
+  {name:"It's your choice", img:"actions/choice.jpg", text:"Tu choisis l'action"},
+  {name:"Everybody", img:"actions/everybody.jpg", text:"Tout le monde joue !"},
+  {name:"No way", img:"actions/no_way.jpg", text:"Bonne réponse obligatoire"},
+  {name:"Quadruple", img:"actions/quadruple.jpg", text:"×4 les points"}
+];
+
 fetch('/data/board.json').then(r => r.json()).then(data => {
   board = data;
   createActionGrid();
 });
 
 function createActionGrid() {
-  const actions = [
-    {name:"Flash",img:"actions/flash.jpg"},
-    {name:"Battle on left",img:"actions/battle_left.jpg"},
-    {name:"Battle on right",img:"actions/battle_right.jpg"},
-    {name:"Call a friend",img:"actions/call_friend.jpg"},
-    {name:"For you",img:"actions/for_you.jpg"},
-    {name:"Second life",img:"actions/second_life.jpg"},
-    {name:"No way",img:"actions/no_way.jpg"},
-    {name:"Double",img:"actions/double.jpg"},
-    {name:"Téléportation",img:"actions/teleport.jpg"},
-    {name:"+1 ou -1",img:"actions/plus_minus.jpg"},
-    {name:"Everybody",img:"actions/everybody.jpg"},
-    {name:"Double or quits",img:"actions/double_quits.jpg"},
-    {name:"It's your choice",img:"actions/choice.jpg"},
-    {name:"Everybody",img:"actions/everybody.jpg"},
-    {name:"No way",img:"actions/no_way.jpg"},
-    {name:"Quadruple",img:"actions/quadruple.jpg"}
-  ];
-  actions.forEach(a => {
+  const grid = $('actionGrid');
+  ACTIONS.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
-    card.innerHTML = `<img src="${a.img}" style="width:100%;border-radius:10px;"><strong>${a.name}</strong>`;
-    $('actionGrid').appendChild(card);
+    card.innerHTML = `
+      <img src="${a.img}" style="width:100%;height:160px;object-fit:cover;border-radius:12px;">
+      <div style="padding:8px;background:#1565c0;color:white;border-radius:0 0 12px 12px;">
+        <strong>${a.name}</strong><br>
+        <small style="font-size:10px;">${a.text}</small>
+      </div>
+    `;
+    grid.appendChild(card);
   });
 }
 
@@ -44,74 +53,60 @@ function updatePawns(players) {
 
   players.forEach((p, i) => {
     const pos = board.positions[p.pos];
-    const x = rect.left + rect.width * (pos.x / 100);
-    const y = rect.top + rect.height * (pos.y / 100);
+    const x = rect.width * (pos.x / 100);
+    const y = rect.height * (pos.y / 100);
 
     const pawn = document.createElement('div');
     pawn.className = 'pawn';
-    pawn.style.left = (x - 28) + 'px';
-    pawn.style.top = (y - 28) + 'px';
+    pawn.style.left = (x - 30) + 'px';
+    pawn.style.top = (y - 30) + 'px';
     pawn.style.background = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'][i];
     pawn.textContent = i + 1;
-    pawn.title = p.name + ' – ' + p.score + ' pts';
+    pawn.title = `${p.name} – ${p.score} pts`;
     $('pions').appendChild(pawn);
   });
 }
 
-// Afficher toutes les cases atteignables (ramifications incluses)
 function showPossibleCases(currentPos, steps) {
   const reachable = new Set();
-  const queue = [{pos: currentPos, remaining: steps}];
+  const queue = [{pos: currentPos, left: steps}];
 
   while (queue.length) {
-    const {pos, remaining} = queue.shift();
-    if (remaining === 0) {
-      reachable.add(pos);
-      continue;
-    }
-    // Avancer sur le cercle
+    const {pos, left} = queue.shift();
+    if (left === 0) { reachable.add(pos); continue; }
+
     if (pos < 48) {
-      const next = (pos + 1) % 48;
-      queue.push({pos: next, remaining: remaining - 1});
-    }
-    // Entrer dans une branche si on est sur une case d'embranchement
-    if (pos < 48 && pos % 4 === 0) {
-      const branchIndex = pos / 4;
-      const branchStart = 48 + branchIndex * 3;
-      if (branchStart < 84) {
-        queue.push({pos: branchStart, remaining: remaining - 1});
+      queue.push({pos: (pos + 1) % 48, left: left - 1});
+      if (pos % 4 === 0) {
+        const branch = 48 + (pos / 4) * 3;
+        if (branch < 84) queue.push({pos: branch, left: left - 1});
       }
     }
-    // Avancer dans une branche
     if (pos >= 48 && pos < 84) {
-      const nextInBranch = pos + 1;
-      if (nextInBranch < 84 || nextInBranch === 84) {
-        queue.push({pos: nextInBranch, remaining: remaining - 1});
-      }
+      const next = pos + 1;
+      if (next <= 84) queue.push({pos: next, left: left - 1});
     }
   }
 
-  // Affichage visuel
   $('possibleCases').innerHTML = '';
   reachable.forEach(pos => {
     const p = board.positions[pos];
     const spot = document.createElement('div');
     spot.style.position = 'absolute';
-    spot.style.width = '70px';
-    spot.style.height = '70px';
-    spot.style.background = 'rgba(255,215,0,0.7)';
-    spot.style.border = '5px solid gold';
+    spot.style.width = '90px'; spot.style.height = '90px';
+    spot.style.background = 'radial-gradient(circle, gold, orange)';
+    spot.style.border = '6px solid white';
     spot.style.borderRadius = '50%';
-    spot.style.left = (p.x / 100 * img.width - 35) + 'px';
-    spot.style.top = (p.y / 100 * img.height - 35) + 'px';
+    spot.style.left = (p.x / 100 * $('plateau').width - 45) + 'px';
+    spot.style.top = (p.y / 100 * $('plateau').height - 45) + 'px';
     spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 40px gold';
+    spot.style.boxShadow = '0 0 50px gold, inset 0 0 20px white';
+    spot.style.zIndex = '1000';
     spot.onclick = () => socket.emit('moveTo', {code: room, pos});
     $('possibleCases').appendChild(spot);
   });
 }
 
-// === ÉVÉNEMENTS ===
 window.rollDice = () => socket.emit('roll', room);
 
 socket.on('rolled', data => {
@@ -120,10 +115,14 @@ socket.on('rolled', data => {
   showPossibleCases(data.currentPos, roll);
 });
 
-socket.on('players', players => updatePawns(players));
-socket.on('yourTurn', () => $('rollBtn').disabled = false);
-socket.on('actionDrawn', a => {
+socket.on('players', p => updatePawns(p));
+socket.on('yourTurn', () => {
+  $('rollBtn').disabled = false;
+  $('rollBtn').textContent = 'Lancer le dé';
+});
+
+socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  const card = [...document.querySelectorAll('.actionCard')].find(c => c.textContent.includes(a.name));
+  const card = [...document.querySelectorAll('.actionCard')].find(c => c.textContent.includes(data.action));
   if (card) card.classList.add('currentAction');
 });
