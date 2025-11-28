@@ -3,45 +3,46 @@ let room = null;
 
 const $ = id => document.getElementById(id);
 
-const ACTIONS = [ /* les 16 actions exactement comme ton tableau */ 
-  {name:"Flash",flash:30}, {name:"Battle on left",battleLeft:true}, {name:"Battle on right",battleRight:true},
-  {name:"Call a friend",callFriend:true}, {name:"For you",forYou:true}, {name:"Second life",secondLife:true},
-  {name:"No way",noWay:true}, {name:"Double",multiplier:2}, {name:"Téléportation",teleport:true},
-  {name:"+1 ou -1",plusOrMinus:true}, {name:"Everybody",everybody:true}, {name:"Double or quits",doubleOrQuits:true},
-  {name:"It's your choice",freeChoice:true}, {name:"Everybody",everybody:true}, {name:"No way",noWay:true},
-  {name:"Quadruple",multiplier:4}
+const ACTIONS = [
+  {name:"Flash",flash:30,desc:"Réponds en moins de 30 secondes !"},
+  {name:"Battle on left",battleLeft:true,desc:"Plus rapide que ton voisin de gauche"},
+  {name:"Battle on right",battleRight:true,desc:"Plus rapide que ton voisin de droite"},
+  {name:"Call a friend",callFriend:true,desc:"Choisis un partenaire → +1 point chacun"},
+  {name:"For you",forYou:true,desc:"Désigne un joueur qui répond à ta place"},
+  {name:"Second life",secondLife:true,desc:"Deuxième chance si tu échoues"},
+  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
+  {name:"Double",multiplier:2,desc:"×2 les points"},
+  {name:"Téléportation",teleport:true,desc:"Réussite → +1 point + tu choisis la prochaine case"},
+  {name:"+1 ou -1",plusOrMinus:true,desc:"Réussite → +2 / Échec → -1"},
+  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
+  {name:"Double or quits",doubleOrQuits:true,desc:"Tout doubler ou tout perdre"},
+  {name:"It's your choice",freeChoice:true,desc:"Choisis l'action que tu veux !"},
+  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
+  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
+  {name:"Quadruple",multiplier:4,desc:"×4 les points"}
 ];
 
-const actionImages = [
-  "flash.jpg","battle-left.jpg","battle-right.jpg","call-a-friend.jpg","for-you.jpg","second-life.jpg",
-  "no-way.jpg","double.jpg","teleportation.jpg","plus-ou-moins.jpg","everybody.jpg","double-or-quits.jpg",
-  "its-your-choice.jpg","everybody.jpg","no-way.jpg","quadruple.jpg"
-];
-
-// === GRILLE 4×4 ===
+// GRILLE 4×4
 function createActionGrid() {
-  if ($('actionGrid').children.length > 0) return;
-  const grid = $('actionGrid');
-  ACTIONS.forEach((a,i) => {
+  if ($('actionGrid').children.length) return;
+  ACTIONS.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
-    card.innerHTML = `<img src="actions/${actionImages[i]}" alt="${a.name}"><div class="title">${a.name}</div>`;
-    grid.appendChild(card);
+    card.innerHTML = `<strong>${a.name}</strong><br><small>${a.desc}</small>`;
+    card.title = a.desc;
+    $('actionGrid').appendChild(card);
   });
 }
 
-// === PIONS PARFAITS ===
+// PIONS PARFAITS
 function updatePawns(players) {
   const container = $('pions');
   const img = $('plateau');
-  const rect = img.getBoundingClientRect();
-  const w = rect.width, h = rect.height;
+  const w = img.clientWidth, h = img.clientHeight;
   container.style.width = w+'px'; container.style.height = h+'px';
   container.innerHTML = '';
-
   const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.39;
   const colors = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'];
-
   players.forEach((p,i) => {
     const angle = (p.pos/32)*Math.PI*2 - Math.PI/2;
     const x = cx + Math.cos(angle)*radius;
@@ -51,12 +52,12 @@ function updatePawns(players) {
     pawn.style.left = x+'px'; pawn.style.top = y+'px';
     pawn.style.background = colors[i%6];
     pawn.textContent = i+1;
-    pawn.title = p.name + ' – ' + p.score + ' pts';
+    pawn.title = `${p.name} – ${p.score} pts`;
     container.appendChild(pawn);
   });
 }
 
-// === FONCTIONS ===
+// FONCTIONS
 window.createRoom = () => socket.emit('create', $('playerName').value || 'Hôte');
 window.joinRoom = () => {
   const code = $('roomCode').value.trim().toUpperCase();
@@ -71,10 +72,10 @@ window.sendAnswer = () => {
   $('answerInput').value = '';
 };
 
-// Bouton Démarrer
-$('startGameBtn').onclick = () => socket.emit('start', room);
+// Démarrer la partie
+$('startBtn').onclick = () => socket.emit('start', room);
 
-// === SOCKET ===
+// SOCKET
 socket.on('created', code => { room=code; showGame(code); });
 socket.on('joined', code => { room=code; showGame(code); });
 socket.on('error', msg => alert(msg));
@@ -87,13 +88,13 @@ function showGame(code) {
 }
 
 socket.on('players', players => {
-  $('players').innerHTML = players.map(p=>`<div style="padding:12px; background:#bbdefb; margin:8px; border-radius:10px;"><strong>${p.name}</strong> – ${p.score} pts – case ${p.pos}</div>`).join('');
+  $('players').innerHTML = players.map(p=>`<div><strong>${p.name}</strong> – ${p.score} pts – case ${p.pos}</div>`).join('');
   updatePawns(players);
 });
 
 socket.on('gameStart', () => {
-  $('startGameBtn').style.display = 'none';
-  alert('La partie commence !');
+  $('startBtn').style.display = 'none';
+  alert('La partie est lancée !');
 });
 
 socket.on('yourTurn', () => $('rollBtn').disabled = false);
@@ -108,7 +109,7 @@ socket.on('actionDrawn', data => {
     $('flashTimer').style.display = 'block';
     $('flashTimer').textContent = t+'s';
     const int = setInterval(()=>{ t--; $('flashTimer').textContent = t+'s'; if(t<=0) clearInterval(int); },1000);
-  }
+  } else $('flashTimer').style.display = 'none';
 });
 
 socket.on('question', q => {
