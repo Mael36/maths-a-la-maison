@@ -1,25 +1,50 @@
-/* ...existing code... */
-body { font-family: sans-serif; margin: 20px; }
-#menu { max-width: 520px; margin: 0 auto; text-align: center; }
-#menu input { margin: 6px; padding: 8px; width: 180px; }
-#menu button { margin: 6px; padding: 8px 12px; cursor: pointer; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', sans-serif; background:#e3f2fd; color:#1565c0; }
+#menu, #game { text-align:center; padding:20px; }
+#menu h1 { font-size:3em; margin:20px; color:#1976d2; }
+input, button { padding:12px; margin:10px; font-size:1.2em; border-radius:8px; border:none; }
+button { background:#1976d2; color:white; cursor:pointer; }
+button:hover { background:#1565c0; }
 
-#game { max-width: 800px; margin: 10px auto; text-align: center; }
-#playersList { margin: 10px 0; text-align: left; min-height: 60px; }
-#board { position: relative; display: inline-block; margin: 12px; }
-#boardImg { display:block; }
-#pions { position: absolute; left: 0; top: 0; pointer-events: none; }
+#game { display:flex; flex-direction:column; align-items:center; }
+#board { position:relative; width:90vw; max-width:900px; margin:20px auto; }
+#plateau { width:100%; border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+#pions { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+.pion { position:absolute; width:40px; height:40px; border-radius:50%; border:4px solid white; box-shadow:0 4px 15px rgba(0,0,0,0.4); transition:all 0.8s ease; }
 
-/* style d'un pion */
-.pawn {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+#flashTimer {
+  position:absolute; top:15px; right:15px; background:#d32f2f; color:white;
+  padding:12px 25px; border-radius:50px; font-size:28px; font-weight:bold;
+  box-shadow:0 6px 20px rgba(0,0,0,0.4); display:none; z-index:1000;
+  animation:pulse 1s infinite;
 }
 
-#controls { margin: 10px; }
-button { pointer-events: auto; cursor: pointer; }
-/* ...existing code... */
+/* GRILLE DES 16 CARTES MAGNIFIQUES */
+#actionGrid {
+  position:absolute; top:15px; left:15px; z-index:999;
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  background:rgba(255,255,255,0.97); padding:18px; border-radius:20px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.3); border:4px solid #1976d2;
+  max-width:520px; backdrop-filter:blur(12px);
+  animation:slideIn 0.8s ease-out;
+}
+.actionCard {
+  background:white; border-radius:14px; overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2); transition:all 0.4s; cursor:pointer;
+  position:relative; text-align:center;
+}
+.actionCard img { width:100%; height:90px; object-fit:cover; }
+.actionCard div { padding:6px; background:#1976d2; color:white; font-weight:bold; font-size:11px; }
+.actionCard:hover { transform:translateY(-8px) scale(1.05); box-shadow:0 20px 40px rgba(25,118,210,0.5); }
+.currentAction {
+  border:5px solid gold !important; transform:scale(1.1);
+  box-shadow:0 0 40px gold !important; animation:glow 1.5s infinite;
+  z-index:1001;
+}
+
+#sidebar { background:white; padding:20px; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.2); width:90%; max-width:400px; }
+#playerList div { padding:10px; background:#e3f2fd; margin:8px; border-radius:8px; font-weight:bold; }
+
+@keyframes slideIn { from{opacity:0; transform:translateX(-50px);} to{opacity:1; transform:none;} }
+@keyframes glow { 0%,100%{box-shadow:0 0 40px gold;} 50%{box-shadow:0 0 60px gold;} }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
