@@ -64,7 +64,15 @@ window.joinRoom = () => {
   if(!code) return alert('Entre un code !');
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
-window.rollDice = () => socket.emit('roll', room);
+window.rollDice = () => {
+  if (!room) {
+    alert("Erreur : pas de salle !");
+    return;
+  }
+  socket.emit('roll', room);           // Envoie le lancer à la bonne salle
+  $('rollBtn').disabled = true;        // Désactive le bouton immédiatement
+  $('rollBtn').textContent = "Dé lancé...";
+};
 window.chooseDir = dir => socket.emit('move', {code:room, direction:dir});
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
@@ -97,7 +105,21 @@ socket.on('gameStart', () => {
   alert('La partie est lancée !');
 });
 
-socket.on('yourTurn', () => $('rollBtn').disabled = false);
+socket.on('yourTurn', () => {
+  $('rollBtn').disabled = false;
+  $('rollBtn').textContent = "Lancer le dé";
+  alert("À toi de jouer ! Lance le dé !");
+});
+
+socket.on('rolled', ({roll}) => {
+  $('directions').style.display = 'block';
+  alert(`Tu as fait ${roll} ! Choisis GAUCHE ou DROITE`);
+});
+
+socket.on('rolledInfo', ({player, roll}) => {
+  // Optionnel : pour que tout le monde voie qui a lancé quoi
+  console.log(`${player} a lancé ${roll}`);
+});
 
 socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c=>c.classList.remove('currentAction'));
@@ -118,3 +140,4 @@ socket.on('question', q => {
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
 });
+
