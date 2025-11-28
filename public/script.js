@@ -1,5 +1,6 @@
 const socket = io();
 let room = null;
+let lastRoll = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -65,19 +66,16 @@ window.joinRoom = () => {
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
 window.rollDice = () => {
-  if (!room) {
-    alert("Erreur : pas de salle !");
-    return;
-  }
-  socket.emit('roll', room);           // Envoie le lancer à la bonne salle
-  $('rollBtn').disabled = true;        // Désactive le bouton immédiatement
+  if (!room) return alert("Erreur : pas de salle");
+  socket.emit('roll', room);
+  $('rollBtn').disabled = true;
   $('rollBtn').textContent = "Dé lancé...";
 };
-window.chooseDir = dir => socket.emit('move', {code:room, direction:dir});
-window.sendAnswer = () => {
-  const ans = $('answerInput').value.trim();
-  if(ans) socket.emit('answer', {code:room, answer:ans});
-  $('answerInput').value = '';
+window.chooseDir = (dir) => {
+  if (!room || lastRoll === 0) return alert("Lance d'abord le dé !");
+  socket.emit('move', { code: room, steps: lastRoll, direction: dir });  // ← steps ajouté
+  $('directions').style.display = 'none';
+  lastRoll = 0; // reset
 };
 
 // Démarrer la partie
@@ -112,6 +110,7 @@ socket.on('yourTurn', () => {
 });
 
 socket.on('rolled', ({roll}) => {
+  lastRoll = roll;                                      // ← LIGNE AJOUTÉE
   $('directions').style.display = 'block';
   alert(`Tu as fait ${roll} ! Choisis GAUCHE ou DROITE`);
 });
@@ -140,4 +139,5 @@ socket.on('question', q => {
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
 });
+
 
