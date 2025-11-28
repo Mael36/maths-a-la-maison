@@ -108,12 +108,12 @@ io.on('connection', (socket) => {
     io.to(player.id).emit('yourTurn');
   }
 
-  socket.on('roll', (code) => {
+   socket.on('roll', code => {
     const room = rooms[code];
     if (!room || room.activePlayers[0] !== socket.id) return;
     const roll = Math.floor(Math.random() * 6) + 1;
-    io.to(code).emit('rolledInfo', { player: getPlayer(room, socket.id).name, roll });
-    io.to(socket.id).emit('rolled', { roll });
+    const player = getPlayer(room, socket.id);
+    io.to(code).emit('rolled', { roll, currentPos: player.pos });
   });
 
   // ... (le début reste identique jusqu'à socket.on('move'))
@@ -214,4 +214,5 @@ function applyActionResults(room, action, correct) {
 });
 
 server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
+
 
