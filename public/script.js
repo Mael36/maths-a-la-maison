@@ -228,5 +228,32 @@
     $('actionInfo').textContent = `${d.player} → ${d.action}`;
     setTimeout(() => $('actionInfo').textContent = '', 3000);
   });
+  
+  socket.on('choosePlayer', ({ action }) => {
+  alert(`Action: ${action}\nChoisis un joueur (clique sur son nom dans la liste)`);
+  document.querySelectorAll('#playerList li').forEach(li => {
+    li.style.cursor = 'pointer';
+    li.onclick = () => {
+      const targetName = li.textContent.split(' - ')[0];
+      const target = players.find(p => p.name === targetName);
+      if (target) {
+        socket.emit('playerChosen', { code: currentRoom, targetId: target.id });
+        li.onclick = null;
+      }
+    };
+  });
+});
 
+socket.on('chooseAction', ({ actions }) => {
+  const list = actions.map(a => `${a.name}: ${a.desc}`).join('\n');
+  const choice = prompt(`Choisis une action:\n\n${list}`);
+  if (choice) socket.emit('actionChosen', { code: currentRoom, actionName: choice.split(':')[0].trim() });
+});
+
+socket.on('teleport', () => {
+  const pos = prompt("Téléportation ! Choisis une case (0 à 31):");
+  if (pos && !isNaN(pos)) {
+    socket.emit('move', { code: currentRoom, steps: 0, direction: 'right', teleportTo: +pos });
+  }
+});
 })();
