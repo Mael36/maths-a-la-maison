@@ -41,16 +41,14 @@
 
     <div id="players"></div>
 
-    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.3); max-width:700px; margin:30px auto;">
+    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-width:700px; margin:30px auto;">
       <h3 id="themeTitle"></h3>
       <p id="questionText" style="font-size:1.4em;"></p>
-      <div style="margin:20px 0;">
-        <input type="text" id="answerInput" placeholder="Ta réponse ici">
-        <button onclick="sendAnswer()" style="padding:12px 30px; background:#4caf50; color:white; border:none; border-radius:12px; margin-left:10px;">Envoyer</button>
-      </div>
+      <input type="text" id="answerInput" placeholder="Ta réponse">
+      <button onclick="sendAnswer()">Envoyer</button>
     </div>
 
-    <div id="results" style="font-size:1.3em; margin:20px;"></div>
+    <div id="results"></div>
   </div>
 
   <script src="script.js"></script>
