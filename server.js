@@ -29,7 +29,7 @@ const ACTIONS = [
   { name: "Double or quits", doubleOrQuits: true, desc: "Tout doubler ou tout perdre" },
   { name: "It's your choice", freeChoice: true, desc: "Choisis l'action que tu veux !" },
   { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
-  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon -1 point à tous les autres" },
+  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
   { name: "Quadruple", multiplier: 4, desc: "×4 les points en cas de succès" }
 ];
 
@@ -274,3 +274,4 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
+
