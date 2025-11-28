@@ -13,7 +13,7 @@ const ACTIONS = [
   {name:"Second life",secondLife:true,desc:"Deuxième chance si tu échoues"},
   {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
   {name:"Double",multiplier:2,desc:"×2 les points"},
-  {name:"Téléportation",teleport:true,desc:"Réussite → +1 point + tu choisis la prochaine case"},
+  {name:"Téléportation",teleport:true,desc:"Réussite → +1 point + tu choisit la prochaine case"},
   {name:"+1 ou -1",plusOrMinus:true,desc:"Réussite → +2 / Échec → -1"},
   {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
   {name:"Double or quits",doubleOrQuits:true,desc:"Tout doubler ou tout perdre"},
@@ -23,7 +23,7 @@ const ACTIONS = [
   {name:"Quadruple",multiplier:4,desc:"×4 les points"}
 ];
 
-// Création grille 4×4
+// GRILLE 4×4
 function createActionGrid() {
   if ($('actionGrid').children.length) return;
   ACTIONS.forEach(a => {
@@ -66,32 +66,22 @@ window.joinRoom = () => {
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
 window.rollDice = () => {
-  console.log('Bouton dé cliqué ! Room:', room);
-  if (!room) return alert('Erreur : pas de salle');
+  console.log('DÉBO GAGE: Bouton dé cliqué. Room:', room);
   socket.emit('roll', room);
   $('rollBtn').disabled = true;
-  $('rollBtn').textContent = "Dé lancé...";
-  console.log('Roll émis au serveur');
+  $('rollBtn').textContent = 'Dé lancé...';
+  console.log('DÉBOGAGE: Roll émis au serveur');
 };
-window.chooseDir = dir => {
-  console.log('Direction choisie:', dir, 'Steps:', lastRoll, 'Room:', room);
-  if (!room || lastRoll === 0) return alert("Lance d'abord le dé !");
-  socket.emit('move', {code: room, steps: lastRoll, direction: dir });
-  $('directions').style.display = 'none';
-  lastRoll = 0;
-};
+window.chooseDir = dir => socket.emit('move', {code:room, direction:dir, steps:lastRoll});
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
   if(ans) socket.emit('answer', {code:room, answer:ans});
   $('answerInput').value = '';
-  console.log('Réponse envoyée au serveur');
+  console.log('DÉBOGAGE: Réponse envoyée au serveur');
 };
 
 // Démarrer
-$('startBtn').onclick = () => {
-  console.log('Démarrage partie cliqué ! Room:', room);
-  socket.emit('start', room);
-};
+$('startBtn').onclick = () => socket.emit('start', room);
 
 // SOCKET
 socket.on('created', code => { room=code; showGame(code); });
@@ -116,7 +106,7 @@ socket.on('actionDrawn', data => {
   const idx = ACTIONS.findIndex(a=>a.name===data.action);
   if(idx>=0) document.querySelectorAll('.actionCard')[idx].classList.add('currentAction');
 
-  console.log('Action tirée : ', data.action);
+  console.log('DÉBOGAGE: Action tirée', data.action);
 
   if(data.timer){
     let t = data.timer;
@@ -130,7 +120,6 @@ socket.on('question', q => {
   $('themeTitle').textContent = 'Thème : ' + q.theme;
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
-  $('submitBtn').disabled = false;
   $('answerInput').focus();
 });
 
@@ -139,6 +128,3 @@ socket.on('results', data => {
   $('questionBox').style.display = 'none';
   $('flashTimer').style.display = 'none';
 });
-
-socket.on('connect', () => console.log('Connecté au serveur'));
-socket.on('disconnect', () => console.log('Déconnecté du serveur'));
