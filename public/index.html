@@ -21,8 +21,9 @@
   </div>
 
   <!-- JEU -->
-  <div id="game" style="display:none;">
+  <div id="game" style="display:none; text-align:center; padding:20px;">
     <h2>Salle : <span id="roomDisplay"></span></h2>
+    <button id="startGameBtn" style="padding:15px 40px; font-size:1.4em; background:#4caf50; color:white; border:none; border-radius:12px; margin:15px;">Démarrer la partie</button>
 
     <div id="boardContainer">
       <img src="assets/plateau.png" id="plateau" alt="Plateau">
@@ -32,23 +33,23 @@
     </div>
 
     <div id="controls">
-      <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
-      <div id="directions" style="display:none; margin:15px;">
-        <button onclick="chooseDir('left')">GAUCHE</button>
-        <button onclick="chooseDir('right')">DROITE</button>
+      <button id="rollBtn" onclick="rollDice()" disabled style="padding:18px 40px; font-size:1.5em; background:#ff9800; color:white;">Lancer le dé</button>
+      <div id="directions" style="display:none; margin:20px;">
+        <button onclick="chooseDir('left')" style="padding:12px 25px; margin:10px;">GAUCHE</button>
+        <button onclick="chooseDir('right')" style="padding:12px 25px; margin:10px;">DROITE</button>
       </div>
     </div>
 
-    <div id="players"></div>
+    <div id="players" style="margin:20px;"></div>
 
-    <div id="questionBox" style="display:none;">
-      <h3 id="themeTitle"></h3>
-      <p id="questionText"></p>
-      <input type="text" id="answerInput" placeholder="Ta réponse">
-      <button onclick="sendAnswer()">Envoyer</button>
+    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-width:700px; margin:30px auto;">
+      <h3 id="themeTitle" style="color:#1976d2;"></h3>
+      <p id="questionText" style="font-size:1.4em; margin:20px 0;"></p>
+      <input type="text" id="answerInput" placeholder="Ta réponse" style="padding:15px; width:70%; font-size:1.2em; border-radius:10px; border:2px solid #ddd;">
+      <button onclick="sendAnswer()" style="padding:15px 30px; background:#4caf50; color:white; border:none; border-radius:10px; margin-left:10px;">Envoyer</button>
     </div>
 
-    <div id="results"></div>
+    <div id="results" style="margin:20px; font-size:1.2em;"></div>
   </div>
 
   <script src="script.js"></script>
