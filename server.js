@@ -118,18 +118,18 @@ io.on('connection', (socket) => {
 
   // ... (le début reste identique jusqu'à socket.on('move'))
 
-socket.on('move', ({code, position}) => {
+socket.on('moveTo', ({code, pos}) => {
   const room = rooms[code];
-  if (!room || !room.activePlayers.includes(socket.id)) return;
+  if (!room || room.activePlayers[0] !== socket.id) return;
 
   const player = getPlayer(room, socket.id);
-  player.pos = position;
+  player.pos = pos;
+  io.to(code).emit('players', room.players);
 
-  // Piocher action
+  // Piocher action + question
   const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
   room.currentAction = action;
 
-  // Choisir thème + question
   const theme = THEMES[Math.floor(Math.random() * THEMES.length)] || "Général";
   const q = getRandomQuestion(theme);
   if (!q) return endTurn(room);
@@ -137,22 +137,21 @@ socket.on('move', ({code, position}) => {
   room.currentQuestion = q.question;
   room.currentCorrection = q.correction.trim().toLowerCase();
   room.pendingAnswers = new Map();
-  room.activePlayers = action.everybody ? room.players.map(p=>p.id) : [socket.id];
+  room.activePlayers = action.everybody ? room.players.map(p => p.id) : [socket.id];
 
   io.to(code).emit('actionDrawn', { action: action.name, timer: action.flash || null });
   io.to(code).emit('players', room.players);
 
-  // Timer
   const duration = action.flash || 60;
   room.timer = setTimeout(() => {
     if (room.currentQuestion) {
       io.to(code).emit('timeOut', { message: 'Temps écoulé !' });
-      applyActionResults(room, action, false);
+      room.activePlayers.forEach(id => room.pendingAnswers.set(id, {correct: false}));
+      applyActionResults(room, action);
       endTurn(room);
     }
   }, duration * 1000);
 
-  // Poser la question
   const questionData = { theme, question: q.question };
   if (action.everybody) io.to(code).emit('question', questionData);
   else io.to(socket.id).emit('question', questionData);
@@ -214,5 +213,6 @@ function applyActionResults(room, action, correct) {
 });
 
 server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
+
 
 
