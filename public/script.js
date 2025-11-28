@@ -8,7 +8,7 @@ const ACTIONS = [
   {name:"Flash",flash:30,desc:"Réponds en moins de 30 secondes !"},
   {name:"Battle on left",battleLeft:true,desc:"Plus rapide que ton voisin de gauche"},
   {name:"Battle on right",battleRight:true,desc:"Plus rapide que ton voisin de droite"},
-  {name:"Call a friend",callFriend:true,desc:"Choisis un partenaire → +1 point chacun si bonne réponse"},
+  {name:"Call a friend",callFriend:true,desc:"Choisis un partenaire → +1 point chacun"},
   {name:"For you",forYou:true,desc:"Désigne un joueur qui répond à ta place"},
   {name:"Second life",secondLife:true,desc:"Deuxième chance si tu échoues"},
   {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
@@ -65,17 +65,33 @@ window.joinRoom = () => {
   if(!code) return alert('Entre un code !');
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
-window.rollDice = () => socket.emit('roll', room);
-window.chooseDir = dir => socket.emit('move', {code:room, direction:dir});
+window.rollDice = () => {
+  console.log('Bouton dé cliqué ! Room:', room);
+  if (!room) return alert('Erreur : pas de salle');
+  socket.emit('roll', room);
+  $('rollBtn').disabled = true;
+  $('rollBtn').textContent = "Dé lancé...";
+  console.log('Roll émis au serveur');
+};
+window.chooseDir = dir => {
+  console.log('Direction choisie:', dir, 'Steps:', lastRoll, 'Room:', room);
+  if (!room || lastRoll === 0) return alert("Lance d'abord le dé !");
+  socket.emit('move', {code: room, steps: lastRoll, direction: dir });
+  $('directions').style.display = 'none';
+  lastRoll = 0;
+};
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
   if(ans) socket.emit('answer', {code:room, answer:ans});
   $('answerInput').value = '';
-  $('submitBtn').disabled = true;
+  console.log('Réponse envoyée au serveur');
 };
 
 // Démarrer
-$('startBtn').onclick = () => socket.emit('start', room);
+$('startBtn').onclick = () => {
+  console.log('Démarrage partie cliqué ! Room:', room);
+  socket.emit('start', room);
+};
 
 // SOCKET
 socket.on('created', code => { room=code; showGame(code); });
@@ -100,6 +116,8 @@ socket.on('actionDrawn', data => {
   const idx = ACTIONS.findIndex(a=>a.name===data.action);
   if(idx>=0) document.querySelectorAll('.actionCard')[idx].classList.add('currentAction');
 
+  console.log('Action tirée : ', data.action);
+
   if(data.timer){
     let t = data.timer;
     $('flashTimer').style.display = 'block';
@@ -117,7 +135,10 @@ socket.on('question', q => {
 });
 
 socket.on('results', data => {
-  $('results').innerHTML = `<h3>${data.action}</h3>` + data.results.map(r=>`${r.correct?'Correct':'Faux'} ${r.player} → ${p.score} pts`).join('<br>');
+  $('results').innerHTML = `<h3>${data.action}</h3>` + data.results.map(r=>`${r.correct?'Correct':'Faux'} ${r.player} → ${r.score} pts`).join('<br>');
   $('questionBox').style.display = 'none';
   $('flashTimer').style.display = 'none';
 });
+
+socket.on('connect', () => console.log('Connecté au serveur'));
+socket.on('disconnect', () => console.log('Déconnecté du serveur'));
