@@ -13,7 +13,7 @@ app.use(express.static('public'));
 const MAX_PLAYERS = 6;
 const BOARD_LENGTH = 32;
 
-// === LES 16 ACTIONS (pleinement implémentées) ===
+// LES 16 ACTIONS – RÈGLES EXACTES
 const ACTIONS = [
   { name: "Flash", flash: 30, desc: "Réponds en moins de 30 secondes !" },
   { name: "Battle on left", battleLeft: true, desc: "Plus rapide que ton voisin de gauche" },
@@ -21,7 +21,7 @@ const ACTIONS = [
   { name: "Call a friend", callFriend: true, desc: "Choisis un partenaire → +1 point chacun si bonne réponse" },
   { name: "For you", forYou: true, desc: "Désigne un joueur qui répond à ta place" },
   { name: "Second life", secondLife: true, desc: "Deuxième chance si tu échoues" },
-  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon -1 point à tous les autres" },
+  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
   { name: "Double", multiplier: 2, desc: "×2 les points en cas de succès" },
   { name: "Téléportation", teleport: true, desc: "Réussite → +1 point + tu choisis la prochaine case" },
   { name: "+1 ou -1", plusOrMinus: true, desc: "Réussite → +2 points / Échec → -1 point" },
@@ -33,10 +33,10 @@ const ACTIONS = [
   { name: "Quadruple", multiplier: 4, desc: "×4 les points en cas de succès" }
 ];
 
-// Charger data.json
+// Chargement data.json
 let DATA = null;
 try {
-  const dataPath = path.join(__dirname, 'public', 'data.json');
+  const dataPath = path.join(process.cwd(), 'public', 'data.json');
   DATA = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 } catch (e) {
   console.error("Erreur data.json :", e);
@@ -44,7 +44,7 @@ try {
 const THEMES = DATA ? Object.keys(DATA.categories) : [];
 const QUESTIONS = DATA ? DATA.categories : {};
 
-// Générer le plateau
+// Plateau
 const BOARD = [];
 for (let i = 0; i < BOARD_LENGTH; i++) {
   if (i % 2 === 0) {
@@ -63,9 +63,7 @@ function generateCode() {
 }
 
 function getPlayer(room, id) { return room.players.find(p => p.id === id); }
-function getNextPlayer(room) { return room.players[room.currentTurn % room.players.length]; }
 
-// === SOCKET.IO ===
 io.on('connection', (socket) => {
   console.log("Connecté:", socket.id);
 
@@ -74,7 +72,8 @@ io.on('connection', (socket) => {
     rooms[code] = {
       code, host: socket.id, started: false, currentTurn: 0,
       players: [{ id: socket.id, name: name || "Hôte", pos: 0, score: 0 }],
-      currentAction: null, currentQuestion: null, activePlayers: [], pendingAnswers: new Map()
+      currentAction: null, currentQuestion: null, activePlayers: [], pendingAnswers: new Map(),
+      timer: null
     };
     socket.join(code);
     socket.emit('created', code);
@@ -103,7 +102,7 @@ io.on('connection', (socket) => {
 
   function nextTurn(room) {
     room.currentTurn++;
-    const player = getNextPlayer(room);
+    const player = room.players[room.currentTurn % room.players.length];
     room.activePlayers = [player.id];
     room.pendingAnswers = new Map();
     io.to(player.id).emit('yourTurn');
@@ -111,12 +110,9 @@ io.on('connection', (socket) => {
 
   socket.on('roll', (code) => {
     const room = rooms[code];
-    if (!room || !room.started) return;
-    const player = getPlayer(room, socket.id);
-    if (!player || room.activePlayers[0] !== socket.id) return;
-
+    if (!room || room.activePlayers[0] !== socket.id) return;
     const roll = Math.floor(Math.random() * 6) + 1;
-    io.to(code).emit('rolledInfo', { player: player.name, roll });
+    io.to(code).emit('rolledInfo', { player: getPlayer(room, socket.id).name, roll });
     io.to(socket.id).emit('rolled', { roll });
   });
 
@@ -128,7 +124,7 @@ io.on('connection', (socket) => {
     if (direction === 'left') {
       player.pos = (player.pos - steps + BOARD_LENGTH) % BOARD_LENGTH;
     } else {
-      player.pos = (steps + player.pos) % BOARD_LENGTH;
+      player.pos = (player.pos + steps) % BOARD_LENGTH;
     }
 
     const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
@@ -147,16 +143,30 @@ io.on('connection', (socket) => {
     room.currentQuestion = q;
     room.pendingAnswers = new Map();
 
-    // Appliquer action
-    io.to(code).emit('actionDrawn', { player: player.name, action: action.desc, timer: action.flash || null });
+    // Timer Flash
+    if (action.flash) {
+      let time = action.flash;
+      room.timer = setInterval(() => {
+        time--;
+        io.to(code).emit('timerUpdate', { time });
+        if (time <= 0) {
+          clearInterval(room.timer);
+          room.timer = null;
+          if (room.pendingAnswers.size === 0) {
+            applyActionResults(room, action);
+            endTurn(room);
+          }
+        }
+      }, 1000);
+    }
+
+    io.to(code).emit('actionDrawn', { player: player.name, action: action.name, desc: action.desc, timer: action.flash || null });
 
     if (action.everybody) {
       room.activePlayers = room.players.map(p => p.id);
       io.to(code).emit('question', { theme, question: q.question, everybody: true });
-    } else if (action.callFriend || action.forYou) {
-      io.to(socket.id).emit('choosePlayer', { action: action.name });
-    } else if (action.freeChoice) {
-      io.to(socket.id).emit('chooseAction', { actions: ACTIONS.map(a => ({ name: a.name, desc: a.desc })) });
+    } else if (action.callFriend || action.forYou || action.freeChoice) {
+      io.to(socket.id).emit('choosePlayerOrAction', { type: action.callFriend || action.forYou ? 'player' : 'action' });
     } else {
       room.activePlayers = [socket.id];
       io.to(socket.id).emit('question', { theme, question: q.question });
@@ -169,10 +179,12 @@ io.on('connection', (socket) => {
     const room = rooms[code];
     if (!room || room.activePlayers[0] !== socket.id) return;
     const action = room.currentAction;
-    if (action.callFriend || action.forYou) {
+    if (action.callFriend) {
       room.activePlayers = [socket.id, targetId];
-      io.to(code).emit('question', { theme: room.currentQuestion.theme, question: room.currentQuestion.question });
+    } else if (action.forYou) {
+      room.activePlayers = [targetId];
     }
+    io.to(code).emit('question', { theme: room.currentQuestion.theme || "Général", question: room.currentQuestion.question });
   });
 
   socket.on('actionChosen', ({ code, actionName }) => {
@@ -181,29 +193,32 @@ io.on('connection', (socket) => {
     const newAction = ACTIONS.find(a => a.name === actionName);
     if (newAction) {
       room.currentAction = newAction;
-      io.to(code).emit('actionDrawn', { player: getPlayer(room, socket.id).name, action: newAction.desc });
-      // relancer la question avec la nouvelle action
-      io.to(code).emit('question', { theme: room.currentQuestion.theme, question: room.currentQuestion.question, everybody: newAction.everybody });
+      io.to(code).emit('actionDrawn', { player: getPlayer(room, socket.id).name, action: newAction.name, desc: newAction.desc });
+      if (newAction.everybody) {
+        room.activePlayers = room.players.map(p => p.id);
+      }
+      io.to(code).emit('question', { theme: room.currentQuestion.theme || "Général", question: room.currentQuestion.question });
     }
   });
 
   socket.on('answer', ({ code, answer }) => {
     const room = rooms[code];
-    if (!room || !room.currentQuestion) return;
-    if (!room.activePlayers.includes(socket.id)) return;
+    if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
 
     const player = getPlayer(room, socket.id);
     const correct = (room.currentQuestion.answer + "").trim().toLowerCase() === (answer + "").trim().toLowerCase();
-
-    // Enregistrer réponse
-    room.pendingAnswers.set(socket.id, { correct, answered: true });
+    room.pendingAnswers.set(socket.id, { correct, player: player.name });
 
     const action = room.currentAction;
 
-    // Si tout le monde a répondu ou pas everybody
+    // Si tout le monde a répondu
     const allAnswered = room.activePlayers.every(id => room.pendingAnswers.has(id));
 
-    if (!action.everybody || allAnswered) {
+    if (!action.everybody || allAnswered || action.battleLeft || action.battleRight) {
+      if (action.flash && room.timer) {
+        clearInterval(room.timer);
+        room.timer = null;
+      }
       applyActionResults(room, action);
       endTurn(room);
     }
@@ -214,14 +229,21 @@ io.on('connection', (socket) => {
       const res = room.pendingAnswers.get(id);
       if (!res) return;
       const player = getPlayer(room, id);
-      if (!player) return;
 
       if (res.correct) {
         let points = action.multiplier || 1;
         if (action.plusOrMinus) points = 2;
+        if (action.callFriend && room.activePlayers.length === 2) {
+          room.players.forEach(p => {
+            if (room.activePlayers.includes(p.id)) p.score += 1;
+          });
+        } else {
+          player.score += points;
+        }
         if (action.doubleOrQuits) player.score *= 2;
-        if (action.doubleOrQuits && player.score === 0) player.score = 1;
-        player.score += points;
+        if (action.teleport && id === room.activePlayers[0]) {
+          io.to(id).emit('teleportChoice');
+        }
       } else {
         if (action.plusOrMinus) player.score = Math.max(0, player.score - 1);
         if (action.noWay) {
@@ -231,26 +253,24 @@ io.on('connection', (socket) => {
       }
     });
 
-    // Téléportation
-    if (action.teleport && room.pendingAnswers.get(room.activePlayers[0])?.correct) {
-      io.to(room.activePlayers[0]).emit('teleport');
-    }
-
-    // Broadcast résultats
-    room.activePlayers.forEach(id => {
-      const p = getPlayer(room, id);
-      const res = room.pendingAnswers.get(id);
-      io.to(room.code).emit('result', { player: p.name, correct: res.correct, score: p.score });
+    io.to(room.code).emit('results', {
+      action: action.name,
+      results: Array.from(room.pendingAnswers.entries()).map(([id, r]) => ({
+        player: r.player,
+        correct: r.correct,
+        score: getPlayer(room, id).score
+      }))
     });
   }
 
   function endTurn(room) {
-    io.to(room.code).emit('actionClear', {});
+    if (room.timer) { clearInterval(room.timer); room.timer = null; }
+    io.to(room.code).emit('actionClear');
     room.currentQuestion = null;
     room.currentAction = null;
     room.activePlayers = [];
     room.pendingAnswers = new Map();
-    setTimeout(() => nextTurn(room), 3000);
+    setTimeout(() => nextTurn(room), 4000);
   }
 
   function getRandomQuestion(theme) {
@@ -264,9 +284,7 @@ io.on('connection', (socket) => {
       if (idx !== -1) {
         room.players.splice(idx, 1);
         io.to(room.code).emit('players', room.players);
-        if (room.host === socket.id && room.players.length > 0) {
-          room.host = room.players[0].id;
-        }
+        if (room.host === socket.id && room.players.length > 0) room.host = room.players[0].id;
         if (room.players.length === 0) delete rooms[room.code];
       }
     });
@@ -274,4 +292,3 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
-
