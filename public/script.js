@@ -1,200 +1,136 @@
-(() => {
-  const socket = io();
-  let currentRoom = null;
-  let myName = '';
-  let amHost = false;
-  let myId = null;
-  const BOARD_LENGTH = 32;
-  const COLORS = ['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4'];
+const socket = io();
+let room = null;
+let myId = null;
 
-  const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id);
+const ACTIONS = [
+  {name:"Flash",flash:30,desc:"Réponds en moins de 30 secondes !"},
+  {name:"Battle on left",battleLeft:true,desc:"Plus rapide que ton voisin de gauche"},
+  {name:"Battle on right",battleRight:true,desc:"Plus rapide que ton voisin de droite"},
+  {name:"Call a friend",callFriend:true,desc:"Choisis un partenaire → +1 point chacun"},
+  {name:"For you",forYou:true,desc:"Désigne un joueur qui répond à ta place"},
+  {name:"Second life",secondLife:true,desc:"Deuxième chance si tu échoues"},
+  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
+  {name:"Double",multiplier:2,desc:"×2 les points"},
+  {name:"Téléportation",teleport:true,desc:"Réussite → +1 point + tu choisis la prochaine case"},
+  {name:"+1 ou -1",plusOrMinus:true,desc:"Réussite → +2 / Échec → -1"},
+  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
+  {name:"Double or quits",doubleOrQuits:true,desc:"Tout doubler ou tout perdre"},
+  {name:"It's your choice",freeChoice:true,desc:"Choisis l'action que tu veux !"},
+  {name:"Everybody",everybody:true,desc:"Tout le monde joue !"},
+  {name:"No way",noWay:true,desc:"Bonne réponse obligatoire, sinon +1 point à tous les autres"},
+  {name:"Quadruple",multiplier:4,desc:"×4 les points"}
+];
 
-  function showGame(room, isHost) {
-    $('menu').style.display = 'none';
-    $('game').style.display = 'block';
-    $('roomCodeDisplay').textContent = `Salle : ${room}`;
-    amHost = !!isHost;
-    currentRoom = room;
+// Créer la grille 4×4 des actions
+function createActionGrid() {
+  if ($('actionGrid').innerHTML) return;
+  const grid = $('actionGrid');
+  ACTIONS.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'actionCard';
+    card.innerHTML = `<strong>${a.name}</strong><br><small>${a.desc}</small>`;
+    card.title = a.desc;
+    grid.appendChild(card);
+  });
+}
+
+// Position des pions (parfaitement centrés)
+function updatePawns(players) {
+  const container = $('pions');
+  const img = $('plateau');
+  const w = img.clientWidth;
+  const h = img.clientHeight;
+  container.style.width = w + 'px';
+  container.style.height = h + 'px';
+  container.innerHTML = '';
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = Math.min(w,h) * 0.39;
+  const colors = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'];
+
+  players.forEach((p,i) => {
+    const angle = (p.pos / 32) * Math.PI * 2 - Math.PI/2;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+    const pawn = document.createElement('div');
+    pawn.className = 'pawn';
+    pawn.style.left = x+'px';
+    pawn.style.top = y+'px';
+    pawn.style.background = colors[i%6];
+    pawn.textContent = i+1;
+    pawn.title = `${p.name} – ${p.score} pts`;
+    container.appendChild(pawn);
+  });
+}
+
+// === FONCTIONS UTILISATEUR ===
+window.createRoom = () => {
+  const name = $('playerName').value.trim() || 'Hôte';
+  socket.emit('create', name);
+};
+window.joinRoom = () => {
+  const name = $('playerName').value.trim() || 'Joueur';
+  const code = $('roomCode').value.trim().toUpperCase();
+  if (!code) return alert('Entre un code !');
+  socket.emit('join', {code, name});
+};
+window.rollDice = () => socket.emit('roll', room);
+window.chooseDir = dir => socket.emit('move', {code:room, direction:dir});
+window.sendAnswer = () => {
+  const ans = $('answerInput').value.trim();
+  if (ans) socket.emit('answer', {code:room, answer:ans});
+  $('answerInput').value = '';
+};
+
+// === SOCKET ===
+socket.on('created', code => { room=code; startGame(code); });
+socket.on('joined', code => { room=code; startGame(code); });
+socket.on('error', msg => alert(msg));
+
+function startGame(code) {
+  $('menu').style.display = 'none';
+  $('game').style.display = 'block';
+  $('roomDisplay').textContent = code;
+  createActionGrid();
+}
+
+socket.on('players', players => {
+  $('players').innerHTML = players.map(p=>`<div>${p.name} – ${p.score} pts – case ${p.pos}</div>`).join('');
+  updatePawns(players);
+});
+
+socket.on('yourTurn', () => $('rollBtn').disabled = false);
+socket.on('rolled', ({roll}) => {
+  alert(`Tu as fait ${roll} ! Choisis la direction`);
+  $('directions').style.display = 'block';
+});
+socket.on('actionDrawn', data => {
+  // Timer Flash
+  if (data.timer) {
+    let t = data.timer;
+    $('flashTimer').style.display = 'block';
+    $('flashTimer').textContent = t+'s';
+    const int = setInterval(()=>{ t--; $('flashTimer').textContent = t+'s'; if(t<=0) clearInterval(int); },1000);
   }
+  // Surligner action
+  document.querySelectorAll('.actionCard').forEach(c=>c.classList.remove('currentAction'));
+  const cards = document.querySelectorAll('.actionCard');
+  const idx = ACTIONS.findIndex(a=>a.name===data.action);
+  if(cards[idx]) cards[idx].classList.add('currentAction');
+});
 
-  function renderPawns(players) {
-    const pions = $('pions');
-    const img = $('boardImg');
-    if (!pions || !img) return;
-    const w = img.clientWidth || 400;
-    pions.style.width = w + 'px';
-    pions.style.height = w + 'px';
-    pions.innerHTML = '';
-    const cx = w / 2;
-    const cy = w / 2;
-    const radius = w * 0.38;
-    players.forEach((p, i) => {
-      const pos = (typeof p.pos === 'number') ? p.pos : 0;
-      const angle = ((pos + 0.5) / BOARD_LENGTH) * Math.PI * 2 - Math.PI/2;
-      const x = cx + Math.cos(angle) * radius;
-      const y = cy + Math.sin(angle) * radius;
-      const dot = document.createElement('div');
-      dot.className = 'pawn';
-      dot.style.background = COLORS[i % COLORS.length];
-      dot.style.left = (x - 22) + 'px';
-      dot.style.top = (y - 22) + 'px';
-      dot.title = `${p.name} (${p.score || 0} pts)`;
-      dot.innerHTML = i + 1;
-      pions.appendChild(dot);
-    });
-  }
+socket.on('question', q => {
+  $('themeTitle').textContent = q.theme;
+  $('questionText').textContent = q.question;
+  $('questionBox').style.display = 'block';
+  $('answerInput').focus();
+});
 
-  // === GRILLE DES 16 ACTIONS ===
-  function createActionGrid() {
-    if (document.getElementById('actionGrid')) return;
-    const grid = document.createElement('div');
-    grid.id = 'actionGrid';
+socket.on('results', data => {
+  $('results').innerHTML = `<h3>${data.action}</h3>` + data.results.map(r=>`${r.correct?'Correct':'Faux'} ${r.player} → ${r.score} pts`).join('<br>');
+  setTimeout(()=>{ $('results').innerHTML=''; },5000);
+});
 
-    ACTIONS.forEach(action => {
-      const card = document.createElement('div');
-      card.className = 'actionCard';
-      card.innerHTML = `
-        <div class="actionIcon">${action.name}</div>
-        <div class="actionDesc">${action.desc}</div>
-      `;
-      card.title = action.desc;
-      grid.appendChild(card);
-    });
-
-    $('gameBoard').appendChild(grid);
-  }
-
-  // === FONCTIONS DU JEU ===
-  window.createRoom = () => {
-    const name = $('playerName').value.trim() || 'Hôte';
-    myName = name;
-    socket.emit('create', name);
-  };
-
-  window.joinRoom = () => {
-    const name = $('playerName').value.trim() || 'Joueur';
-    const code = $('roomCodeInput').value.trim().toUpperCase();
-    if (!code) return alert('Entre le code de la salle !');
-    myName = name;
-    socket.emit('join', { code, name });
-  };
-
-  window.rollDice = () => {
-    if (!currentRoom) return;
-    socket.emit('roll', currentRoom);
-    $('rollButton').disabled = true;
-  };
-
-  window.chooseDirection = (dir) => {
-    if (!currentRoom) return;
-    socket.emit('move', { code: currentRoom, steps: +$('controls').dataset.lastRoll || 1, direction: dir });
-    document.querySelectorAll('.dirBtn').forEach(btn => btn.disabled = true);
-  };
-
-  window.submitAnswer = () => {
-    const ans = $('answerInput').value.trim();
-    if (!ans || !currentRoom) return;
-    socket.emit('answer', { code: currentRoom, answer: ans });
-    $('answerInput').value = '';
-  };
-
-  // === SOCKET EVENTS ===
-  socket.on('connect', () => { myId = socket.id; });
-
-  socket.on('created', (code) => {
-    currentRoom = code;
-    showGame(code, true);
-    $('roomInfo').innerHTML = `<h3>🎉 Salle créée : <strong>${code}</strong></h3><p>Partage ce code avec tes amis !</p>`;
-  });
-
-  socket.on('joined', (code) => {
-    currentRoom = code;
-    showGame(code, false);
-    $('roomInfo').innerHTML = `<h3>✅ Rejoint : <strong>${code}</strong></h3>`;
-  });
-
-  socket.on('players', (players) => {
-    const list = $('playerList');
-    list.innerHTML = '';
-    players.forEach(p => {
-      const div = document.createElement('div');
-      div.innerHTML = `<strong>${p.name}</strong> - ${p.score || 0} pts - Case ${p.pos || 0}`;
-      list.appendChild(div);
-    });
-    renderPawns(players);
-  });
-
-  socket.on('gameStart', () => {
-    $('startButton').style.display = 'none';
-    $('rollButton').style.display = 'inline-block';
-    createActionGrid();
-    alert('🎮 Partie lancée ! Premier joueur, lance le dé.');
-  });
-
-  socket.on('yourTurn', () => {
-    $('rollButton').disabled = false;
-    alert('🎲 C\'est ton tour ! Lance le dé.');
-  });
-
-  socket.on('rolled', ({ roll }) => {
-    $('controls').dataset.lastRoll = roll;
-    document.querySelectorAll('.dirBtn').forEach(btn => btn.disabled = false);
-    alert(`Tu as fait ${roll} ! Choisis GAUCHE ← ou DROITE →`);
-  });
-
-  socket.on('rolledInfo', ({ player, roll }) => {
-    console.log(`${player} a fait ${roll}`);
-  });
-
-  socket.on('actionDrawn', (data) => {
-    const timer = $('flashTimer');
-    if (data.timer) {
-      timer.style.display = 'block';
-      let time = data.timer;
-      timer.textContent = `${time}s`;
-      const int = setInterval(() => {
-        time--;
-        timer.textContent = `${time}s`;
-        if (time <= 0) clearInterval(int);
-      }, 1000);
-    } else {
-      timer.style.display = 'none';
-    }
-
-    // Surligner l'action
-    setTimeout(() => {
-      document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-      const cards = document.querySelectorAll('.actionCard');
-      const index = ACTIONS.findIndex(a => a.name === data.action);
-      if (cards[index]) cards[index].classList.add('currentAction');
-    }, 100);
-  });
-
-  socket.on('question', (data) => {
-    $('questionTheme').textContent = `Thème : ${data.theme}`;
-    $('questionText').textContent = data.question;
-    $('questionContainer').style.display = 'block';
-    $('answerInput').focus();
-    $('answerInput').value = '';
-  });
-
-  socket.on('results', (data) => {
-    $('results').innerHTML = `<h3>🎯 Résultats : ${data.action}</h3>`;
-    data.results.forEach(r => {
-      const emoji = r.correct ? '✅' : '❌';
-      $('results').innerHTML += `<div>${emoji} ${r.player} : ${r.score} pts</div>`;
-    });
-    setTimeout(() => $('questionContainer').style.display = 'none', 3000);
-  });
-
-  socket.on('actionClear', () => {
-    $('flashTimer').style.display = 'none';
-    document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  });
-
-  // === ÉVÉNEMENTS DOM ===
-  document.addEventListener('DOMContentLoaded', () => {
-    const startBtn = $('startButton');
-    if (startBtn) startBtn.addEventListener('click', () => socket.emit('start', currentRoom));
-  });
-})();
+socket.on('gameStart', () => alert('La partie commence !'));
