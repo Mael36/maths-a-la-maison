@@ -24,7 +24,7 @@ const ACTIONS = [
   { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
   { name: "Double", multiplier: 2, desc: "×2 les points en cas de succès" },
   { name: "Téléportation", teleport: true, desc: "Réussite → +1 point + tu choisis la prochaine case" },
-  { name: "+1 ou -1", plusOrMinus: true, desc: "Réussite → +2 points / Échec → -1 point" },
+  { name: " +1 ou -1", plusOrMinus: true, desc: "Réussite → +2 points / Échec → -1 point" },
   { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
   { name: "Double or quits", doubleOrQuits: true, desc: "Tout doubler ou tout perdre" },
   { name: "It's your choice", freeChoice: true, desc: "Choisis l'action que tu veux !" },
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
     rooms[code] = {
       code, host: socket.id, started: false, currentTurn: 0,
       players: [{ id: socket.id, name: name || "Hôte", pos: 0, score: 0 }],
-      currentAction: null, currentQuestion: null, activePlayers: [], pendingAnswers: new Map(),
+      currentAction: null, currentQuestion: null, currentCorrection: null, activePlayers: [], pendingAnswers: new Map(),
       timer: null
     };
     socket.join(code);
@@ -140,23 +140,31 @@ io.on('connection', (socket) => {
       return;
     }
 
-    room.currentQuestion = q;
-    room.currentCorrection = q.correction;
+    room.currentQuestion = q.question;
+    room.currentCorrection = q.correction.trim().toLowerCase();
     room.pendingAnswers = new Map();
 
-    // Envoyer action
     io.to(code).emit('actionDrawn', { player: player.name, action: action.name, desc: action.desc, timer: action.flash || null });
 
-    // Timer 60s ou 30s pour Flash
+    // Timer
     const timerDuration = action.flash || 60;
-    room.timer = setTimeout(() => {
-      if (room.currentQuestion) {
-        io.to(room.code).emit('timeOut', { message: 'Temps écoulé !' });
-        $('questionBox').style.display = 'none';
-        applyActionResults(room, action);
-        endTurn(room);
+    let time = timerDuration;
+    const timerInterval = setInterval(() => {
+      time--;
+      io.to(code).emit('timerUpdate', { time });
+      if (time <= 0) {
+        clearInterval(timerInterval);
+        if (room.currentQuestion) {
+          io.to(room.code).emit('timeOut', { message: 'Temps écoulé !' });
+          room.pendingAnswers.forEach((_, id) => {
+            room.pendingAnswers.set(id, { correct: false, player: getPlayer(room, id).name });
+          });
+          applyActionResults(room, action);
+          endTurn(room);
+        }
       }
-    }, timerDuration * 1000);
+    }, 1000);
+    room.timer = timerInterval;
 
     if (action.everybody) {
       room.activePlayers = room.players.map(p => p.id);
@@ -176,17 +184,13 @@ io.on('connection', (socket) => {
     if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
 
     const player = getPlayer(room, socket.id);
-    const correct = (room.currentCorrection + "").trim().toLowerCase() === (answer + "").trim().toLowerCase();
+    const correct = (answer + "").trim().toLowerCase() === room.currentCorrection;
     room.pendingAnswers.set(socket.id, { correct, player: player.name });
 
     const action = room.currentAction;
 
-    if (!action.everybody) {
-      if (room.timer) clearTimeout(room.timer);
-      applyActionResults(room, action);
-      endTurn(room);
-    } else if (room.pendingAnswers.size === room.activePlayers.length) {
-      if (room.timer) clearTimeout(room.timer);
+    if (!action.everybody || room.pendingAnswers.size === room.activePlayers.length) {
+      if (room.timer) clearInterval(room.timer);
       applyActionResults(room, action);
       endTurn(room);
     }
@@ -194,8 +198,7 @@ io.on('connection', (socket) => {
 
   function applyActionResults(room, action) {
     room.activePlayers.forEach(id => {
-      const res = room.pendingAnswers.get(id);
-      if (!res) return;
+      const res = room.pendingAnswers.get(id) || { correct: false, player: getPlayer(room, id).name };
       const player = getPlayer(room, id);
 
       if (res.correct) {
@@ -226,14 +229,12 @@ io.on('connection', (socket) => {
   }
 
   function endTurn(room) {
-    if (room.timer) clearTimeout(room.timer);
-    room.timer = null;
+    io.to(room.code).emit('actionClear');
     room.currentQuestion = null;
     room.currentCorrection = null;
     room.currentAction = null;
     room.activePlayers = [];
     room.pendingAnswers = new Map();
-    io.to(room.code).emit('actionClear');
     setTimeout(() => nextTurn(room), 3000);
   }
 
