@@ -1,57 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maths à la Maison</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maths à la Maison – Jeu en ligne</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
   <div id="menu">
     <h1>Maths à la Maison</h1>
-    <input id="playerName" placeholder="Ton nom">
-    <button onclick="createRoom()">Créer Partie</button>
-    <input id="roomCodeInput" placeholder="Code room">
-    <button onclick="joinRoom()">Rejoindre</button>
-    <button id="startGame" style="display: none;">Lancer la partie</button>
+    <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur" />
+    <button onclick="createGame()">Créer une partie</button>
+    <div>OU</div>
+    <input type="text" id="roomCode" placeholder="Code de la salle" maxlength="4" />
+    <button onclick="joinGame()">Rejoindre</button>
+    <div id="codeDisplay"></div>
   </div>
+
   <div id="game" style="display:none;">
-    <h2 id="roomCode"></h2>
-    <button id="startButton" style="display:none;">Démarrer</button>
-    <div id="playersList"></div>
     <div id="board">
-      <!-- utiliser plateau.png -->
-      <img id="boardImg" src="assets/plateau.png" alt="Plateau" style="width:400px; border-radius:50%;">
+      <img src="assets/plateau.png" alt="Plateau" id="plateau" />
       <div id="pions"></div>
-    </div>
-    <div id="actionInfo">
-      <span id="actionDesc"></span><span id="actionTimer" style="font-weight:bold;margin-left:8px;color:#c00"></span>
+      <div id="flashTimer">30s</div>
     </div>
 
-    <!-- bouton lancer le dé -->
-    <div id="controls">
-      <button id="rollButton" disabled>Lancer le dé</button>
-    </div>
-
-    <div id="questionContainer" style="display:none;">
-      <h2 id="questionTheme"></h2>
-      <p id="questionText"></p>
-      <input id="answerInput" type="text">
-      <button onclick="submitAnswer()">Répondre</button>
-    </div>
-
-    <div id="game">
-      <div id="question">
-        <h2 id="questionTheme"></h2>
+    <div id="sidebar">
+      <h2>Joueurs</h2>
+      <div id="playerList"></div>
+      <button id="rollBtn" onclick="rollDice()" style="display:none;">Lancer le dé</button>
+      <div id="questionBox" style="display:none;">
+        <h3 id="theme"></h3>
         <p id="questionText"></p>
+        <input type="text" id="answerInput" placeholder="Ta réponse" />
+        <button onclick="sendAnswer()">Valider</button>
       </div>
+      <div id="results"></div>
     </div>
   </div>
-  <div id="game">
-    <h2>Joueurs</h2>
-    <ul id="playerList"></ul>
-  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
