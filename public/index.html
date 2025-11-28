@@ -8,21 +8,24 @@
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
+
+  <!-- MENU -->
   <div id="menu">
     <h1>Maths à la Maison</h1>
-    <input id="playerName" type="text" placeholder="Ton prénom" value="Joueur">
+    <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
     <button onclick="createRoom()">Créer une partie</button>
-    <div style="margin:20px;">OU</div>
-    <input id="roomCode" type="text" placeholder="Code (ex: ABCD)" maxlength="4" style="text-transform:uppercase;">
+    <p>OU</p>
+    <input type="text" id="roomCode" placeholder="Code (ex: ABCD)" maxlength="4">
     <button onclick="joinRoom()">Rejoindre</button>
-    <div id="status"></div>
+    <div id="info"></div>
   </div>
 
+  <!-- JEU -->
   <div id="game" style="display:none;">
-    <h2 id="roomDisplay"></h2>
-    
-    <div id="board">
-      <img src="assets/plateau.png" id="plateau" alt="Plateau arbre">
+    <h2>Salle : <span id="roomDisplay"></span></h2>
+
+    <div id="boardContainer">
+      <img src="assets/plateau.png" id="plateau" alt="Plateau">
       <div id="pions"></div>
       <div id="actionGrid"></div>
       <div id="flashTimer">30s</div>
@@ -30,18 +33,18 @@
 
     <div id="controls">
       <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
-      <div id="direction" style="display:none; margin:15px;">
-        <button onclick="move('right')">DROITE →</button>
-        <button onclick="move('left')">← GAUCHE</button>
+      <div id="directions" style="display:none; margin:15px;">
+        <button onclick="chooseDir('left')">GAUCHE</button>
+        <button onclick="chooseDir('right')">DROITE</button>
       </div>
     </div>
 
     <div id="players"></div>
 
-    <div id="question" style="display:none;">
-      <h3 id="theme"></h3>
-      <p id="qtext"></p>
-      <input id="answer" type="text" placeholder="Ta réponse">
+    <div id="questionBox" style="display:none;">
+      <h3 id="themeTitle"></h3>
+      <p id="questionText"></p>
+      <input type="text" id="answerInput" placeholder="Ta réponse">
       <button onclick="sendAnswer()">Envoyer</button>
     </div>
 
