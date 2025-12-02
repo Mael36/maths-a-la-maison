@@ -8,7 +8,6 @@
   <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-
   <div id="menu">
     <h1>Maths à la Maison</h1>
     <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
@@ -18,7 +17,7 @@
     <button onclick="joinRoom()">Rejoindre</button>
   </div>
 
-  <div id="game" style="display:none; padding:20px; text-align:center;">
+  <div id="game" style="display:none;">
     <h2>Salle : <span id="roomDisplay"></span></h2>
     <button id="startBtn">Démarrer la partie</button>
 
@@ -26,29 +25,24 @@
       <img src="assets/plateau.png" id="plateau" alt="Plateau">
       <div id="pions"></div>
       <div id="possibleCases"></div>
-      <div id="flashTimer">30s</div>
     </div>
+
+    <div id="timer">60s</div>
 
     <div id="actionGrid"></div>
 
-    <div id="controls">
-      <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
-      <div id="directions" style="display:none; margin:30px;">
-        <button onclick="chooseDir('left')">GAUCHE</button>
-        <button onclick="chooseDir('right')">DROITE</button>
-      </div>
-    </div>
+    <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
 
-    <div id="players"></div>
-
-    <div id="questionBox" style="display:none; background:white; padding:30px; border-radius:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); max-width:700px; margin:30px auto;">
+    <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>
-      <p id="questionText" style="font-size:1.4em;"></p>
+      <p id="questionText"></p>
       <input type="text" id="answerInput" placeholder="Ta réponse">
       <button onclick="sendAnswer()">Envoyer</button>
     </div>
 
-    <div id="results"></div>
+    <div id="resultBox" style="display:none;">
+      <h2 id="resultText"></h2>
+    </div>
   </div>
 
   <script src="script.js"></script>
