@@ -13,51 +13,40 @@ fetch('/data/board.json')
     createActionGrid();
   });
 
-// 16 CARTES OFFICIELLES – TES IMAGES + TES RONDS "MATHS À LA MAISON"
+// 16 CARTES ACTION RONDES OFFICIELLES – TON DESIGN EXACT (arbre + "ACTION")
 function createActionGrid() {
   const grid = $('actionGrid');
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  grid.style.gap = '30px';
-  grid.style.maxWidth = '1400px';
-  grid.style.margin = '60px auto';
+  grid.style.gap = '50px';
+  grid.style.maxWidth = '1600px';
+  grid.style.margin = '80px auto';
   grid.style.padding = '40px';
   grid.style.background = '#e1f5fe';
-  grid.style.borderRadius = '30px';
+  grid.style.borderRadius = '40px';
+  grid.style.boxShadow = '0 20px 60px rgba(0,0,0,0.2)';
 
-  const actions = [
-    {name: "Flash", img: "actions/flash.jpg"},
-    {name: "Battle on left", img: "actions/battle_left.jpg"},
-    {name: "Battle on right", img: "actions/battle_right.jpg"},
-    {name: "Call a friend", img: "actions/call_friend.jpg"},
-    {name: "For you", img: "actions/for_you.jpg"},
-    {name: "Second life", img: "actions/second_life.jpg"},
-    {name: "No way", img: "actions/no_way.jpg"},
-    {name: "Double", img: "actions/double.jpg"},
-    {name: "Téléportation", img: "actions/teleport.jpg"},
-    {name: "+1 ou -1", img: "actions/plus_minus.jpg"},
-    {name: "Everybody", img: "actions/everybody.jpg"},
-    {name: "Double or quits", img: "actions/double_quits.jpg"},
-    {name: "It's your choice", img: "actions/choice.jpg"},
-    {name: "Everybody", img: "actions/everybody.jpg"},
-    {name: "No way", img: "actions/no_way.jpg"},
-    {name: "Quadruple", img: "actions/quadruple.jpg"}
+  const actionNames = [
+    "Flash","Battle on left","Battle on right","Call a friend",
+    "For you","Second life","No way","Double",
+    "Téléportation","+1 ou -1","Everybody","Double or quits",
+    "It's your choice","Everybody","No way","Quadruple"
   ];
 
-  actions.forEach((a, i) => {
+  actionNames.forEach(name => {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <div style="width:260px; height:260px; background:white; border-radius:50%; 
-                  box-shadow:0 20px 50px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;
-                  border:12px solid #1565c0; margin:0 auto; overflow:hidden;">
-        <img src="assets/action-circle.png" style="width:100%; height:100%; object-fit:contain;">
-        <div style="position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center;">
-          <img src="${a.img}" style="width:85%; height:85%; object-fit:contain; border-radius:15px;">
-        </div>
+      <div style="width:280px; height:280px; background:white; border-radius:50%; 
+                  box-shadow:0 25px 70px rgba(0,0,0,0.4); display:flex; flex-direction:column; 
+                  align-items:center; justify-content:center; border:14px solid #1565c0; margin:0 auto;">
+        <div style="width:240px; height:240px; background:url('assets/plateau.png') center/70% no-repeat;"></div>
       </div>
-      <div style="text-align:center; margin-top:30px; font-size:28px; font-weight:bold; color:#1565c0;">
-        ${a.name}
+      <div style="text-align:center; margin-top:40px; font-size:36px; font-weight:bold; color:#1565c0;">
+        ACTION
+      </div>
+      <div style="text-align:center; margin-top:15px; font-size:26px; color:#000;">
+        ${name}
       </div>
     `;
     grid.appendChild(card);
@@ -83,15 +72,15 @@ function updatePawns(players) {
 
     const pawn = document.createElement('div');
     pawn.style.position = 'absolute';
-    pawn.style.width = '44px';
-    pawn.style.height = '44px';
+    pawn.style.width = '48px';
+    pawn.style.height = '48px';
     pawn.style.borderRadius = '50%';
     pawn.style.background = ['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i % 6];
     pawn.style.border = '6px solid white';
-    pawn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.7)';
+    pawn.style.boxShadow = '0 12px 35px rgba(0,0,0,0.7)';
     pawn.style.color = 'white';
     pawn.style.fontWeight = 'bold';
-    pawn.style.fontSize = '24px';
+    pawn.style.fontSize = '26px';
     pawn.style.display = 'flex';
     pawn.style.alignItems = 'center';
     pawn.style.justifyContent = 'center';
@@ -137,16 +126,16 @@ function showPossibleCases(currentPos, steps) {
 
     const spot = document.createElement('div');
     spot.style.position = 'absolute';
-    spot.style.width = '60px';
-    spot.style.height = '60px';
+    spot.style.width = '64px';
+    spot.style.height = '64px';
     spot.style.background = 'radial-gradient(circle, gold, orange)';
-    spot.style.border = '6px solid white';
+    spot.style.border = '7px solid white';
     spot.style.borderRadius = '50%';
     spot.style.left = x + 'px';
     spot.style.top = y + 'px';
     spot.style.transform = 'translate(-50%, -50%)';
     spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 60px gold, inset 0 0 30px white';
+    spot.style.boxShadow = '0 0 70px gold, inset 0 0 30px white';
     spot.style.zIndex = '999';
     spot.onclick = () => {
       socket.emit('moveTo', {code: room, targetPos: pos});
@@ -172,7 +161,7 @@ window.rollDice = () => {
 
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
-  if (ans) socket.emit('answer',', {code: room, answer: ans});
+  if (ans) socket.emit('answer', {code: room, answer: ans});
   $('answerInput').value = '';
 };
 
@@ -204,41 +193,23 @@ socket.on('rolled', data => {
 
 socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  const cards = document.querySelectorAll('.actionCard');
-  cards.forEach(card => {
+  document.querySelectorAll('.actionCard').forEach(card => {
     if (card.textContent.includes(data.action)) {
       card.classList.add('currentAction');
-      card.style.transform = 'scale(1.25)';
-      card.style.boxShadow = '0 0 100px gold';
+      card.style.transform = 'scale(1.3)';
+      card.style.boxShadow = '0 0 120px gold';
     }
   });
 });
 
 // QUESTIONS POSÉES DEPUIS public/data.json
 socket.on('question', q => {
-  $('themeTitle').textContent = `Thème : ${q.theme || 'Général'}`;
+  $('themeTitle').textContent = `Thème : ${q.theme || 'Maths'}`;
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
-
-  if (q.timer) {
-    let t = q.timer;
-    $('flashTimer').style.display = 'block';
-    $('flashTimer').textContent = t + 's';
-    const int = setInterval(() => {
-      t--;
-      $('flashTimer').textContent = t + 's';
-      if (t <= 0) {
-        clearInterval(int);
-        $('flashTimer').style.display = 'none';
-      }
-    }, 1000);
-  }
 });
 
-socket.on('results', data => {
-  $('results').innerHTML = `<h3>Résultat – ${data.action || 'Question'}</h3>` +
-    data.results.map(r => `<strong>${r.correct ? 'Correct' : 'Faux'}</strong> ${r.player} → ${r.score} pts`).join('<br>');
+socket.on('results', () => {
   $('questionBox').style.display = 'none';
-  $('flashTimer').style.display = 'none';
 });
