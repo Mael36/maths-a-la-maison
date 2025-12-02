@@ -1,3 +1,4 @@
+// public/script.js
 const socket = io();
 let room = null;
 let board = null;
@@ -5,12 +6,12 @@ let timer = null;
 
 const $ = id => document.getElementById(id);
 
-fetch('data/board.json')
-  .then(r => r.json())
-  .then(data => { board = data; createActionCards(); });
-
 function createActionCards() {
   const grid = $('actionGrid');
+  if (!grid) return;
+  // si déjà rempli, ne pas dupliquer
+  if (grid.children.length) return;
+
   const actions = [
     {name:"Flash", text:"Tu dois répondre en moins de 30 secondes à la question !"},
     {name:"Battle on left", text:"Tu dois répondre plus vite que ton voisin de gauche..."},
@@ -25,8 +26,6 @@ function createActionCards() {
     {name:"Everybody", text:"Tout le monde joue !"},
     {name:"Double or quits", text:"Tout doubler ou tout perdre"},
     {name:"It's your choice", text:"Tu choisis l'action que tu veux !"},
-    {name:"Everybody", text:"Tout le monde joue !"},
-    {name:"No way", text:"Réponds correctement sinon tu offres 1 point à chacun..."},
     {name:"Quadruple", text:"Si tu réussis la question, tu gagnes 4 points."}
   ];
 
@@ -46,13 +45,15 @@ function createActionCards() {
 }
 
 function updatePawns(players) {
-  $('pions').innerHTML = '';
+  const container = $('pions');
+  if (!container || !board) return;
+  container.innerHTML = '';
   const img = $('plateau');
-  if (!img || !board) return;
   const w = img.offsetWidth, h = img.offsetHeight;
 
   players.forEach((p, i) => {
-    const pos = board.positions[p.pos];
+    const posIndex = Math.max(0, Math.min((p.pos || 0), board.positions.length - 1));
+    const pos = board.positions[posIndex];
     const x = (pos.x / 100) * w;
     const y = (pos.y / 100) * h;
 
@@ -67,11 +68,12 @@ function updatePawns(players) {
     `;
     pawn.textContent = i + 1;
     pawn.title = `${p.name} – ${p.score} pts`;
-    $('pions').appendChild(pawn);
+    container.appendChild(pawn);
   });
 }
 
 function showPossibleCases(currentPos, steps) {
+  if (!board) return;
   const reachable = new Set();
   const q = [{pos: currentPos, rem: steps}];
   while (q.length) {
@@ -87,7 +89,8 @@ function showPossibleCases(currentPos, steps) {
     if (pos >= 48 && pos < 84 && pos + 1 <= 84) q.push({pos: pos + 1, rem: rem - 1});
   }
 
-  $('possibleCases').innerHTML = '';
+  const el = $('possibleCases');
+  el.innerHTML = '';
   const img = $('plateau');
   const w = img.offsetWidth, h = img.offsetHeight;
 
@@ -105,44 +108,52 @@ function showPossibleCases(currentPos, steps) {
       cursor:pointer;box-shadow:0 0 120px gold;z-index:999;
     `;
     spot.onclick = () => {
-      socket.emit('moveTo', {code: room, targetPos: pos});
-      $('possibleCases').innerHTML = '';
+      socket.emit('moveTo', { code: room, pos });
+      el.innerHTML = '';
     };
-    $('possibleCases').appendChild(spot);
+    el.appendChild(spot);
   });
 }
 
 function startTimer(sec) {
   if (timer) clearInterval(timer);
-  $('timer').style.display = 'block';
+  const el = $('timer');
+  el.style.display = 'block';
   let t = sec;
-  $('timer').textContent = t + 's';
-  $('timer').style.background = sec === 30 ? '#d32f2f' : '#1976d2';
+  el.textContent = t + 's';
+  el.style.background = sec === 30 ? '#d32f2f' : '#1976d2';
 
   timer = setInterval(() => {
     t--;
-    $('timer').textContent = t + 's';
-    if (t <= 0) { clearInterval(timer); $('timer').style.display = 'none'; }
+    el.textContent = t + 's';
+    if (t <= 0) { clearInterval(timer); el.style.display = 'none'; }
   }, 1000);
 }
 
-// INTERACTIONS & SOCKET
-window.createRoom = () => socket.emit('create', $('playerName').value || 'Hôte');
-window.joinRoom = () => {
+// UI wiring
+$('createBtn').onclick = () => socket.emit('create', $('playerName').value || 'Hôte');
+$('joinBtn').onclick = () => {
   const code = $('roomCode').value.trim().toUpperCase();
   if (!code) return alert('Code requis !');
-  socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
-};
-window.rollDice = () => { socket.emit('roll', room); $('rollBtn').disabled = true; };
-window.sendAnswer = () => {
-  const ans = $('answerInput').value.trim();
-  if (ans) socket.emit('answer', {code: room, answer: ans});
-  $('answerInput').value = '';
+  socket.emit('join', { code, name: $('playerName').value || 'Joueur' });
 };
 $('startBtn').onclick = () => socket.emit('start', room);
+$('rollBtn').onclick = () => { socket.emit('roll', room); $('rollBtn').disabled = true; };
+$('sendAnswerBtn').onclick = () => {
+  const ans = $('answerInput').value.trim();
+  if (ans) socket.emit('answer', { code: room, answer: ans });
+  $('answerInput').value = '';
+};
 
-socket.on('created', code => { room = code; showGame(code); });
-socket.on('joined', code => { room = code; showGame(code); });
+// Socket events
+socket.on('created', code => {
+  room = code;
+  showGame(code);
+});
+socket.on('joined', code => {
+  room = code;
+  showGame(code);
+});
 socket.on('error', msg => alert(msg));
 function showGame(code) {
   $('menu').style.display = 'none';
@@ -150,16 +161,26 @@ function showGame(code) {
   $('roomDisplay').textContent = code;
 }
 
-socket.on('players', updatePawns);
-socket.on('yourTurn', () => { $('rollBtn').disabled = false; $('rollBtn').textContent = 'Lancer le dé'; });
+socket.on('players', players => updatePawns(players));
+
+socket.on('boardData', b => {
+  board = b;
+  createActionCards();
+});
+
+socket.on('yourTurn', () => {
+  $('rollBtn').disabled = false;
+  $('rollBtn').textContent = 'Lancer le dé';
+});
 socket.on('rolled', data => {
   alert(`Tu as fait ${data.roll} ! Choisis une case dorée`);
   showPossibleCases(data.currentPos, data.roll);
 });
 socket.on('actionDrawn', data => {
+  // mettre en évidence l'action sur la grille
   document.querySelectorAll('.actionCard').forEach(c => c.style.transform = 'scale(1)');
   document.querySelectorAll('.actionCard').forEach(c => {
-    if (c.textContent.includes(data.action)) c.style.transform = 'scale(1.4)';
+    if (c.textContent.includes(data.action)) c.style.transform = 'scale(1.2)';
   });
 });
 socket.on('question', q => {
@@ -167,17 +188,28 @@ socket.on('question', q => {
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
-  startTimer(q.action === 'Flash' ? 30 : 60);
+  startTimer(q.action === 'Flash' ? 30 : (q.timer || 60));
 });
-socket.on('result', data => {
+socket.on('timeOut', data => {
   clearInterval(timer);
   $('timer').style.display = 'none';
-  $('resultText').textContent = data.correct ? `BRAVO ${data.player} ! +1 point` : `Dommage ${data.player}...`;
-  $('resultText').style.color = data.correct ? '#4caf50' : '#f44336';
+  $('resultText').textContent = data.message || 'Temps écoulé';
+  $('resultText').style.color = '#f44336';
+  $('resultBox').style.display = 'block';
+  setTimeout(() => { $('resultBox').style.display = 'none'; $('questionBox').style.display = 'none'; }, 2500);
+});
+socket.on('results', data => {
+  clearInterval(timer);
+  $('timer').style.display = 'none';
+  $('resultText').textContent = data.message || 'Résultats';
+  $('resultText').style.color = '#1976d2';
   $('resultBox').style.display = 'block';
   setTimeout(() => {
     $('questionBox').style.display = 'none';
     $('resultBox').style.display = 'none';
-  }, 5000);
+  }, 2500);
 });
-
+socket.on('actionClear', () => {
+  // nettoyage UI action
+  document.querySelectorAll('.actionCard').forEach(c => c.style.transform = 'scale(1)');
+});
