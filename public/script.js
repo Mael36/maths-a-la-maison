@@ -1,3 +1,4 @@
+// public/script.js
 const socket = io();
 let room = null;
 let board = null;
@@ -5,7 +6,7 @@ let timer = null;
 
 const $ = id => document.getElementById(id);
 
-// --- Créer les cartes actions
+// ────────────── ACTION CARDS ──────────────
 function createActionCards() {
   const grid = $('actionGrid');
   if (!grid || grid.children.length) return;
@@ -16,15 +17,15 @@ function createActionCards() {
     "Everybody","Double or quits","It's your choice","Quadruple"
   ];
 
-  actions.forEach(a=>{
-    const card=document.createElement('div');
-    card.className='actionCard';
-    card.innerHTML=`<h4>${a}</h4>`;
+  actions.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'actionCard';
+    card.innerHTML = `<h4>${a}</h4>`;
     grid.appendChild(card);
   });
 }
 
-// --- Mettre à jour les pions sur le plateau
+// ────────────── PAWNS ──────────────
 function updatePawns(players) {
   const container = $('pions');
   if (!container || !board) return;
@@ -51,8 +52,8 @@ function updatePawns(players) {
   });
 }
 
-// --- Montrer les cases possibles après lancer le dé
-¨function showPossibleCases(currentPos, steps) {
+// ────────────── CASES ──────────────
+function showPossibleCases(currentPos, steps) {
   if (!board) return;
   const reachable = new Set();
   const q = [{pos: currentPos, rem: steps}];
@@ -75,20 +76,19 @@ function updatePawns(players) {
     const spot = document.createElement('div');
     spot.style.cssText = `
       position:absolute;width:50px;height:50px;border-radius:50%;
-      background:radial-gradient(circle,gold,orange);border:3px solid white;
+      background:radial-gradient(circle,gold,orange);border:4px solid white;
       left:${x}px;top:${y}px;transform:translate(-50%,-50%);
-      cursor:pointer;z-index:10; /* mettre plus haut que les pions */
+      cursor:pointer;z-index:999;
     `;
     spot.onclick = ()=> {
       socket.emit('moveTo',{code:room,pos});
-      el.innerHTML=''; // supprime les cases dorées
+      el.innerHTML='';
     };
     el.appendChild(spot);
   });
 }
 
-
-// --- Timer
+// ────────────── TIMER ──────────────
 function startTimer(sec){
   if(timer) clearInterval(timer);
   const el=$('timer');
@@ -96,13 +96,17 @@ function startTimer(sec){
   let t=sec; el.textContent=t+'s';
   timer=setInterval(()=>{
     t--; el.textContent=t+'s';
-    if(t<=0){ clearInterval(timer); el.style.display='none'; }
+    if(t<=0){ clearInterval(timer); el.style.display='none'; clearInterval(timer); }
   },1000);
 }
 
-// --- UI wiring
+// ────────────── UI BUTTONS ──────────────
 $('createBtn').onclick = () => socket.emit('create',$('playerName').value||'Hôte');
-$('joinBtn').onclick = () => socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(), name:$('playerName').value||'Joueur'});
+$('joinBtn').onclick = () => {
+  const code = $('roomCode').value.trim().toUpperCase();
+  if(!code){ alert('Code requis!'); return; }
+  socket.emit('join',{code,name:$('playerName').value||'Joueur'});
+};
 $('startBtn').onclick = () => socket.emit('start', room);
 $('rollBtn').onclick = () => { socket.emit('roll', room); $('rollBtn').disabled=true; };
 $('sendAnswerBtn').onclick = ()=>{
@@ -111,7 +115,7 @@ $('sendAnswerBtn').onclick = ()=>{
   $('answerInput').value='';
 };
 
-// --- Socket events
+// ────────────── SOCKET EVENTS ──────────────
 socket.on('created', code => { room = code; showGame(); });
 socket.on('joined', code => { room = code; showGame(); });
 socket.on('boardData', b => { board = b; createActionCards(); updatePawns([]); });
@@ -152,11 +156,9 @@ socket.on('results', data=>{
 
 socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
 
-// --- Afficher le jeu
+// ────────────── SHOW GAME ──────────────
 function showGame(){
   $('menu').style.display='none';
   $('game').style.display='block';
   $('roomDisplay').textContent=room;
-  socket.emit('requestBoard'); // demande le board au serveur
 }
-
