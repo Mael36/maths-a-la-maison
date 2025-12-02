@@ -1,128 +1,83 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const path = require('path');
-const fs = require('fs');
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*"
-  }
-});
+const io = new Server(server);
 
-// Serve les fichiers du dossier public/
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Chargement des questions
+// ---------------------------------------------------------
+// 1. Chargement sécurisé des questions
+// ---------------------------------------------------------
+
 let questions = [];
+
 try {
-  const dataPath = path.join(__dirname, 'public', 'data.json');
-  const data = fs.readFileSync(dataPath, 'utf8');
-  questions = JSON.parse(data);
+  const dataPath = path.join(__dirname, "public/data.json");
+  const raw = fs.readFileSync(dataPath, "utf8");
+  const json = JSON.parse(raw);
+
+  // Le JSON reçu est un OBJET avec des catégories
+  // => on l'aplatit en un tableau unique
+  questions = Object.values(json).flat();
+
   console.log("Questions chargées :", questions.length);
+
 } catch (e) {
-  console.error("ERREUR : impossible de lire public/data.json");
+  console.error("❌ Erreur chargement data.json :", e);
 }
 
-// Actions possibles
-const actions = [
-  "Flash","Battle on left","Battle on right","Call a friend",
-  "For you","Second life","No way","Double",
-  "Téléportation","+1 ou -1","Everybody","Double or quits",
-  "It's your choice","Everybody","No way","Quadruple"
-];
+// ---------------------------------------------------------
+// 2. Chargement du board
+// ---------------------------------------------------------
 
-const rooms = {};
+let board = null;
 
-io.on('connection', socket => {
+try {
+  const boardPath = path.join(__dirname, "public/data/board.json");
+  const raw = fs.readFileSync(boardPath, "utf8");
+  board = JSON.parse(raw);
+  console.log("Board chargé :", board.totalCases, "cases");
+} catch (e) {
+  console.error("❌ Erreur chargement board.json :", e);
+}
 
-  // Création
-  socket.on('create', name => {
-    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-    rooms[code] = {
-      players: [{ id: socket.id, name, pos: 0, score: 0 }],
-      started: false,
-      currentPlayer: 0
-    };
-    socket.join(code);
-    socket.emit('created', code);
-    io.to(code).emit('players', rooms[code].players);
+
+// ---------------------------------------------------------
+// 3. SOCKET.IO
+// ---------------------------------------------------------
+
+io.on("connection", (socket) => {
+  console.log("🔌 Nouveau joueur connecté");
+
+  socket.on("joinRoom", (roomId) => {
+    socket.join(roomId);
+    console.log("➡️ Joueur rejoint la room", roomId);
+
+    // Envoi du plateau
+    socket.emit("boardData", board);
   });
 
-  // Rejoindre
-  socket.on('join', ({code, name}) => {
-    code = code.toUpperCase();
-    if (!rooms[code]) return socket.emit('error', 'Salle inexistante');
-    if (rooms[code].started) return socket.emit('error', 'Partie déjà commencée');
-
-    rooms[code].players.push({ id: socket.id, name, pos: 0, score: 0 });
-    socket.join(code);
-    socket.emit('joined', code);
-    io.to(code).emit('players', rooms[code].players);
+  socket.on("requestQuestion", (roomId) => {
+    const q = questions[Math.floor(Math.random() * questions.length)];
+    io.to(roomId).emit("newQuestion", q);
   });
-
-  // Démarrer la partie
-  socket.on('start', code => {
-    rooms[code].started = true;
-    io.to(code).emit('gameStart');
-    nextTurn(code);
-  });
-
-  // Tour suivant
-  function nextTurn(code) {
-    const room = rooms[code];
-    if (!room) return;
-    const player = room.players[room.currentPlayer];
-
-    io.to(player.id).emit('yourTurn');
-
-    room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
-  }
-
-  // Dé
-  socket.on('roll', code => {
-    const roll = Math.floor(Math.random() * 6) + 1;
-    const player = rooms[code].players.find(p => p.id === socket.id);
-
-    socket.emit('rolled', { roll, currentPos: player.pos });
-  });
-
-  // Déplacement vers une case
-  socket.on('moveTo', ({code, targetPos}) => {
-    const player = rooms[code].players.find(p => p.id === socket.id);
-    player.pos = targetPos;
-
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const question = questions[Math.floor(Math.random() * questions.length)];
-
-    io.to(code).emit('actionDrawn', { action });
-    io.to(code).emit('question', { ...question, action });
-    io.to(code).emit('players', rooms[code].players);
-  });
-
-  // Réponse
-  socket.on('answer', ({code, answer}) => {
-    const player = rooms[code].players.find(p => p.id === socket.id);
-
-    const correct = answer.trim().toLowerCase() === "42"; // À améliorer
-    if (correct) player.score++;
-
-    io.to(code).emit('result', {
-      player: player.name,
-      correct,
-      points: correct ? 1 : 0
-    });
-
-    setTimeout(() => nextTurn(code), 5000);
-  });
-
 });
 
-// ---- DÉMARRAGE ----
-const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-  console.log("Serveur lancé sur le port " + PORT);
+// ---------------------------------------------------------
+// 4. Lancement serveur (Railway-friendly)
+// ---------------------------------------------------------
+
+const port = process.env.PORT || 8080;
+server.listen(port, () => {
+  console.log("Serveur lancé sur le port", port);
 });
