@@ -1,22 +1,10 @@
-// public/script.js
 const socket = io();
-let room = null;
-let board = null;
-let timer = null;
-
+let room=null, board=null, timer=null;
 const $ = id => document.getElementById(id);
 
-// ---------------- ACTION CARDS ----------------
-function createActionCards() {
-  const grid = $('actionGrid');
-  if (!grid || grid.children.length) return;
-
-  const actions = [
-    "Flash","Battle on left","Battle on right","Call a friend","For you",
-    "Second life","No way","Double","Téléportation","+1 ou -1",
-    "Everybody","Double or quits","It's your choice","Quadruple"
-  ];
-
+function createActionCards(){
+  const grid=$('actionGrid'); if(!grid||grid.children.length) return;
+  const actions=["Flash","Battle on left","Battle on right","Call a friend","For you","Second life","No way","Double","Téléportation","+1 ou -1","Everybody","Double or quits","It's your choice","Quadruple"];
   actions.forEach(a=>{
     const card=document.createElement('div');
     card.className='actionCard';
@@ -25,96 +13,42 @@ function createActionCards() {
   });
 }
 
-// ---------------- PAWNS + SCORE ----------------
-function updatePawns(players) {
-  const container = $('pions');
-  const scoreList = $('scoreList');
-  if (!container || !board) return;
-  container.innerHTML = '';
-  if(scoreList) scoreList.innerHTML = '';
-
-  const img = $('plateau');
-  const w = img.offsetWidth, h = img.offsetHeight;
-
-  players.forEach((p,i) => {
-    // Pions
-    const posIndex = Math.min(Math.max(p.pos || 0,0), board.positions.length-1);
-    const pos = board.positions[posIndex];
-    const x = (pos.x/100)*w;
-    const y = (pos.y/100)*h;
-
-    const pawn = document.createElement('div');
-    pawn.style.cssText = `
-      position:absolute;width:36px;height:36px;border-radius:50%;
-      background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};
-      border:4px solid white;display:flex;align-items:center;justify-content:center;
-      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
-    `;
-    pawn.textContent = i+1;
-    pawn.title = `${p.name} – ${p.score} pts`;
+function updatePawns(players){
+  const container=$('pions'); if(!container||!board) return;
+  container.innerHTML=''; const img=$('plateau'); const w=img.offsetWidth,h=img.offsetHeight;
+  players.forEach((p,i)=>{
+    const posIndex=Math.min(Math.max(p.pos||0,0),board.positions.length-1);
+    const pos=board.positions[posIndex];
+    const x=(pos.x/100)*w, y=(pos.y/100)*h;
+    const pawn=document.createElement('div');
+    pawn.style.cssText=`position:absolute;width:30px;height:30px;border-radius:50%;background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};border:3px solid white;left:${x}px;top:${y}px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:14px;`;
+    pawn.textContent=i+1;
+    pawn.title=`${p.name} – ${p.score} pts`;
     container.appendChild(pawn);
-
-    // Score
-    if(scoreList){
-      const li = document.createElement('div');
-      li.textContent = `${p.name}: ${p.score} pts`;
-      scoreList.appendChild(li);
-    }
   });
 }
 
-// ---------------- CASES ATTEIGNABLES ----------------
-function showPossibleCases(currentPos, steps) {
-  if (!board) return;
-  const reachable = new Set();
-
-  const queue = [{pos: currentPos, rem: steps}];
-  while(queue.length) {
-    const {pos, rem} = queue.shift();
-    if(rem===0){ reachable.add(pos); continue; }
-
-    if(pos+1 < board.positions.length) queue.push({pos: pos+1, rem: rem-1});
-
-    if(board.branches) {
-      board.branches.forEach(branch => {
-        if(branch.includes(pos)) {
-          const idx = branch.indexOf(pos);
-          if(idx+1 < branch.length) queue.push({pos: branch[idx+1], rem: rem-1});
-        }
-      });
-    }
+function showPossibleCases(currentPos,steps){
+  if(!board) return;
+  const reachable=new Set();
+  for(let i=1;i<=steps;i++){
+    let pos=currentPos+i;
+    if(pos>=board.positions.length) pos=board.positions.length-1;
+    reachable.add(pos);
   }
-
-  const el = $('possibleCases');
-  el.innerHTML = '';
-  const img = $('plateau');
-  const w = img.offsetWidth, h = img.offsetHeight;
-
+  const el=$('possibleCases'); el.innerHTML=''; const img=$('plateau'); const w=img.offsetWidth,h=img.offsetHeight;
   reachable.forEach(pos=>{
-    const p = board.positions[pos];
-    const x = (p.x/100)*w;
-    const y = (p.y/100)*h;
-
-    const spot = document.createElement('div');
-    spot.style.cssText = `
-      position:absolute;width:50px;height:50px;border-radius:50%;
-      background:radial-gradient(circle,gold,orange);border:4px solid white;
-      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
-      cursor:pointer;z-index:999;
-    `;
-    spot.onclick = ()=> {
-      socket.emit('moveTo',{code:room,pos});
-      el.innerHTML='';
-    };
+    const p=board.positions[pos]; const x=(p.x/100)*w,y=(p.y/100)*h;
+    const spot=document.createElement('div');
+    spot.style.cssText=`position:absolute;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,gold,orange);border:3px solid white;left:${x}px;top:${y}px;transform:translate(-50%,-50%);cursor:pointer;z-index:999;`;
+    spot.onclick=()=>{ socket.emit('moveTo',{code:room,pos}); el.innerHTML=''; };
     el.appendChild(spot);
   });
 }
 
-// ---------------- TIMER ----------------
 function startTimer(sec){
   if(timer) clearInterval(timer);
-  const el=$('timer');
-  el.style.display='inline-block';
+  const el=$('timer'); el.style.display='block';
   let t=sec; el.textContent=t+'s';
   timer=setInterval(()=>{
     t--; el.textContent=t+'s';
@@ -122,76 +56,36 @@ function startTimer(sec){
   },1000);
 }
 
-// ---------------- UI ----------------
-$('createBtn').onclick = () => socket.emit('create',$('playerName').value||'Hôte');
-$('joinBtn').onclick = () => socket.emit('join',{
-  code:$('roomCode').value.trim().toUpperCase(),
-  name:$('playerName').value||'Joueur'
-});
-$('startBtn').onclick = () => socket.emit('start', room);
-$('rollBtn').onclick = () => { socket.emit('roll', room); $('rollBtn').disabled=true; };
+// --- UI
+$('createBtn').onclick = ()=>socket.emit('create',$('playerName').value||'Hôte');
+$('joinBtn').onclick = ()=>socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(),name:$('playerName').value||'Joueur'});
+$('startBtn').onclick = ()=>socket.emit('start',room);
+$('rollBtn').onclick = ()=>{ socket.emit('roll',room); $('rollBtn').disabled=true; };
 $('sendAnswerBtn').onclick = ()=>{
-  const ans = $('answerInput').value.trim();
+  const ans=$('answerInput').value.trim();
   if(ans) socket.emit('answer',{code:room,answer:ans});
   $('answerInput').value='';
 };
 
-// ---------------- SOCKET EVENTS ----------------
-socket.on('created', code => { room = code; showGame(); });
-socket.on('joined', code => { room = code; showGame(); });
-
-socket.on('boardData', b => { board = b; createActionCards(); updatePawns([]); });
-socket.on('players', players => updatePawns(players));
-
+// --- Socket events
+socket.on('created', code=>{ room=code; showGame(); });
+socket.on('joined', code=>{ room=code; showGame(); });
+socket.on('boardData', b=>{ board=b; createActionCards(); updatePawns([]); });
+socket.on('players', players=>updatePawns(players));
 socket.on('yourTurn', ()=>{ $('rollBtn').disabled=false; $('rollBtn').textContent='Lancer le dé'; });
-
-socket.on('rolled', data => {
-  alert(`Tu as fait ${data.roll}! Choisis une case dorée`);
-  showPossibleCases(data.currentPos,data.roll);
-});
-
-socket.on('actionDrawn', data=>{
-  document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)');
-  document.querySelectorAll('.actionCard').forEach(c=>{
-    if(c.textContent.includes(data.action)) c.style.transform='scale(1.2)';
-  });
-});
-
-socket.on('question', q=>{
-  $('themeTitle').textContent=q.theme||'Général';
-  $('questionText').textContent=q.question;
-  $('questionBox').style.display='block';
-  startTimer(q.timer||60);
-});
-
-socket.on('timeOut', data=>{
-  clearInterval(timer); $('timer').style.display='none';
-  $('resultText').textContent=data.message||'Temps écoulé';
-  $('resultText').style.color='#f44336';
-  $('resultBox').style.display='block';
-  setTimeout(()=>{ $('resultBox').style.display='none'; $('questionBox').style.display='none'; },2500);
-});
-
+socket.on('rolled', data=>{ alert(`Tu as fait ${data.roll}!`); showPossibleCases(data.currentPos,data.roll); });
+socket.on('actionDrawn', data=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); document.querySelectorAll('.actionCard').forEach(c=>{ if(c.textContent.includes(data.action)) c.style.transform='scale(1.2)'; }); });
+socket.on('question', q=>{ $('themeTitle').textContent=q.theme||'Général'; $('questionText').textContent=q.question; $('questionBox').style.display='block'; startTimer(q.timer||60); });
+socket.on('timeOut', data=>{ clearInterval(timer); $('timer').style.display='none'; $('resultText').textContent=data.message||'Temps écoulé'; $('resultText').style.color='#f44336'; $('resultBox').style.display='block'; setTimeout(()=>{$('resultBox').style.display='none'; $('questionBox').style.display='none';},2500); });
 socket.on('results', data=>{
   clearInterval(timer); $('timer').style.display='none';
-  $('resultText').textContent=data.message||'Résultats';
-  $('resultText').style.color='#1976d2';
+  const correct = data.correctById[socket.id] ? 'Bonne réponse' : 'Mauvaise réponse';
+  $('resultText').textContent=correct;
+  $('resultText').style.color= data.correctById[socket.id] ? '#4caf50' : '#f44336';
   $('resultBox').style.display='block';
-  updatePawns(data.players); // mettre à jour scores
-  setTimeout(()=>{ $('questionBox').style.display='none'; $('resultBox').style.display='none'; },2500);
+  updatePawns(data.players);
+  setTimeout(()=>{$('resultBox').style.display='none'; $('questionBox').style.display='none';},2500);
 });
-
 socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
 
-// ---------------- SHOW GAME ----------------
-function showGame(){
-  $('menu').style.display='none';
-  $('game').style.display='block';
-  $('roomDisplay').textContent=room;
-  // créer la div pour scores si elle n'existe pas
-  if(!document.getElementById('scoreList')){
-    const s = document.createElement('div'); s.id='scoreList'; s.style.margin='10px 0';
-    $('game').insertBefore(s,$('actionGrid'));
-  }
-  socket.emit('requestBoard'); // demander le board au serveur
-}
+function showGame(){ $('menu').style.display='none'; $('game').style.display='block'; $('roomDisplay').textContent=room; socket.emit('requestBoard'); }
