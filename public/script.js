@@ -1,10 +1,21 @@
 const socket = io();
-let room=null, board=null, timer=null;
+let room = null;
+let board = null;
+let timer = null;
+let forYouMode=false;
+let callFriendMode=false;
+let activePlayerId=null;
+
 const $ = id => document.getElementById(id);
 
 function createActionCards(){
-  const grid=$('actionGrid'); if(!grid||grid.children.length) return;
-  const actions=["Flash","Battle on left","Battle on right","Call a friend","For you","Second life","No way","Double","Téléportation","+1 ou -1","Everybody","Double or quits","It's your choice","Quadruple"];
+  const grid = $('actionGrid');
+  if(!grid||grid.children.length) return;
+  const actions=[
+    "Flash","Battle on left","Battle on right","Call a friend","For you",
+    "Second life","No way","Double","Téléportation","+1 ou -1",
+    "Everybody","Double or quits","It's your choice","Quadruple"
+  ];
   actions.forEach(a=>{
     const card=document.createElement('div');
     card.className='actionCard';
@@ -14,14 +25,22 @@ function createActionCards(){
 }
 
 function updatePawns(players){
-  const container=$('pions'); if(!container||!board) return;
-  container.innerHTML=''; const img=$('plateau'); const w=img.offsetWidth,h=img.offsetHeight;
+  const container=$('pions');
+  if(!container||!board) return;
+  container.innerHTML='';
+  const img=$('plateau'); const w=img.offsetWidth, h=img.offsetHeight;
   players.forEach((p,i)=>{
     const posIndex=Math.min(Math.max(p.pos||0,0),board.positions.length-1);
     const pos=board.positions[posIndex];
-    const x=(pos.x/100)*w, y=(pos.y/100)*h;
+    const x=(pos.x/100)*w;
+    const y=(pos.y/100)*h;
     const pawn=document.createElement('div');
-    pawn.style.cssText=`position:absolute;width:30px;height:30px;border-radius:50%;background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};border:3px solid white;left:${x}px;top:${y}px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;font-size:14px;`;
+    pawn.style.cssText=`
+      position:absolute;width:40px;height:40px;border-radius:50%;
+      background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};
+      border:4px solid white;display:flex;align-items:center;justify-content:center;
+      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
+    `;
     pawn.textContent=i+1;
     pawn.title=`${p.name} – ${p.score} pts`;
     container.appendChild(pawn);
@@ -31,24 +50,36 @@ function updatePawns(players){
 function showPossibleCases(currentPos,steps){
   if(!board) return;
   const reachable=new Set();
-  for(let i=1;i<=steps;i++){
-    let pos=currentPos+i;
-    if(pos>=board.positions.length) pos=board.positions.length-1;
-    reachable.add(pos);
+  const q=[{pos:currentPos,rem:steps}];
+  while(q.length){
+    const {pos,rem}=q.shift();
+    if(rem===0){reachable.add(pos); continue;}
+    if(pos<board.positions.length-1) q.push({pos:pos+1,rem:rem-1});
   }
-  const el=$('possibleCases'); el.innerHTML=''; const img=$('plateau'); const w=img.offsetWidth,h=img.offsetHeight;
+
+  const el=$('possibleCases'); el.innerHTML='';
+  const img=$('plateau'); const w=img.offsetWidth,h=img.offsetHeight;
+
   reachable.forEach(pos=>{
-    const p=board.positions[pos]; const x=(p.x/100)*w,y=(p.y/100)*h;
+    const p=board.positions[pos];
+    const x=(p.x/100)*w;
+    const y=(p.y/100)*h;
     const spot=document.createElement('div');
-    spot.style.cssText=`position:absolute;width:40px;height:40px;border-radius:50%;background:radial-gradient(circle,gold,orange);border:3px solid white;left:${x}px;top:${y}px;transform:translate(-50%,-50%);cursor:pointer;z-index:999;`;
-    spot.onclick=()=>{ socket.emit('moveTo',{code:room,pos}); el.innerHTML=''; };
+    spot.style.cssText=`
+      position:absolute;width:60px;height:60px;border-radius:50%;
+      background:radial-gradient(circle,gold,orange);border:5px solid white;
+      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
+      cursor:pointer;z-index:999;
+    `;
+    spot.onclick=()=>{socket.emit('moveTo',{code:room,pos}); el.innerHTML='';};
     el.appendChild(spot);
   });
 }
 
 function startTimer(sec){
   if(timer) clearInterval(timer);
-  const el=$('timer'); el.style.display='block';
+  const el=$('timer');
+  el.style.display='block';
   let t=sec; el.textContent=t+'s';
   timer=setInterval(()=>{
     t--; el.textContent=t+'s';
@@ -56,36 +87,103 @@ function startTimer(sec){
   },1000);
 }
 
-// --- UI
-$('createBtn').onclick = ()=>socket.emit('create',$('playerName').value||'Hôte');
-$('joinBtn').onclick = ()=>socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(),name:$('playerName').value||'Joueur'});
-$('startBtn').onclick = ()=>socket.emit('start',room);
-$('rollBtn').onclick = ()=>{ socket.emit('roll',room); $('rollBtn').disabled=true; };
-$('sendAnswerBtn').onclick = ()=>{
+function updateScoreBoard(players,activeId){
+  const ul=$('scoreList'); ul.innerHTML='';
+  players.forEach(p=>{
+    const li=document.createElement('li');
+    li.textContent=`${p.name}: ${p.score} pts`;
+    li.style.fontWeight=(p.id===activeId)?'bold':'normal';
+    li.style.cursor='pointer';
+    li.dataset.playerId=p.id;
+    ul.appendChild(li);
+  });
+}
+
+$('scoreList').onclick=e=>{
+  const target=e.target;
+  if(target.dataset.playerId){
+    const pid=target.dataset.playerId;
+    if(forYouMode) socket.emit('forYouChoice',{code:room,targetId:pid});
+    if(callFriendMode) socket.emit('callFriendChoice',{code:room,targetId:pid});
+  }
+};
+
+$('createBtn').onclick=()=>socket.emit('create',$('playerName').value||'Hôte');
+$('joinBtn').onclick=()=>socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(),name:$('playerName').value||'Joueur'});
+$('startBtn').onclick=()=>socket.emit('start',room);
+$('rollBtn').onclick=()=>{socket.emit('roll',room); $('rollBtn').disabled=true;};
+$('sendAnswerBtn').onclick=()=>{
   const ans=$('answerInput').value.trim();
   if(ans) socket.emit('answer',{code:room,answer:ans});
   $('answerInput').value='';
 };
 
-// --- Socket events
-socket.on('created', code=>{ room=code; showGame(); });
-socket.on('joined', code=>{ room=code; showGame(); });
-socket.on('boardData', b=>{ board=b; createActionCards(); updatePawns([]); });
-socket.on('players', players=>updatePawns(players));
-socket.on('yourTurn', ()=>{ $('rollBtn').disabled=false; $('rollBtn').textContent='Lancer le dé'; });
-socket.on('rolled', data=>{ alert(`Tu as fait ${data.roll}!`); showPossibleCases(data.currentPos,data.roll); });
-socket.on('actionDrawn', data=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); document.querySelectorAll('.actionCard').forEach(c=>{ if(c.textContent.includes(data.action)) c.style.transform='scale(1.2)'; }); });
-socket.on('question', q=>{ $('themeTitle').textContent=q.theme||'Général'; $('questionText').textContent=q.question; $('questionBox').style.display='block'; startTimer(q.timer||60); });
-socket.on('timeOut', data=>{ clearInterval(timer); $('timer').style.display='none'; $('resultText').textContent=data.message||'Temps écoulé'; $('resultText').style.color='#f44336'; $('resultBox').style.display='block'; setTimeout(()=>{$('resultBox').style.display='none'; $('questionBox').style.display='none';},2500); });
-socket.on('results', data=>{
-  clearInterval(timer); $('timer').style.display='none';
-  const correct = data.correctById[socket.id] ? 'Bonne réponse' : 'Mauvaise réponse';
-  $('resultText').textContent=correct;
-  $('resultText').style.color= data.correctById[socket.id] ? '#4caf50' : '#f44336';
-  $('resultBox').style.display='block';
-  updatePawns(data.players);
-  setTimeout(()=>{$('resultBox').style.display='none'; $('questionBox').style.display='none';},2500);
+socket.on('created',code=>{room=code; showGame();});
+socket.on('joined',code=>{room=code; showGame();});
+socket.on('boardData',b=>{board=b; createActionCards(); updatePawns([]);});
+socket.on('players',players=>{
+  updatePawns(players);
+  updateScoreBoard(players,activePlayerId);
 });
-socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
 
-function showGame(){ $('menu').style.display='none'; $('game').style.display='block'; $('roomDisplay').textContent=room; socket.emit('requestBoard'); }
+socket.on('yourTurn',data=>{
+  activePlayerId=data.playerId;
+  setControlsActive(data.playerId===socket.id);
+});
+
+socket.on('rolled',data=>{
+  if(data.playerId===socket.id){
+    $('diceResult').textContent=`Tu as fait ${data.roll}`;
+    showPossibleCases(data.currentPos,data.roll);
+  }
+});
+
+socket.on('actionDrawn',data=>{
+  document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)');
+  document.querySelectorAll('.actionCard').forEach(c=>{
+    if(c.textContent.includes(data.action)) c.style.transform='scale(1.2)';
+  });
+  forYouMode=data.action==='For you';
+  callFriendMode=data.action==='Call a friend';
+});
+
+socket.on('question',q=>{
+  if(q.everybody || q.playerId===socket.id){
+    $('themeTitle').textContent=q.theme||'Général';
+    $('questionText').textContent=q.question;
+    $('questionBox').style.display='block';
+    startTimer(q.timer||60);
+  }
+});
+
+socket.on('timeOut',data=>{
+  clearInterval(timer); $('timer').style.display='none';
+  $('resultText').textContent=data.message||'Temps écoulé';
+  $('resultText').style.color='#f44336';
+  $('resultBox').style.display='block';
+  setTimeout(()=>{$('resultBox').style.display='none';$('questionBox').style.display='none';},2500);
+});
+
+socket.on('results',data=>{
+  clearInterval(timer); $('timer').style.display='none';
+  $('resultText').textContent=data.correct?'Bonne réponse':'Mauvaise réponse';
+  $('resultText').style.color=data.correct?'#1976d2':'#f44336';
+  $('resultBox').style.display='block';
+  setTimeout(()=>{$('questionBox').style.display='none';$('resultBox').style.display='none';},2500);
+  updateScoreBoard(data.players,activePlayerId);
+});
+
+socket.on('actionClear',()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
+
+function setControlsActive(active){
+  $('rollBtn').disabled=!active;
+  $('sendAnswerBtn').disabled=!active;
+  $('answerInput').disabled=!active;
+}
+
+function showGame(){
+  $('menu').style.display='none';
+  $('game').style.display='block';
+  $('roomDisplay').textContent=room;
+  socket.emit('requestBoard');
+}
