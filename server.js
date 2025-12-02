@@ -1,218 +1,127 @@
 const express = require('express');
 const http = require('http');
-const fs = require('fs');
+const socketIo = require('socket.io');
 const path = require('path');
-const { Server } = require('socket.io');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = socketIo(server);
 
 app.use(express.static('public'));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-const MAX_PLAYERS = 6;
-const BOARD_LENGTH = 32;
+let rooms = {};
+let questions = [];
 
-// ACTIONS
-const ACTIONS = [
-  { name: "Flash", flash: 30, desc: "Réponds en moins de 30 secondes !" },
-  { name: "Battle on left", battleLeft: true, desc: "Plus rapide que ton voisin de gauche" },
-  { name: "Battle on right", battleRight: true, desc: "Plus rapide que ton voisin de droite" },
-  { name: "Call a friend", callFriend: true, desc: "Choisis un partenaire → +1 point chacun si bonne réponse" },
-  { name: "For you", forYou: true, desc: "Désigne un joueur qui répond à ta place" },
-  { name: "Second life", secondLife: true, desc: "Deuxième chance si tu échoues" },
-  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
-  { name: "Double", multiplier: 2, desc: "×2 les points en cas de succès" },
-  { name: "Téléportation", teleport: true, desc: "Réussite → +1 point + tu choisis la prochaine case" },
-  { name: " +1 ou -1", plusOrMinus: true, desc: "Réussite → +2 points / Échec → -1 point" },
-  { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
-  { name: "Double or quits", doubleOrQuits: true, desc: "Tout doubler ou tout perdre" },
-  { name: "It's your choice", freeChoice: true, desc: "Choisis l'action que tu veux !" },
-  { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
-  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
-  { name: "Quadruple", multiplier: 4, desc: "×4 les points en cas de succès" }
+try {
+  const data = fs.readFileSync('public/data.json', 'utf8');
+  questions = JSON.parse(data);
+} catch (e) {
+  console.log("data.json non trouvé ou invalide");
+}
+
+const actions = [
+  "Flash","Battle on left","Battle on right","Call a friend",
+  "For you","Second life","No way","Double",
+  "Téléportation","+1 ou -1","Everybody","Double or quits",
+  "It's your choice","Everybody","No way","Quadruple"
 ];
 
-// DATA
-let DATA = null;
-try {
-  const dataPath = path.join(process.cwd(), 'public', 'data.json');
-  DATA = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-} catch (e) {
-  console.error("Erreur data.json :", e);
-}
-const THEMES = DATA ? Object.keys(DATA.categories) : [];
-const QUESTIONS = DATA ? DATA.categories : {};
-
-// BOARD
-const BOARD = [];
-for (let i = 0; i < BOARD_LENGTH; i++) {
-  if (i % 2 === 0) {
-    BOARD.push({ type: "action", name: ACTIONS[i % ACTIONS.length].name });
-  } else {
-    BOARD.push({ type: "theme", name: THEMES[i % THEMES.length] || "Général" });
-  }
-}
-
-const rooms = {};
-
-function generateCode() {
-  let code;
-  do { code = Math.random().toString(36).substring(2, 6).toUpperCase(); } while (rooms[code]);
-  return code;
-}
-
-function getPlayer(room, id) { return room.players.find(p => p.id === id); }
-
-io.on('connection', (socket) => {
-  console.log("Connecté:", socket.id);
-
-  socket.on('create', (name) => {
-    const code = generateCode();
+io.on('connection', socket => {
+  socket.on('create', name => {
+    const code = Math.random().toString(36).substring(2, 6).toUpperCase();
     rooms[code] = {
-      code, host: socket.id, started: false, currentTurn: 0,
-      players: [{ id: socket.id, name: name || "Hôte", pos: 0, score: 0 }],
-      currentAction: null, currentQuestion: null, currentCorrection: null, activePlayers: [], pendingAnswers: new Map(),
-      timer: null
+      players: [{ id: socket.id, name, pos: 0, score: 0 }],
+      started: false,
+      currentPlayer: 0
     };
     socket.join(code);
     socket.emit('created', code);
     io.to(code).emit('players', rooms[code].players);
   });
 
-  socket.on('join', ({ code, name }) => {
-    const room = rooms[code];
-    if (!room || room.players.length >= MAX_PLAYERS) {
-      socket.emit('error', room ? "Salle pleine" : "Salle introuvable");
-      return;
-    }
-    room.players.push({ id: socket.id, name: name || "Joueur", pos: 0, score: 0 });
+  socket.on('join', ({code, name}) => {
+    code = code.toUpperCase();
+    if (!rooms[code]) return socket.emit('error', 'Salle inexistante');
+    if (rooms[code].started) return socket.emit('error', 'Partie déjà commencée');
+    rooms[code].players.push({ id: socket.id, name, pos: 0, score: 0 });
     socket.join(code);
     socket.emit('joined', code);
+    io.to(code).emit('players', rooms[code].players);
+  });
+
+  socket.on('start', code => {
+    if (!rooms[code]) return;
+    rooms[code].started = true;
+    io.to(code).emit('gameStart');
+    nextTurn(code);
+  });
+
+  function nextTurn(code) {
+    const room = rooms[code];
+    if (!room) return;
+    const player = room.players[room.currentPlayer];
+    io.to(code).emit('yourTurn', player.id);
+    socket.to(code).emit('waiting', player.name);
+  }
+
+  socket.on('roll', code => {
+    if (!rooms[code]) return;
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const player = rooms[code].players.find(p => p.id === socket.id);
+    if (!player) return;
+    socket.emit('rolled', { roll, currentPos: player.pos });
+    socket.to(code).emit('playerRolled', { name: player.name, roll });
+  });
+
+  socket.on('moveTo', ({code, targetPos}) => {
+    const room = rooms[code];
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+    player.pos = targetPos;
+
+    // Tirage d'une action
+    const action = actions[Math.floor(Math.random() * actions.length)];
+    io.to(code).emit('actionDrawn', { action });
+
+    // Tirage d'une question aléatoire
+    const q = questions[Math.floor(Math.random() * questions.length)];
+    io.to(code).emit('question', { ...q, action });
+
     io.to(code).emit('players', room.players);
   });
 
-  socket.on('start', (code) => {
+  socket.on('answer', ({code, answer}) => {
     const room = rooms[code];
-    if (!room || room.host !== socket.id) return;
-    room.started = true;
-    io.to(code).emit('gameStart');
-    nextTurn(room);
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    const correct = answer.trim().toLowerCase() === "42"; // À remplacer par vraie logique plus tard
+    const points = correct ? 1 : 0;
+
+    player.score += points;
+
+    io.to(code).emit('result', {
+      player: player.name,
+      correct,
+      points: correct ? 1 : 0
+    });
+
+    // Passe au joueur suivant
+    room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
+    setTimeout(() => nextTurn(code), 5000);
+    io.to(code).emit('players', room.players);
   });
-
-  function nextTurn(room) {
-    room.currentTurn++;
-    const player = room.players[room.currentTurn % room.players.length];
-    room.activePlayers = [player.id];
-    room.pendingAnswers = new Map();
-    io.to(player.id).emit('yourTurn');
-  }
-
-   socket.on('roll', code => {
-    const room = rooms[code];
-    if (!room || room.activePlayers[0] !== socket.id) return;
-    const roll = Math.floor(Math.random() * 6) + 1;
-    const player = getPlayer(room, socket.id);
-    io.to(code).emit('rolled', { roll, currentPos: player.pos });
-  });
-
-  // ... (le début reste identique jusqu'à socket.on('move'))
-
-socket.on('moveTo', ({code, pos}) => {
-  const room = rooms[code];
-  if (!room || room.activePlayers[0] !== socket.id) return;
-
-  const player = getPlayer(room, socket.id);
-  player.pos = pos;
-  io.to(code).emit('players', room.players);
-
-  // Piocher action + question
-  const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
-  room.currentAction = action;
-
-  const theme = THEMES[Math.floor(Math.random() * THEMES.length)] || "Général";
-  const q = getRandomQuestion(theme);
-  if (!q) return endTurn(room);
-
-  room.currentQuestion = q.question;
-  room.currentCorrection = q.correction.trim().toLowerCase();
-  room.pendingAnswers = new Map();
-  room.activePlayers = action.everybody ? room.players.map(p => p.id) : [socket.id];
-
-  io.to(code).emit('actionDrawn', { action: action.name, timer: action.flash || null });
-  io.to(code).emit('players', room.players);
-
-  const duration = action.flash || 60;
-  room.timer = setTimeout(() => {
-    if (room.currentQuestion) {
-      io.to(code).emit('timeOut', { message: 'Temps écoulé !' });
-      room.activePlayers.forEach(id => room.pendingAnswers.set(id, {correct: false}));
-      applyActionResults(room, action);
-      endTurn(room);
-    }
-  }, duration * 1000);
-
-  const questionData = { theme, question: q.question };
-  if (action.everybody) io.to(code).emit('question', questionData);
-  else io.to(socket.id).emit('question', questionData);
-});
-
-socket.on('answer', ({code, answer}) => {
-  const room = rooms[code];
-  if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
-
-  const correct = (answer+"").trim().toLowerCase() === room.currentCorrection;
-  room.pendingAnswers.set(socket.id, { correct, player: getPlayer(room, socket.id).name });
-
-  if (!room.currentAction.everybody || room.pendingAnswers.size === room.activePlayers.length) {
-    clearTimeout(room.timer);
-    applyActionResults(room, room.currentAction, correct);
-    endTurn(room);
-  }
-});
-
-function applyActionResults(room, action, correct) {
-  room.activePlayers.forEach(id => {
-    const res = room.pendingAnswers.get(id) || { correct: false };
-    const player = getPlayer(room, id);
-    if (res.correct) {
-      player.score += action.multiplier || 1;
-    } else if (action.noWay) {
-      room.players.forEach(p => { if (p.id !== id) p.score += 1; });
-    }
-  });
-  io.to(room.code).emit('results', { message: correct ? 'Bonne réponse ! +1 point' : 'Mauvaise réponse' });
-}
-
-  function endTurn(room) {
-    io.to(room.code).emit('actionClear');
-    room.currentQuestion = null;
-    room.currentCorrection = null;
-    room.currentAction = null;
-    room.activePlayers = [];
-    room.pendingAnswers = new Map();
-    setTimeout(() => nextTurn(room), 3000);
-  }
-
-  function getRandomQuestion(theme) {
-    const list = QUESTIONS[theme] || Object.values(QUESTIONS).flat();
-    return list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
-  }
 
   socket.on('disconnect', () => {
-    Object.values(rooms).forEach(room => {
-      const idx = room.players.findIndex(p => p.id === socket.id);
-      if (idx !== -1) {
-        room.players.splice(idx, 1);
-        io.to(room.code).emit('players', room.players);
-        if (room.host === socket.id && room.players.length > 0) room.host = room.players[0].id;
-        if (room.players.length === 0) delete rooms[room.code];
-      }
-    });
+    for (const code in rooms) {
+      rooms[code].players = rooms[code].players.filter(p => p.id !== socket.id);
+      if (rooms[code].players.length === 0) delete rooms[code];
+      else io.to(code).emit('players', rooms[code].players);
+    }
   });
 });
 
-server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
-
-
-
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Serveur lancé sur le port ${PORT}`));
