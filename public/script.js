@@ -1,4 +1,3 @@
-// public/script.js
 const socket = io();
 let room = null;
 let board = null;
@@ -6,6 +5,7 @@ let timer = null;
 
 const $ = id => document.getElementById(id);
 
+// --- Créer les cartes actions
 function createActionCards() {
   const grid = $('actionGrid');
   if (!grid || grid.children.length) return;
@@ -17,12 +17,14 @@ function createActionCards() {
   ];
 
   actions.forEach(a=>{
-  const card=document.createElement('div');
-  card.className='actionCard';
-  card.innerHTML=`<h4>${a.name}</h4><p>${a.text||''}</p>`;
-  grid.appendChild(card);
-});
+    const card=document.createElement('div');
+    card.className='actionCard';
+    card.innerHTML=`<h4>${a}</h4>`;
+    grid.appendChild(card);
+  });
+}
 
+// --- Mettre à jour les pions sur le plateau
 function updatePawns(players) {
   const container = $('pions');
   if (!container || !board) return;
@@ -49,6 +51,7 @@ function updatePawns(players) {
   });
 }
 
+// --- Montrer les cases possibles après lancer le dé
 function showPossibleCases(currentPos, steps) {
   if (!board) return;
   const reachable = new Set();
@@ -84,6 +87,7 @@ function showPossibleCases(currentPos, steps) {
   });
 }
 
+// --- Timer
 function startTimer(sec){
   if(timer) clearInterval(timer);
   const el=$('timer');
@@ -95,7 +99,7 @@ function startTimer(sec){
   },1000);
 }
 
-// UI wiring
+// --- UI wiring
 $('createBtn').onclick = () => socket.emit('create',$('playerName').value||'Hôte');
 $('joinBtn').onclick = () => socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(), name:$('playerName').value||'Joueur'});
 $('startBtn').onclick = () => socket.emit('start', room);
@@ -106,7 +110,7 @@ $('sendAnswerBtn').onclick = ()=>{
   $('answerInput').value='';
 };
 
-// Socket events
+// --- Socket events
 socket.on('created', code => { room = code; showGame(); });
 socket.on('joined', code => { room = code; showGame(); });
 socket.on('boardData', b => { board = b; createActionCards(); updatePawns([]); });
@@ -145,12 +149,4 @@ socket.on('results', data=>{
   setTimeout(()=>{ $('questionBox').style.display='none'; $('resultBox').style.display='none'; },2500);
 });
 
-socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
-
-function showGame(){
-  $('menu').style.display='none';
-  $('game').style.display='block';
-  $('roomDisplay').textContent=room;
-  socket.emit('requestBoard'); // demande le board au serveur
-}
-
+socket.on('actionCle
