@@ -18,13 +18,12 @@
   </div>
 
   <div id="game" style="display:none;">
-    <h2>Salle : <span id="roomDisplay"></span></h2>
-    <button id="startBtn">Démarrer la partie</button>
-
-    <div id="scoreBoard">
-      <h3>Scores</h3>
-      <ul id="scoreList"></ul>
+    <div id="topBar">
+      <h2>Salle : <span id="roomDisplay"></span></h2>
+      <div id="scoreboard"></div>
     </div>
+
+    <button id="startBtn">Démarrer la partie</button>
 
     <div id="boardContainer">
       <img src="assets/plateau.png" id="plateau" alt="Plateau">
@@ -32,10 +31,10 @@
       <div id="possibleCases"></div>
     </div>
 
-    <div id="diceResult"></div>
-    <div id="timer">60s</div>
-    <div id="actionGrid"></div>
+    <div id="diceResult">Résultat du dé : <span id="diceNumber">-</span></div>
     <button id="rollBtn" disabled>Lancer le dé</button>
+
+    <div id="actionGrid"></div>
 
     <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>
@@ -47,6 +46,8 @@
     <div id="resultBox" style="display:none;">
       <h2 id="resultText"></h2>
     </div>
+
+    <div id="timer">60s</div>
   </div>
 
   <script src="script.js"></script>
