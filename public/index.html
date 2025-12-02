@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Maths à la Maison</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Socket.io via CDN (correct pour Railway) -->
+  <!-- Socket.io client via CDN (fiable sur Railway) -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
   <div id="menu">
     <h1>Maths à la Maison</h1>
     <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
-    <button onclick="createRoom()">Créer une partie</button>
+    <button id="createBtn">Créer une partie</button>
     <p>OU</p>
     <input type="text" id="roomCode" placeholder="Code (ex: ABCD)" maxlength="4">
-    <button onclick="joinRoom()">Rejoindre</button>
+    <button id="joinBtn">Rejoindre</button>
   </div>
 
   <div id="game" style="display:none;">
@@ -33,9 +32,20 @@
 
     <div id="actionGrid"></div>
 
-    <button id="rollBtn" onclick="rollDice()" disabled>Lancer le dé</button>
+    <button id="rollBtn" disabled>Lancer le dé</button>
 
     <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>
       <p id="questionText"></p>
-      <input type="text" id="answerInput" placeholder="T
+      <input type="text" id="answerInput" placeholder="Ta réponse">
+      <button id="sendAnswerBtn">Envoyer</button>
+    </div>
+
+    <div id="resultBox" style="display:none;">
+      <h2 id="resultText"></h2>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
