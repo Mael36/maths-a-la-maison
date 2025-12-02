@@ -9,16 +9,13 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use(express.static('public'));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-let rooms = {};
 let questions = [];
-
 try {
-  const data = fs.readFileSync('public/data.json', 'utf8');
+  const data = fs.readFileSync(path.join(__dirname, 'public', 'data.json'), 'utf8');
   questions = JSON.parse(data);
 } catch (e) {
-  console.log("data.json non trouvé ou invalide");
+  console.error("data.json introuvable ou invalide");
 }
 
 const actions = [
@@ -27,6 +24,8 @@ const actions = [
   "Téléportation","+1 ou -1","Everybody","Double or quits",
   "It's your choice","Everybody","No way","Quadruple"
 ];
+
+const rooms = {};
 
 io.on('connection', socket => {
   socket.on('create', name => {
@@ -62,45 +61,32 @@ io.on('connection', socket => {
     const room = rooms[code];
     if (!room) return;
     const player = room.players[room.currentPlayer];
-    io.to(code).emit('yourTurn', player.id);
-    socket.to(code).emit('waiting', player.name);
+    io.to(player.id).emit('yourTurn');
+    room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
   }
 
   socket.on('roll', code => {
-    if (!rooms[code]) return;
     const roll = Math.floor(Math.random() * 6) + 1;
     const player = rooms[code].players.find(p => p.id === socket.id);
-    if (!player) return;
     socket.emit('rolled', { roll, currentPos: player.pos });
-    socket.to(code).emit('playerRolled', { name: player.name, roll });
   });
 
   socket.on('moveTo', ({code, targetPos}) => {
-    const room = rooms[code];
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
+    const player = rooms[code].players.find(p => p.id === socket.id);
     player.pos = targetPos;
 
-    // Tirage d'une action
     const action = actions[Math.floor(Math.random() * actions.length)];
+    const question = questions[Math.floor(Math.random() * questions.length)];
+
     io.to(code).emit('actionDrawn', { action });
-
-    // Tirage d'une question aléatoire
-    const q = questions[Math.floor(Math.random() * questions.length)];
-    io.to(code).emit('question', { ...q, action });
-
-    io.to(code).emit('players', room.players);
+    io.to(code).emit('question', { ...question, action });
+    io.to(code).emit('players', rooms[code].players);
   });
 
   socket.on('answer', ({code, answer}) => {
-    const room = rooms[code];
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
-
-    const correct = answer.trim().toLowerCase() === "42"; // À remplacer par vraie logique plus tard
-    const points = correct ? 1 : 0;
-
-    player.score += points;
+    const player = rooms[code].players.find(p => p.id === socket.id);
+    const correct = answer.trim().toLowerCase() === "42"; // ← à améliorer plus tard
+    player.score += correct ? 1 : 0;
 
     io.to(code).emit('result', {
       player: player.name,
@@ -108,20 +94,12 @@ io.on('connection', socket => {
       points: correct ? 1 : 0
     });
 
-    // Passe au joueur suivant
-    room.currentPlayer = (room.currentPlayer + 1) % room.players.length;
     setTimeout(() => nextTurn(code), 5000);
-    io.to(code).emit('players', room.players);
-  });
-
-  socket.on('disconnect', () => {
-    for (const code in rooms) {
-      rooms[code].players = rooms[code].players.filter(p => p.id !== socket.id);
-      if (rooms[code].players.length === 0) delete rooms[code];
-      else io.to(code).emit('players', rooms[code].players);
-    }
   });
 });
 
+// PORT 3000 OBLIGATOIRE SUR RAILWAY
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Serveur lancé sur le port ${PORT}`));
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Serveur lancé sur le port ${PORT}`);
+});
