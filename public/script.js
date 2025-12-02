@@ -5,11 +5,11 @@ let board = null;
 
 const $ = id => document.getElementById(id);
 
-// Les 16 vraies cartes Action avec images et textes
+// 16 vraies cartes Action avec tes images et textes exacts
 const ACTIONS = [
   {name:"Flash", img:"actions/flash.jpg", text:"Tu dois répondre en moins de 30 secondes à la question !"},
-  {name:"Battle on left", img:"actions/battle_left.jpg", text:"Tu dois répondre plus vite que ton voisin de gauche. Si l'un de vous deux répond juste avant toi, c'est lui qui remporte le point sinon c'est toi."},
-  {name:"Battle on right", img:"actions/battle_right.jpg", text:"Tu dois répondre plus vite que ton voisin de droite. Si l'un de vous deux répond juste avant toi, c'est lui qui remporte le point sinon c'est toi."},
+  {name:"Battle on left", img:"actions/battle_left.jpg", text:"Tu dois répondre plus vite que ton voisin de gauche"},
+  {name:"Battle on right", img:"actions/battle_right.jpg", text:"Tu dois répondre plus vite que ton voisin de droite"},
   {name:"Call a friend", img:"actions/call_friend.jpg", text:"Choisis le partenaire de ton choix. Cherchez la réponse à 2. Si vous réussissez, vous remportez 1 point tous les 2."},
   {name:"For you", img:"actions/for_you.jpg", text:"Choisis le joueur qui répondra à ta place. S'il réussit, vous remportez chacun 1 point."},
   {name:"Second life", img:"actions/second_life.jpg", text:"Si tu ne réussis pas la prochaine question, tu peux piocher une autre question dans la même catégorie et retenter ta chance."},
@@ -33,46 +33,73 @@ fetch('/data/board.json')
     createActionGrid();
   });
 
-// Grille 4×4 avec vraies images et textes
+// Grille 4×4 avec vraies cartes
 function createActionGrid() {
   const grid = $('actionGrid');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  grid.style.gap = '15px';
+  grid.style.maxWidth = '900px';
+  grid.style.margin = '30px auto';
+
   ACTIONS.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <img src="${a.img}" style="width:100%; height:160px; object-fit:cover; border-radius:12px;">
-      <div style="padding:10px; background:#1565c0; color:white; border-radius:0 0 12px 12px;">
-        <strong style="font-size:14px;">${a.name}</strong><br>
-        <small style="font-size:10px; line-height:1.3;">${a.text}</small>
+      <img src="${a.img}" style="width:100%; height:180px; object-fit:cover; border-radius:12px 12px 0 0;">
+      <div style="padding:12px; background:#1565c0; color:white; border-radius:0 0 12px 12px; min-height:100px;">
+        <strong style="font-size:15px; display:block; margin-bottom:6px;">${a.name}</strong>
+        <small style="font-size:11px; line-height:1.4;">${a.text}</small>
       </div>
     `;
     grid.appendChild(card);
   });
 }
 
-// Pions exactement sur les vraies cases
+// PIONS PARFAITEMENT CENTRÉS – CORRIGÉ À 100 %
 function updatePawns(players) {
-  $('pions').innerHTML = '';
+  const container = $('pions');
+  container.innerHTML = '';
   const img = $('plateau');
+  if (!img || !board) return;
+
   const rect = img.getBoundingClientRect();
 
   players.forEach((p, i) => {
     const pos = board.positions[p.pos];
+    if (!pos) return;
+
+    // Calcul ultra-précis en %
     const x = rect.width * (pos.x / 100);
     const y = rect.height * (pos.y / 100);
 
     const pawn = document.createElement('div');
     pawn.className = 'pawn';
-    pawn.style.left = (x - 30) + 'px';
-    pawn.style.top = (y - 30) + 'px';
-    pawn.style.background = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'][i];
+    pawn.style.position = 'absolute';
+    pawn.style.width = '60px';
+    pawn.style.height = '60px';
+    pawn.style.borderRadius = '50%';
+    pawn.style.background = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'][i % 6];
+    pawn.style.border = '5px solid white';
+    pawn.style.boxShadow = '0 8px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.4)';
+    pawn.style.color = 'white';
+    pawn.style.fontWeight = 'bold';
+    pawn.style.fontSize = '24px';
+    pawn.style.display = 'flex';
+    pawn.style.alignItems = 'center';
+    pawn.style.justifyContent = 'center';
+    pawn.style.transform = 'translate(-50%, -50%)'; // CENTRAGE PARFAIT
+    pawn.style.left = x + 'px';
+    pawn.style.top = y + 'px';
+    pawn.style.zIndex = '10';
     pawn.textContent = i + 1;
     pawn.title = `${p.name} – ${p.score} pts`;
-    $('pions').appendChild(pawn);
+
+    container.appendChild(pawn);
   });
 }
 
-// Cases atteignables (gère cercle + branches + centre)
+// Cases atteignables – doré cliquable
 function showPossibleCases(currentPos, steps) {
   const reachable = new Set();
   const queue = [{pos: currentPos, remaining: steps}];
@@ -84,47 +111,42 @@ function showPossibleCases(currentPos, steps) {
       continue;
     }
 
-    // Cercle extérieur (0-47)
     if (pos < 48) {
       const next = (pos + 1) % 48;
       queue.push({pos: next, remaining: remaining - 1});
-
-      // Embranchement toutes les 4 cases
       if (pos % 4 === 0) {
         const branchIndex = pos / 4;
         const branchStart = 48 + branchIndex * 3;
-        if (branchStart < 84) {
-          queue.push({pos: branchStart, remaining: remaining - 1});
-        }
+        if (branchStart < 84) queue.push({pos: branchStart, remaining: remaining - 1});
       }
     }
 
-    // Dans une branche (48-83)
     if (pos >= 48 && pos < 84) {
       const next = pos + 1;
-      if (next <= 84) {
-        queue.push({pos: next, remaining: remaining - 1});
-      }
+      if (next <= 84) queue.push({pos: next, remaining: remaining - 1});
     }
   }
 
-  // Affichage doré cliquable
   $('possibleCases').innerHTML = '';
   reachable.forEach(pos => {
     const p = board.positions[pos];
     const spot = document.createElement('div');
     spot.style.position = 'absolute';
-    spot.style.width = '90px';
-    spot.style.height = '90px';
+    spot.style.width = '100px';
+    spot.style.height = '100px';
     spot.style.background = 'radial-gradient(circle, gold, orange)';
-    spot.style.border = '6px solid white';
+    spot.style.border = '8px solid rgba(255,255,255,0.8)';
     spot.style.borderRadius = '50%';
-    spot.style.left = (p.x / 100 * $('plateau').width - 45) + 'px';
-    spot.style.top = (p.y / 100 * $('plateau').height - 45) + 'px';
+    spot.style.left = (p.x / 100 * $('plateau').width - 50) + 'px';
+    spot.style.top = (p.y / 100 * $('plateau').height - 50) + 'px';
     spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 50px gold, inset 0 0 20px white';
-    spot.style.zIndex = '1000';
-    spot.onclick = () => socket.emit('moveTo', {code: room, pos});
+    spot.style.boxShadow = '0 0 60px gold, inset 0 0 30px white';
+    spot.style.zIndex = '999';
+    spot.style.transform = 'translate(-50%, -50%)';
+    spot.onclick = () => {
+      socket.emit('moveTo', {code: room, pos});
+      $('possibleCases').innerHTML = '';
+    };
     $('possibleCases').appendChild(spot);
   });
 }
@@ -164,6 +186,7 @@ function showGame(code) {
 
 socket.on('players', players => updatePawns(players));
 socket.on('gameStart', () => $('startBtn').style.display = 'none');
+
 socket.on('yourTurn', () => {
   $('rollBtn').disabled = false;
   $('rollBtn').textContent = 'Lancer le dé';
