@@ -1,83 +1,215 @@
-import express from "express";
-import http from "http";
-import { Server } from "socket.io";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: "*" } });
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static('public'));
 
-// ---------------------------------------------------------
-// 1. Chargement sécurisé des questions
-// ---------------------------------------------------------
+const MAX_PLAYERS = 6;
+const BOARD_LENGTH = 32;
 
-let questions = [];
+// ACTIONS
+const ACTIONS = [
+  { name: "Flash", flash: 30, desc: "Réponds en moins de 30 secondes !" },
+  { name: "Battle on left", battleLeft: true, desc: "Plus rapide que ton voisin de gauche" },
+  { name: "Battle on right", battleRight: true, desc: "Plus rapide que ton voisin de droite" },
+  { name: "Call a friend", callFriend: true, desc: "Choisis un partenaire → +1 point chacun si bonne réponse" },
+  { name: "For you", forYou: true, desc: "Désigne un joueur qui répond à ta place" },
+  { name: "Second life", secondLife: true, desc: "Deuxième chance si tu échoues" },
+  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
+  { name: "Double", multiplier: 2, desc: "×2 les points en cas de succès" },
+  { name: "Téléportation", teleport: true, desc: "Réussite → +1 point + tu choisis la prochaine case" },
+  { name: " +1 ou -1", plusOrMinus: true, desc: "Réussite → +2 points / Échec → -1 point" },
+  { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
+  { name: "Double or quits", doubleOrQuits: true, desc: "Tout doubler ou tout perdre" },
+  { name: "It's your choice", freeChoice: true, desc: "Choisis l'action que tu veux !" },
+  { name: "Everybody", everybody: true, desc: "Tout le monde joue !" },
+  { name: "No way", noWay: true, desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
+  { name: "Quadruple", multiplier: 4, desc: "×4 les points en cas de succès" }
+];
 
+// DATA
+let DATA = null;
 try {
-  const dataPath = path.join(__dirname, "public/data.json");
-  const raw = fs.readFileSync(dataPath, "utf8");
-  const json = JSON.parse(raw);
-
-  // Le JSON reçu est un OBJET avec des catégories
-  // => on l'aplatit en un tableau unique
-  questions = Object.values(json).flat();
-
-  console.log("Questions chargées :", questions.length);
-
+  const dataPath = path.join(process.cwd(), 'public', 'data.json');
+  DATA = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 } catch (e) {
-  console.error("❌ Erreur chargement data.json :", e);
+  console.error("Erreur data.json :", e);
+}
+const THEMES = DATA ? Object.keys(DATA.categories) : [];
+const QUESTIONS = DATA ? DATA.categories : {};
+
+// BOARD
+const BOARD = [];
+for (let i = 0; i < BOARD_LENGTH; i++) {
+  if (i % 2 === 0) {
+    BOARD.push({ type: "action", name: ACTIONS[i % ACTIONS.length].name });
+  } else {
+    BOARD.push({ type: "theme", name: THEMES[i % THEMES.length] || "Général" });
+  }
 }
 
-// ---------------------------------------------------------
-// 2. Chargement du board
-// ---------------------------------------------------------
+const rooms = {};
 
-let board = null;
-
-try {
-  const boardPath = path.join(__dirname, "public/data/board.json");
-  const raw = fs.readFileSync(boardPath, "utf8");
-  board = JSON.parse(raw);
-  console.log("Board chargé :", board.totalCases, "cases");
-} catch (e) {
-  console.error("❌ Erreur chargement board.json :", e);
+function generateCode() {
+  let code;
+  do { code = Math.random().toString(36).substring(2, 6).toUpperCase(); } while (rooms[code]);
+  return code;
 }
 
+function getPlayer(room, id) { return room.players.find(p => p.id === id); }
 
-// ---------------------------------------------------------
-// 3. SOCKET.IO
-// ---------------------------------------------------------
+io.on('connection', (socket) => {
+  console.log("Connecté:", socket.id);
 
-io.on("connection", (socket) => {
-  console.log("🔌 Nouveau joueur connecté");
-
-  socket.on("joinRoom", (roomId) => {
-    socket.join(roomId);
-    console.log("➡️ Joueur rejoint la room", roomId);
-
-    // Envoi du plateau
-    socket.emit("boardData", board);
+  socket.on('create', (name) => {
+    const code = generateCode();
+    rooms[code] = {
+      code, host: socket.id, started: false, currentTurn: 0,
+      players: [{ id: socket.id, name: name || "Hôte", pos: 0, score: 0 }],
+      currentAction: null, currentQuestion: null, currentCorrection: null, activePlayers: [], pendingAnswers: new Map(),
+      timer: null
+    };
+    socket.join(code);
+    socket.emit('created', code);
+    io.to(code).emit('players', rooms[code].players);
   });
 
-  socket.on("requestQuestion", (roomId) => {
-    const q = questions[Math.floor(Math.random() * questions.length)];
-    io.to(roomId).emit("newQuestion", q);
+  socket.on('join', ({ code, name }) => {
+    const room = rooms[code];
+    if (!room || room.players.length >= MAX_PLAYERS) {
+      socket.emit('error', room ? "Salle pleine" : "Salle introuvable");
+      return;
+    }
+    room.players.push({ id: socket.id, name: name || "Joueur", pos: 0, score: 0 });
+    socket.join(code);
+    socket.emit('joined', code);
+    io.to(code).emit('players', room.players);
+  });
+
+  socket.on('start', (code) => {
+    const room = rooms[code];
+    if (!room || room.host !== socket.id) return;
+    room.started = true;
+    io.to(code).emit('gameStart');
+    nextTurn(room);
+  });
+
+  function nextTurn(room) {
+    room.currentTurn++;
+    const player = room.players[room.currentTurn % room.players.length];
+    room.activePlayers = [player.id];
+    room.pendingAnswers = new Map();
+    io.to(player.id).emit('yourTurn');
+  }
+
+   socket.on('roll', code => {
+    const room = rooms[code];
+    if (!room || room.activePlayers[0] !== socket.id) return;
+    const roll = Math.floor(Math.random() * 6) + 1;
+    const player = getPlayer(room, socket.id);
+    io.to(code).emit('rolled', { roll, currentPos: player.pos });
+  });
+
+  // ... (le début reste identique jusqu'à socket.on('move'))
+
+socket.on('moveTo', ({code, pos}) => {
+  const room = rooms[code];
+  if (!room || room.activePlayers[0] !== socket.id) return;
+
+  const player = getPlayer(room, socket.id);
+  player.pos = pos;
+  io.to(code).emit('players', room.players);
+
+  // Piocher action + question
+  const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
+  room.currentAction = action;
+
+  const theme = THEMES[Math.floor(Math.random() * THEMES.length)] || "Général";
+  const q = getRandomQuestion(theme);
+  if (!q) return endTurn(room);
+
+  room.currentQuestion = q.question;
+  room.currentCorrection = q.correction.trim().toLowerCase();
+  room.pendingAnswers = new Map();
+  room.activePlayers = action.everybody ? room.players.map(p => p.id) : [socket.id];
+
+  io.to(code).emit('actionDrawn', { action: action.name, timer: action.flash || null });
+  io.to(code).emit('players', room.players);
+
+  const duration = action.flash || 60;
+  room.timer = setTimeout(() => {
+    if (room.currentQuestion) {
+      io.to(code).emit('timeOut', { message: 'Temps écoulé !' });
+      room.activePlayers.forEach(id => room.pendingAnswers.set(id, {correct: false}));
+      applyActionResults(room, action);
+      endTurn(room);
+    }
+  }, duration * 1000);
+
+  const questionData = { theme, question: q.question };
+  if (action.everybody) io.to(code).emit('question', questionData);
+  else io.to(socket.id).emit('question', questionData);
+});
+
+socket.on('answer', ({code, answer}) => {
+  const room = rooms[code];
+  if (!room || !room.currentQuestion || !room.activePlayers.includes(socket.id)) return;
+
+  const correct = (answer+"").trim().toLowerCase() === room.currentCorrection;
+  room.pendingAnswers.set(socket.id, { correct, player: getPlayer(room, socket.id).name });
+
+  if (!room.currentAction.everybody || room.pendingAnswers.size === room.activePlayers.length) {
+    clearTimeout(room.timer);
+    applyActionResults(room, room.currentAction, correct);
+    endTurn(room);
+  }
+});
+
+function applyActionResults(room, action, correct) {
+  room.activePlayers.forEach(id => {
+    const res = room.pendingAnswers.get(id) || { correct: false };
+    const player = getPlayer(room, id);
+    if (res.correct) {
+      player.score += action.multiplier || 1;
+    } else if (action.noWay) {
+      room.players.forEach(p => { if (p.id !== id) p.score += 1; });
+    }
+  });
+  io.to(room.code).emit('results', { message: correct ? 'Bonne réponse ! +1 point' : 'Mauvaise réponse' });
+}
+
+  function endTurn(room) {
+    io.to(room.code).emit('actionClear');
+    room.currentQuestion = null;
+    room.currentCorrection = null;
+    room.currentAction = null;
+    room.activePlayers = [];
+    room.pendingAnswers = new Map();
+    setTimeout(() => nextTurn(room), 3000);
+  }
+
+  function getRandomQuestion(theme) {
+    const list = QUESTIONS[theme] || Object.values(QUESTIONS).flat();
+    return list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
+  }
+
+  socket.on('disconnect', () => {
+    Object.values(rooms).forEach(room => {
+      const idx = room.players.findIndex(p => p.id === socket.id);
+      if (idx !== -1) {
+        room.players.splice(idx, 1);
+        io.to(room.code).emit('players', room.players);
+        if (room.host === socket.id && room.players.length > 0) room.host = room.players[0].id;
+        if (room.players.length === 0) delete rooms[room.code];
+      }
+    });
   });
 });
 
-
-// ---------------------------------------------------------
-// 4. Lancement serveur (Railway-friendly)
-// ---------------------------------------------------------
-
-const port = process.env.PORT || 8080;
-server.listen(port, () => {
-  console.log("Serveur lancé sur le port", port);
-});
+server.listen(3000, () => console.log("Serveur démarré → http://localhost:3000"));
