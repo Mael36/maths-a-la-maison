@@ -5,7 +5,7 @@ let board = null;
 
 const $ = id => document.getElementById(id);
 
-// Chargement du plateau réel (85 cases)
+// Chargement du plateau (85 cases)
 fetch('/data/board.json')
   .then(r => r.json())
   .then(data => {
@@ -13,46 +13,58 @@ fetch('/data/board.json')
     createActionGrid();
   });
 
-// 16 CARTES RONDES OFFICIELLES "MATHS À LA MAISON"
+// 16 CARTES OFFICIELLES – TES IMAGES + TES RONDS "MATHS À LA MAISON"
 function createActionGrid() {
   const grid = $('actionGrid');
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  grid.style.gap = '40px';
+  grid.style.gap = '30px';
   grid.style.maxWidth = '1400px';
   grid.style.margin = '60px auto';
-  grid.style.padding = '30px';
-  grid.style.background = '#e3f2fd';
+  grid.style.padding = '40px';
+  grid.style.background = '#e1f5fe';
   grid.style.borderRadius = '30px';
 
-  const actionNames = [
-    "Flash","Battle on left","Battle on right","Call a friend",
-    "For you","Second life","No way","Double",
-    "Téléportation","+1 ou -1","Everybody","Double or quits",
-    "It's your choice","Everybody","No way","Quadruple"
+  const actions = [
+    {name: "Flash", img: "actions/flash.jpg"},
+    {name: "Battle on left", img: "actions/battle_left.jpg"},
+    {name: "Battle on right", img: "actions/battle_right.jpg"},
+    {name: "Call a friend", img: "actions/call_friend.jpg"},
+    {name: "For you", img: "actions/for_you.jpg"},
+    {name: "Second life", img: "actions/second_life.jpg"},
+    {name: "No way", img: "actions/no_way.jpg"},
+    {name: "Double", img: "actions/double.jpg"},
+    {name: "Téléportation", img: "actions/teleport.jpg"},
+    {name: "+1 ou -1", img: "actions/plus_minus.jpg"},
+    {name: "Everybody", img: "actions/everybody.jpg"},
+    {name: "Double or quits", img: "actions/double_quits.jpg"},
+    {name: "It's your choice", img: "actions/choice.jpg"},
+    {name: "Everybody", img: "actions/everybody.jpg"},
+    {name: "No way", img: "actions/no_way.jpg"},
+    {name: "Quadruple", img: "actions/quadruple.jpg"}
   ];
 
-  actionNames.forEach(name => {
+  actions.forEach((a, i) => {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <div style="width:220px; height:220px; background:white; border-radius:50%; 
-                  box-shadow:0 15px 40px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;
-                  border:10px solid #1565c0; margin:0 auto;">
-        <div style="width:190px; height:190px; background:url('assets/action-circle.png') center/contain no-repeat;"></div>
+      <div style="width:260px; height:260px; background:white; border-radius:50%; 
+                  box-shadow:0 20px 50px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;
+                  border:12px solid #1565c0; margin:0 auto; overflow:hidden;">
+        <img src="assets/action-circle.png" style="width:100%; height:100%; object-fit:contain;">
+        <div style="position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center;">
+          <img src="${a.img}" style="width:85%; height:85%; object-fit:contain; border-radius:15px;">
+        </div>
       </div>
       <div style="text-align:center; margin-top:30px; font-size:28px; font-weight:bold; color:#1565c0;">
-        ACTION
-      </div>
-      <div style="text-align:center; margin-top:15px; font-size:22px; color:#000;">
-        ${name}
+        ${a.name}
       </div>
     `;
     grid.appendChild(card);
   });
 }
 
-// PIONS PARFAITEMENT CENTRÉS – CORRIGÉ À 1000 %
+// PIONS PARFAITEMENT CENTRÉS – 100 % CORRIGÉ
 function updatePawns(players) {
   const container = $('pions');
   container.innerHTML = '';
@@ -71,15 +83,15 @@ function updatePawns(players) {
 
     const pawn = document.createElement('div');
     pawn.style.position = 'absolute';
-    pawn.style.width = '42px';
-    pawn.style.height = '42px';
+    pawn.style.width = '44px';
+    pawn.style.height = '44px';
     pawn.style.borderRadius = '50%';
     pawn.style.background = ['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i % 6];
-    pawn.style.border = '5px solid white';
-    pawn.style.boxShadow = '0 8px 30px rgba(0,0,0,0.6)';
+    pawn.style.border = '6px solid white';
+    pawn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.7)';
     pawn.style.color = 'white';
     pawn.style.fontWeight = 'bold';
-    pawn.style.fontSize = '22px';
+    pawn.style.fontSize = '24px';
     pawn.style.display = 'flex';
     pawn.style.alignItems = 'center';
     pawn.style.justifyContent = 'center';
@@ -94,17 +106,14 @@ function updatePawns(players) {
   });
 }
 
-// Cases dorées : distance EXACTE
+// Cases dorées : distance parfaite
 function showPossibleCases(currentPos, steps) {
   const reachable = new Set();
   const queue = [{pos: currentPos, remaining: steps}];
 
   while (queue.length) {
     const {pos, remaining} = queue.shift();
-    if (remaining === 0) {
-      reachable.add(pos);
-      continue;
-    }
+    if (remaining === 0) { reachable.add(pos); continue; }
 
     if (pos < 48) {
       queue.push({pos: (pos + 1) % 48, remaining: remaining - 1});
@@ -128,16 +137,16 @@ function showPossibleCases(currentPos, steps) {
 
     const spot = document.createElement('div');
     spot.style.position = 'absolute';
-    spot.style.width = '56px';
-    spot.style.height = '56px';
+    spot.style.width = '60px';
+    spot.style.height = '60px';
     spot.style.background = 'radial-gradient(circle, gold, orange)';
-    spot.style.border = '5px solid white';
+    spot.style.border = '6px solid white';
     spot.style.borderRadius = '50%';
     spot.style.left = x + 'px';
     spot.style.top = y + 'px';
     spot.style.transform = 'translate(-50%, -50%)';
     spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 50px gold, inset 0 0 20px white';
+    spot.style.boxShadow = '0 0 60px gold, inset 0 0 30px white';
     spot.style.zIndex = '999';
     spot.onclick = () => {
       socket.emit('moveTo', {code: room, targetPos: pos});
@@ -163,13 +172,13 @@ window.rollDice = () => {
 
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
-  if (ans) socket.emit('answer', {code: room, answer: ans});
+  if (ans) socket.emit('answer',', {code: room, answer: ans});
   $('answerInput').value = '';
 };
 
 $('startBtn').onclick = () => socket.emit('start', room);
 
-// === SOCKET EVENTS ===
+// === SOCKET ===
 socket.on('created', code => { room = code; showGame(code); });
 socket.on('joined', code => { room = code; showGame(code); });
 socket.on('error', msg => alert(msg));
@@ -182,7 +191,6 @@ function showGame(code) {
 
 socket.on('players', players => updatePawns(players));
 socket.on('gameStart', () => $('startBtn').style.display = 'none');
-
 socket.on('yourTurn', () => {
   $('rollBtn').disabled = false;
   $('rollBtn').textContent = 'Lancer le dé';
@@ -196,31 +204,32 @@ socket.on('rolled', data => {
 
 socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  document.querySelectorAll('.actionCard').forEach(card => {
+  const cards = document.querySelectorAll('.actionCard');
+  cards.forEach(card => {
     if (card.textContent.includes(data.action)) {
       card.classList.add('currentAction');
-      card.style.transform = 'scale(1.2)';
-      card.style.boxShadow = '0 0 80px gold';
+      card.style.transform = 'scale(1.25)';
+      card.style.boxShadow = '0 0 100px gold';
     }
   });
 });
 
-// QUESTION POSÉE DEPUIS public/data.json
+// QUESTIONS POSÉES DEPUIS public/data.json
 socket.on('question', q => {
-  $('themeTitle').textContent = `Thème : ${q.theme}`;
+  $('themeTitle').textContent = `Thème : ${q.theme || 'Général'}`;
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
 
   if (q.timer) {
-    let time = q.timer;
+    let t = q.timer;
     $('flashTimer').style.display = 'block';
-    $('flashTimer').textContent = time + 's';
-    const interval = setInterval(() => {
-      time--;
-      $('flashTimer').textContent = time + 's';
-      if (time <= 0) {
-        clearInterval(interval);
+    $('flashTimer').textContent = t + 's';
+    const int = setInterval(() => {
+      t--;
+      $('flashTimer').textContent = t + 's';
+      if (t <= 0) {
+        clearInterval(int);
         $('flashTimer').style.display = 'none';
       }
     }, 1000);
@@ -228,13 +237,8 @@ socket.on('question', q => {
 });
 
 socket.on('results', data => {
-  $('results').innerHTML = `<h3>${data.action}</h3>` + 
-    data.results.map(r => `${r.correct ? 'Correct' : 'Faux'} ${r.player} → ${r.score} pts`).join('<br>');
+  $('results').innerHTML = `<h3>Résultat – ${data.action || 'Question'}</h3>` +
+    data.results.map(r => `<strong>${r.correct ? 'Correct' : 'Faux'}</strong> ${r.player} → ${r.score} pts`).join('<br>');
   $('questionBox').style.display = 'none';
   $('flashTimer').style.display = 'none';
-});
-
-// Recalcul au redimensionnement
-window.addEventListener('resize', () => {
-  if (board && room) updatePawns([]);
 });
