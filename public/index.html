@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maths à la Maison</title>
   <link rel="stylesheet" href="style.css">
-  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Socket.io via CDN (correct pour Railway) -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
   <div id="menu">
@@ -36,15 +38,4 @@
     <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>
       <p id="questionText"></p>
-      <input type="text" id="answerInput" placeholder="Ta réponse">
-      <button onclick="sendAnswer()">Envoyer</button>
-    </div>
-
-    <div id="resultBox" style="display:none;">
-      <h2 id="resultText"></h2>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+      <input type="text" id="answerInput" placeholder="T
