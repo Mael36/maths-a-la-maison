@@ -186,10 +186,10 @@ io.on('connection', socket => {
   });
 
   // client peut demander le board
-  socket.on('requestBoard', ()=>{
-    if(BOARD_JSON) socket.emit('boardData', BOARD_JSON);
-  });
-
+  socket.on('requestBoard', () => {
+  if (BOARD_JSON) socket.emit('boardData', BOARD_JSON);
+});
 });
 
 server.listen(3000,'0.0.0.0',()=>console.log('Serveur lancé'));
+
