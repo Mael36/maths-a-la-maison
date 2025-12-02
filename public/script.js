@@ -52,7 +52,7 @@ function updatePawns(players) {
 }
 
 // --- Montrer les cases possibles après lancer le dé
-function showPossibleCases(currentPos, steps) {
+¨function showPossibleCases(currentPos, steps) {
   if (!board) return;
   const reachable = new Set();
   const q = [{pos: currentPos, rem: steps}];
@@ -74,18 +74,19 @@ function showPossibleCases(currentPos, steps) {
 
     const spot = document.createElement('div');
     spot.style.cssText = `
-      position:absolute;width:60px;height:60px;border-radius:50%;
-      background:radial-gradient(circle,gold,orange);border:5px solid white;
+      position:absolute;width:50px;height:50px;border-radius:50%;
+      background:radial-gradient(circle,gold,orange);border:3px solid white;
       left:${x}px;top:${y}px;transform:translate(-50%,-50%);
-      cursor:pointer;z-index:999;
+      cursor:pointer;z-index:10; /* mettre plus haut que les pions */
     `;
     spot.onclick = ()=> {
       socket.emit('moveTo',{code:room,pos});
-      el.innerHTML='';
+      el.innerHTML=''; // supprime les cases dorées
     };
     el.appendChild(spot);
   });
 }
+
 
 // --- Timer
 function startTimer(sec){
@@ -158,3 +159,4 @@ function showGame(){
   $('roomDisplay').textContent=room;
   socket.emit('requestBoard'); // demande le board au serveur
 }
+
