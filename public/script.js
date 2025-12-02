@@ -5,7 +5,7 @@ let timer = null;
 
 const $ = id => document.getElementById(id);
 
-fetch('/data/board.json')
+fetch('data/board.json')
   .then(r => r.json())
   .then(data => { board = data; createActionCards(); });
 
@@ -180,3 +180,4 @@ socket.on('result', data => {
     $('resultBox').style.display = 'none';
   }, 5000);
 });
+
