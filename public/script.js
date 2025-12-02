@@ -6,7 +6,7 @@ let timer = null;
 
 const $ = id => document.getElementById(id);
 
-// ────────────── ACTION CARDS ──────────────
+// ---------------- ACTION CARDS ----------------
 function createActionCards() {
   const grid = $('actionGrid');
   if (!grid || grid.children.length) return;
@@ -17,23 +17,27 @@ function createActionCards() {
     "Everybody","Double or quits","It's your choice","Quadruple"
   ];
 
-  actions.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'actionCard';
-    card.innerHTML = `<h4>${a}</h4>`;
+  actions.forEach(a=>{
+    const card=document.createElement('div');
+    card.className='actionCard';
+    card.innerHTML=`<h4>${a}</h4>`;
     grid.appendChild(card);
   });
 }
 
-// ────────────── PAWNS ──────────────
+// ---------------- PAWNS + SCORE ----------------
 function updatePawns(players) {
   const container = $('pions');
+  const scoreList = $('scoreList');
   if (!container || !board) return;
   container.innerHTML = '';
+  if(scoreList) scoreList.innerHTML = '';
+
   const img = $('plateau');
   const w = img.offsetWidth, h = img.offsetHeight;
 
   players.forEach((p,i) => {
+    // Pions
     const posIndex = Math.min(Math.max(p.pos || 0,0), board.positions.length-1);
     const pos = board.positions[posIndex];
     const x = (pos.x/100)*w;
@@ -41,7 +45,7 @@ function updatePawns(players) {
 
     const pawn = document.createElement('div');
     pawn.style.cssText = `
-      position:absolute;width:40px;height:40px;border-radius:50%;
+      position:absolute;width:36px;height:36px;border-radius:50%;
       background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};
       border:4px solid white;display:flex;align-items:center;justify-content:center;
       left:${x}px;top:${y}px;transform:translate(-50%,-50%);
@@ -49,18 +53,36 @@ function updatePawns(players) {
     pawn.textContent = i+1;
     pawn.title = `${p.name} – ${p.score} pts`;
     container.appendChild(pawn);
+
+    // Score
+    if(scoreList){
+      const li = document.createElement('div');
+      li.textContent = `${p.name}: ${p.score} pts`;
+      scoreList.appendChild(li);
+    }
   });
 }
 
-// ────────────── CASES ──────────────
+// ---------------- CASES ATTEIGNABLES ----------------
 function showPossibleCases(currentPos, steps) {
   if (!board) return;
   const reachable = new Set();
-  const q = [{pos: currentPos, rem: steps}];
-  while(q.length){
-    const {pos, rem} = q.shift();
+
+  const queue = [{pos: currentPos, rem: steps}];
+  while(queue.length) {
+    const {pos, rem} = queue.shift();
     if(rem===0){ reachable.add(pos); continue; }
-    if(pos<board.positions.length-1) q.push({pos:pos+1, rem:rem-1});
+
+    if(pos+1 < board.positions.length) queue.push({pos: pos+1, rem: rem-1});
+
+    if(board.branches) {
+      board.branches.forEach(branch => {
+        if(branch.includes(pos)) {
+          const idx = branch.indexOf(pos);
+          if(idx+1 < branch.length) queue.push({pos: branch[idx+1], rem: rem-1});
+        }
+      });
+    }
   }
 
   const el = $('possibleCases');
@@ -88,25 +110,24 @@ function showPossibleCases(currentPos, steps) {
   });
 }
 
-// ────────────── TIMER ──────────────
+// ---------------- TIMER ----------------
 function startTimer(sec){
   if(timer) clearInterval(timer);
   const el=$('timer');
-  el.style.display='block';
+  el.style.display='inline-block';
   let t=sec; el.textContent=t+'s';
   timer=setInterval(()=>{
     t--; el.textContent=t+'s';
-    if(t<=0){ clearInterval(timer); el.style.display='none'; clearInterval(timer); }
+    if(t<=0){ clearInterval(timer); el.style.display='none'; }
   },1000);
 }
 
-// ────────────── UI BUTTONS ──────────────
+// ---------------- UI ----------------
 $('createBtn').onclick = () => socket.emit('create',$('playerName').value||'Hôte');
-$('joinBtn').onclick = () => {
-  const code = $('roomCode').value.trim().toUpperCase();
-  if(!code){ alert('Code requis!'); return; }
-  socket.emit('join',{code,name:$('playerName').value||'Joueur'});
-};
+$('joinBtn').onclick = () => socket.emit('join',{
+  code:$('roomCode').value.trim().toUpperCase(),
+  name:$('playerName').value||'Joueur'
+});
 $('startBtn').onclick = () => socket.emit('start', room);
 $('rollBtn').onclick = () => { socket.emit('roll', room); $('rollBtn').disabled=true; };
 $('sendAnswerBtn').onclick = ()=>{
@@ -115,14 +136,19 @@ $('sendAnswerBtn').onclick = ()=>{
   $('answerInput').value='';
 };
 
-// ────────────── SOCKET EVENTS ──────────────
+// ---------------- SOCKET EVENTS ----------------
 socket.on('created', code => { room = code; showGame(); });
 socket.on('joined', code => { room = code; showGame(); });
+
 socket.on('boardData', b => { board = b; createActionCards(); updatePawns([]); });
 socket.on('players', players => updatePawns(players));
 
 socket.on('yourTurn', ()=>{ $('rollBtn').disabled=false; $('rollBtn').textContent='Lancer le dé'; });
-socket.on('rolled', data => { alert(`Tu as fait ${data.roll}! Choisis une case dorée`); showPossibleCases(data.currentPos,data.roll); });
+
+socket.on('rolled', data => {
+  alert(`Tu as fait ${data.roll}! Choisis une case dorée`);
+  showPossibleCases(data.currentPos,data.roll);
+});
 
 socket.on('actionDrawn', data=>{
   document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)');
@@ -151,14 +177,21 @@ socket.on('results', data=>{
   $('resultText').textContent=data.message||'Résultats';
   $('resultText').style.color='#1976d2';
   $('resultBox').style.display='block';
+  updatePawns(data.players); // mettre à jour scores
   setTimeout(()=>{ $('questionBox').style.display='none'; $('resultBox').style.display='none'; },2500);
 });
 
 socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
 
-// ────────────── SHOW GAME ──────────────
+// ---------------- SHOW GAME ----------------
 function showGame(){
   $('menu').style.display='none';
   $('game').style.display='block';
   $('roomDisplay').textContent=room;
+  // créer la div pour scores si elle n'existe pas
+  if(!document.getElementById('scoreList')){
+    const s = document.createElement('div'); s.id='scoreList'; s.style.margin='10px 0';
+    $('game').insertBefore(s,$('actionGrid'));
+  }
+  socket.emit('requestBoard'); // demander le board au serveur
 }
