@@ -1,7 +1,7 @@
 const socket = io();
 let room = null;
 let board = null;
-let currentTimer = null;
+let timer = null;
 
 const $ = id => document.getElementById(id);
 
@@ -12,19 +12,34 @@ fetch('/data/board.json')
 function createActionCards() {
   const grid = $('actionGrid');
   const actions = [
-    "Flash","Battle on left","Battle on right","Call a friend",
-    "For you","Second life","No way","Double",
-    "Téléportation","+1 ou -1","Everybody","Double or quits",
-    "It's your choice","Everybody","No way","Quadruple"
+    {name:"Flash", text:"Tu dois répondre en moins de 30 secondes à la question !"},
+    {name:"Battle on left", text:"Tu dois répondre plus vite que ton voisin de gauche..."},
+    {name:"Battle on right", text:"Tu dois répondre plus vite que ton voisin de droite..."},
+    {name:"Call a friend", text:"Choisis le partenaire de ton choix. Cherchez la réponse à 2..."},
+    {name:"For you", text:"Choisis le joueur qui répondra à ta place..."},
+    {name:"Second life", text:"Si tu ne réussis pas la prochaine question, tu peux piocher une autre..."},
+    {name:"No way", text:"Réponds correctement à la question sinon tu offres 1 point à chacun..."},
+    {name:"Double", text:"Si tu réussis la question, tu gagnes 2 points."},
+    {name:"Téléportation", text:"Réussite → +1 point + tu choisis la prochaine case"},
+    {name:"+1 ou -1", text:"Réussite → +2 points / Échec → -1 point"},
+    {name:"Everybody", text:"Tout le monde joue !"},
+    {name:"Double or quits", text:"Tout doubler ou tout perdre"},
+    {name:"It's your choice", text:"Tu choisis l'action que tu veux !"},
+    {name:"Everybody", text:"Tout le monde joue !"},
+    {name:"No way", text:"Réponds correctement sinon tu offres 1 point à chacun..."},
+    {name:"Quadruple", text:"Si tu réussis la question, tu gagnes 4 points."}
   ];
 
-  actions.forEach(name => {
+  actions.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <div class="tree" style="background: url('assets/plateau.png') center/70% no-repeat;"></div>
+      <div class="round">
+        <div class="tree" style="background:url('assets/plateau.png') center/70% no-repeat;"></div>
+      </div>
       <h3>ACTION</h3>
-      <p>${name}</p>
+      <h4>${a.name}</h4>
+      <p>${a.text}</p>
     `;
     grid.appendChild(card);
   });
@@ -42,16 +57,14 @@ function updatePawns(players) {
     const y = (pos.y / 100) * h;
 
     const pawn = document.createElement('div');
-    pawn.style.position = 'absolute';
-    pawn.style.width = '60px'; pawn.style.height = '60px';
-    pawn.style.borderRadius = '50%';
-    pawn.style.background = ['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i % 6];
-    pawn.style.border = '8px solid white';
-    pawn.style.boxShadow = '0 15px 40px rgba(0,0,0,0.8)';
-    pawn.style.color = 'white'; pawn.style.fontSize = '32px'; pawn.style.fontWeight = 'bold';
-    pawn.style.display = 'flex'; pawn.style.alignItems = 'center'; pawn.style.justifyContent = 'center';
-    pawn.style.left = x + 'px'; pawn.style.top = y + 'px';
-    pawn.style.transform = 'translate(-50%, -50%)';
+    pawn.style.cssText = `
+      position:absolute;width:60px;height:60px;border-radius:50%;
+      background:${['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i%6]};
+      border:8px solid white;box-shadow:0 15px 40px rgba(0,0,0,0.8);
+      color:white;font-size:32px;font-weight:bold;display:flex;
+      align-items:center;justify-content:center;
+      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
+    `;
     pawn.textContent = i + 1;
     pawn.title = `${p.name} – ${p.score} pts`;
     $('pions').appendChild(pawn);
@@ -60,20 +73,18 @@ function updatePawns(players) {
 
 function showPossibleCases(currentPos, steps) {
   const reachable = new Set();
-  const queue = [{pos: currentPos, rem: steps}];
-  while (queue.length) {
-    const {pos, rem} = queue.shift();
+  const q = [{pos: currentPos, rem: steps}];
+  while (q.length) {
+    const {pos, rem} = q.shift();
     if (rem === 0) { reachable.add(pos); continue; }
     if (pos < 48) {
-      queue.push({pos: (pos + 1) % 48, rem: rem - 1});
+      q.push({pos: (pos + 1) % 48, rem: rem - 1});
       if (pos % 4 === 0) {
         const b = 48 + Math.floor(pos / 4) * 3;
-        if (b < 84) queue.push({pos: b, rem: rem - 1});
+        if (b < 84) q.push({pos: b, rem: rem - 1});
       }
     }
-    if (pos >= 48 && pos < 84 && pos + 1 <= 84) {
-      queue.push({pos: pos + 1, rem: rem - 1});
-    }
+    if (pos >= 48 && pos < 84 && pos + 1 <= 84) q.push({pos: pos + 1, rem: rem - 1});
   }
 
   $('possibleCases').innerHTML = '';
@@ -86,15 +97,13 @@ function showPossibleCases(currentPos, steps) {
     const y = (p.y / 100) * h;
 
     const spot = document.createElement('div');
-    spot.style.position = 'absolute';
-    spot.style.width = '90px'; spot.style.height = '90px';
-    spot.style.background = 'radial-gradient(circle, gold, orange)';
-    spot.style.border = '10px solid white';
-    spot.style.borderRadius = '50%';
-    spot.style.left = x + 'px'; spot.style.top = y + 'px';
-    spot.style.transform = 'translate(-50%, -50%)';
-    spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 120px gold';
+    spot.style.cssText = `
+      position:absolute;width:90px;height:90px;
+      background:radial-gradient(circle,gold,orange);
+      border:10px solid white;border-radius:50%;
+      left:${x}px;top:${y}px;transform:translate(-50%,-50%);
+      cursor:pointer;box-shadow:0 0 120px gold;z-index:999;
+    `;
     spot.onclick = () => {
       socket.emit('moveTo', {code: room, targetPos: pos});
       $('possibleCases').innerHTML = '';
@@ -103,25 +112,25 @@ function showPossibleCases(currentPos, steps) {
   });
 }
 
-function startTimer(seconds) {
-  if (currentTimer) clearInterval(currentTimer);
+function startTimer(sec) {
+  if (timer) clearInterval(timer);
   $('timer').style.display = 'block';
-  let t = seconds;
+  let t = sec;
   $('timer').textContent = t + 's';
-  $('timer').style.background = seconds === 30 ? '#d32f2f' : '#1976d2';
+  $('timer').style.background = sec === 30 ? '#d32f2f' : '#1976d2';
 
-  currentTimer = setInterval(() => {
+  timer = setInterval(() => {
     t--;
     $('timer').textContent = t + 's';
-    if (t <= 0) { clearInterval(currentTimer); $('timer').style.display = 'none'; }
+    if (t <= 0) { clearInterval(timer); $('timer').style.display = 'none'; }
   }, 1000);
 }
 
-// === INTERACTIONS ===
+// INTERACTIONS & SOCKET
 window.createRoom = () => socket.emit('create', $('playerName').value || 'Hôte');
 window.joinRoom = () => {
   const code = $('roomCode').value.trim().toUpperCase();
-  if (!code) return alert('Entre un code !');
+  if (!code) return alert('Code requis !');
   socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
 window.rollDice = () => { socket.emit('roll', room); $('rollBtn').disabled = true; };
@@ -132,7 +141,6 @@ window.sendAnswer = () => {
 };
 $('startBtn').onclick = () => socket.emit('start', room);
 
-// === SOCKET ===
 socket.on('created', code => { room = code; showGame(code); });
 socket.on('joined', code => { room = code; showGame(code); });
 socket.on('error', msg => alert(msg));
@@ -142,10 +150,10 @@ function showGame(code) {
   $('roomDisplay').textContent = code;
 }
 
-socket.on('players', players => updatePawns(players));
+socket.on('players', updatePawns);
 socket.on('yourTurn', () => { $('rollBtn').disabled = false; $('rollBtn').textContent = 'Lancer le dé'; });
 socket.on('rolled', data => {
-  alert(`Tu as fait ${data.roll} ! Clique sur une case dorée`);
+  alert(`Tu as fait ${data.roll} ! Choisis une case dorée`);
   showPossibleCases(data.currentPos, data.roll);
 });
 socket.on('actionDrawn', data => {
@@ -162,7 +170,7 @@ socket.on('question', q => {
   startTimer(q.action === 'Flash' ? 30 : 60);
 });
 socket.on('result', data => {
-  clearInterval(currentTimer);
+  clearInterval(timer);
   $('timer').style.display = 'none';
   $('resultText').textContent = data.correct ? `BRAVO ${data.player} ! +1 point` : `Dommage ${data.player}...`;
   $('resultText').style.color = data.correct ? '#4caf50' : '#f44336';
