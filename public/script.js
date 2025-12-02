@@ -149,4 +149,12 @@ socket.on('results', data=>{
   setTimeout(()=>{ $('questionBox').style.display='none'; $('resultBox').style.display='none'; },2500);
 });
 
-socket.on('actionCle
+socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
+
+// --- Afficher le jeu
+function showGame(){
+  $('menu').style.display='none';
+  $('game').style.display='block';
+  $('roomDisplay').textContent=room;
+  socket.emit('requestBoard'); // demande le board au serveur
+}
