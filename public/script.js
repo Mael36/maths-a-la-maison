@@ -16,13 +16,12 @@ function createActionCards() {
     "Everybody","Double or quits","It's your choice","Quadruple"
   ];
 
-  actions.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'actionCard';
-    card.innerHTML = `<h4>${a}</h4>`;
-    grid.appendChild(card);
-  });
-}
+  actions.forEach(a=>{
+  const card=document.createElement('div');
+  card.className='actionCard';
+  card.innerHTML=`<h4>${a.name}</h4><p>${a.text||''}</p>`;
+  grid.appendChild(card);
+});
 
 function updatePawns(players) {
   const container = $('pions');
@@ -154,3 +153,4 @@ function showGame(){
   $('roomDisplay').textContent=room;
   socket.emit('requestBoard'); // demande le board au serveur
 }
+
