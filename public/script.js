@@ -1,177 +1,182 @@
 const socket = io();
 let room = null;
-let lastRoll = 0;
+let roll = 0;
+let board = null;
 
 const $ = id => document.getElementById(id);
 
-// Définition des 16 actions avec descriptions et images
+// Les 16 vraies cartes Action avec images et textes
 const ACTIONS = [
-  { name: "Flash", flash: 30, img: "actions/flash.jpg", desc: "Réponds en moins de 30 secondes !" },
-  { name: "Battle on left", battleLeft: true, img: "actions/battle_left.jpg", desc: "Plus rapide que ton voisin de gauche" },
-  { name: "Battle on right", battleRight: true, img: "actions/battle_right.jpg", desc: "Plus rapide que ton voisin de droite" },
-  { name: "Call a friend", callFriend: true, img: "actions/call_friend.jpg", desc: "Choisis un partenaire → +1 point chacun si bonne réponse" },
-  { name: "For you", forYou: true, img: "actions/for_you.jpg", desc: "Désigne un joueur qui répond à ta place" },
-  { name: "Second life", secondLife: true, img: "actions/second_life.jpg", desc: "Deuxième chance si tu échoues" },
-  { name: "No way", noWay: true, img: "actions/no_way.jpg", desc: "Bonne réponse obligatoire, sinon +1 pt à tous les autres" },
-  { name: "Double", multiplier: 2, img: "actions/double.jpg", desc: "×2 les points en cas de succès" },
-  { name: "Téléportation", teleport: true, img: "actions/teleport.jpg", desc: "Réussite → +1 point + tu choisis la prochaine case" },
-  { name: "+1 ou -1", plusOrMinus: true, img: "actions/plus_minus.jpg", desc: "Réussite → +2 points / Échec → -1 point" },
-  { name: "Everybody", everybody: true, img: "actions/everybody.jpg", desc: "Tout le monde joue !" },
-  { name: "Double or quits", doubleOrQuits: true, img: "actions/double_quits.jpg", desc: "Tout doubler ou tout perdre" },
-  { name: "It's your choice", freeChoice: true, img: "actions/choice.jpg", desc: "Choisis l'action que tu veux !" },
-  { name: "Everybody", everybody: true, img: "actions/everybody.jpg", desc: "Tout le monde joue !" },
-  { name: "No way", noWay: true, img: "actions/no_way.jpg", desc: "Bonne réponse obligatoire, sinon +1 point à tous les autres" },
-  { name: "Quadruple", multiplier: 4, img: "actions/quadruple.jpg", desc: "×4 les points en cas de succès" }
+  {name:"Flash", img:"actions/flash.jpg", text:"Tu dois répondre en moins de 30 secondes à la question !"},
+  {name:"Battle on left", img:"actions/battle_left.jpg", text:"Tu dois répondre plus vite que ton voisin de gauche. Si l'un de vous deux répond juste avant toi, c'est lui qui remporte le point sinon c'est toi."},
+  {name:"Battle on right", img:"actions/battle_right.jpg", text:"Tu dois répondre plus vite que ton voisin de droite. Si l'un de vous deux répond juste avant toi, c'est lui qui remporte le point sinon c'est toi."},
+  {name:"Call a friend", img:"actions/call_friend.jpg", text:"Choisis le partenaire de ton choix. Cherchez la réponse à 2. Si vous réussissez, vous remportez 1 point tous les 2."},
+  {name:"For you", img:"actions/for_you.jpg", text:"Choisis le joueur qui répondra à ta place. S'il réussit, vous remportez chacun 1 point."},
+  {name:"Second life", img:"actions/second_life.jpg", text:"Si tu ne réussis pas la prochaine question, tu peux piocher une autre question dans la même catégorie et retenter ta chance."},
+  {name:"No way", img:"actions/no_way.jpg", text:"Réponds correctement à la question sinon tu offres 1 point à chacun des autres joueurs."},
+  {name:"Double", img:"actions/double.jpg", text:"Si tu réussis la question, tu gagnes 2 points."},
+  {name:"Téléportation", img:"actions/teleport.jpg", text:"Réussite → +1 point + tu choisis la prochaine case"},
+  {name:"+1 ou -1", img:"actions/plus_minus.jpg", text:"Réussite → +2 points / Échec → -1 point"},
+  {name:"Everybody", img:"actions/everybody.jpg", text:"Tout le monde joue !"},
+  {name:"Double or quits", img:"actions/double_quits.jpg", text:"Tout doubler ou tout perdre"},
+  {name:"It's your choice", img:"actions/choice.jpg", text:"Tu choisis l'action que tu veux !"},
+  {name:"Everybody", img:"actions/everybody.jpg", text:"Tout le monde joue !"},
+  {name:"No way", img:"actions/no_way.jpg", text:"Réponds correctement à la question sinon tu offres 1 point à chacun des autres joueurs."},
+  {name:"Quadruple", img:"actions/quadruple.jpg", text:"Si tu réussis la question, tu gagnes 4 points."}
 ];
 
-// Création de la grille 4×4 avec les cartes d'action
+// Chargement du plateau réel
+fetch('/data/board.json')
+  .then(r => r.json())
+  .then(data => {
+    board = data;
+    createActionGrid();
+  });
+
+// Grille 4×4 avec vraies images et textes
 function createActionGrid() {
-  if ($('actionGrid').children.length) return;
+  const grid = $('actionGrid');
   ACTIONS.forEach(a => {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <img src="${a.img}" style="width:100%; height:140px; object-fit:cover; border-radius:10px;">
-      <div style="padding:8px; background:#1565c0; color:white; border-radius:0 0 10px 10px;">
-        <strong>${a.name}</strong><br>
-        <small style="font-size:10px;">${a.desc}</small>
+      <img src="${a.img}" style="width:100%; height:160px; object-fit:cover; border-radius:12px;">
+      <div style="padding:10px; background:#1565c0; color:white; border-radius:0 0 12px 12px;">
+        <strong style="font-size:14px;">${a.name}</strong><br>
+        <small style="font-size:10px; line-height:1.3;">${a.text}</small>
       </div>
     `;
-    $('actionGrid').appendChild(card);
+    grid.appendChild(card);
   });
 }
 
-// Mise à jour des positions des pions (approximation circulaire pour l'instant)
+// Pions exactement sur les vraies cases
 function updatePawns(players) {
-  const container = $('pions');
+  $('pions').innerHTML = '';
   const img = $('plateau');
-  const w = img.clientWidth, h = img.clientHeight;
-  container.style.width = w + 'px';
-  container.style.height = h + 'px';
-  container.innerHTML = '';
-
-  const cx = w / 2, cy = h / 2, radius = Math.min(w, h) * 0.39;
-  const colors = ['#f44336', '#4caf50', '#ffeb3b', '#2196f3', '#ff9800', '#9c27b0'];
+  const rect = img.getBoundingClientRect();
 
   players.forEach((p, i) => {
-    const angle = (p.pos / 48) * Math.PI * 2 - Math.PI / 2; // Ajusté pour 48 cases
-    const x = cx + Math.cos(angle) * radius;
-    const y = cy + Math.sin(angle) * radius;
+    const pos = board.positions[p.pos];
+    const x = rect.width * (pos.x / 100);
+    const y = rect.height * (pos.y / 100);
+
     const pawn = document.createElement('div');
     pawn.className = 'pawn';
-    pawn.style.left = x + 'px';
-    pawn.style.top = y + 'px';
-    pawn.style.background = colors[i % 6];
+    pawn.style.left = (x - 30) + 'px';
+    pawn.style.top = (y - 30) + 'px';
+    pawn.style.background = ['#f44336','#4caf50','#ffeb3b','#2196f3','#ff9800','#9c27b0'][i];
     pawn.textContent = i + 1;
     pawn.title = `${p.name} – ${p.score} pts`;
-    container.appendChild(pawn);
+    $('pions').appendChild(pawn);
   });
 }
 
-// === FONCTIONS D'INTERACTION ===
-window.createRoom = () => {
-  const name = $('playerName').value || 'Hôte';
-  socket.emit('create', name);
-};
+// Cases atteignables (gère cercle + branches + centre)
+function showPossibleCases(currentPos, steps) {
+  const reachable = new Set();
+  const queue = [{pos: currentPos, remaining: steps}];
 
+  while (queue.length) {
+    const {pos, remaining} = queue.shift();
+    if (remaining === 0) {
+      reachable.add(pos);
+      continue;
+    }
+
+    // Cercle extérieur (0-47)
+    if (pos < 48) {
+      const next = (pos + 1) % 48;
+      queue.push({pos: next, remaining: remaining - 1});
+
+      // Embranchement toutes les 4 cases
+      if (pos % 4 === 0) {
+        const branchIndex = pos / 4;
+        const branchStart = 48 + branchIndex * 3;
+        if (branchStart < 84) {
+          queue.push({pos: branchStart, remaining: remaining - 1});
+        }
+      }
+    }
+
+    // Dans une branche (48-83)
+    if (pos >= 48 && pos < 84) {
+      const next = pos + 1;
+      if (next <= 84) {
+        queue.push({pos: next, remaining: remaining - 1});
+      }
+    }
+  }
+
+  // Affichage doré cliquable
+  $('possibleCases').innerHTML = '';
+  reachable.forEach(pos => {
+    const p = board.positions[pos];
+    const spot = document.createElement('div');
+    spot.style.position = 'absolute';
+    spot.style.width = '90px';
+    spot.style.height = '90px';
+    spot.style.background = 'radial-gradient(circle, gold, orange)';
+    spot.style.border = '6px solid white';
+    spot.style.borderRadius = '50%';
+    spot.style.left = (p.x / 100 * $('plateau').width - 45) + 'px';
+    spot.style.top = (p.y / 100 * $('plateau').height - 45) + 'px';
+    spot.style.cursor = 'pointer';
+    spot.style.boxShadow = '0 0 50px gold, inset 0 0 20px white';
+    spot.style.zIndex = '1000';
+    spot.onclick = () => socket.emit('moveTo', {code: room, pos});
+    $('possibleCases').appendChild(spot);
+  });
+}
+
+// === INTERACTIONS ===
+window.createRoom = () => socket.emit('create', $('playerName').value || 'Hôte');
 window.joinRoom = () => {
   const code = $('roomCode').value.trim().toUpperCase();
-  const name = $('playerName').value || 'Joueur';
   if (!code) return alert('Entre un code !');
-  socket.emit('join', { code, name });
+  socket.emit('join', {code, name: $('playerName').value || 'Joueur'});
 };
 
 window.rollDice = () => {
-  console.log("Bouton dé cliqué – envoi roll à la salle", room);
-  if (!room) return alert('Aucune salle active !');
   socket.emit('roll', room);
   $('rollBtn').disabled = true;
-  $('rollBtn').textContent = "Dé lancé...";
-};
-
-window.chooseDir = dir => {
-  console.log("Direction choisie:", dir, "roll:", lastRoll);
-  if (!room || lastRoll === 0) return alert("Lance d'abord le dé !");
-  socket.emit('move', { code: room, steps: lastRoll, direction: dir });
-  $('directions').style.display = 'none';
-  lastRoll = 0;
+  $('rollBtn').textContent = 'Dé lancé...';
 };
 
 window.sendAnswer = () => {
   const ans = $('answerInput').value.trim();
-  if (ans) socket.emit('answer', { code: room, answer: ans });
+  if (ans) socket.emit('answer', {code: room, answer: ans});
   $('answerInput').value = '';
 };
 
-// Démarrer la partie
-$('startBtn').onclick = () => {
-  if (room) socket.emit('start', room);
-};
+$('startBtn').onclick = () => socket.emit('start', room);
 
-// SOCKET ÉVÉNEMENTS
-socket.on('created', code => {
-  room = code;
-  showGame(code);
-});
-
-socket.on('joined', code => {
-  room = code;
-  showGame(code);
-});
-
+// === SOCKET ===
+socket.on('created', code => { room = code; showGame(code); });
+socket.on('joined', code => { room = code; showGame(code); });
 socket.on('error', msg => alert(msg));
 
 function showGame(code) {
   $('menu').style.display = 'none';
   $('game').style.display = 'block';
   $('roomDisplay').textContent = code;
-  createActionGrid();
 }
 
 socket.on('players', players => updatePawns(players));
-
-socket.on('gameStart', () => {
-  $('startBtn').style.display = 'none';
-  alert('La partie est lancée !');
-});
-
+socket.on('gameStart', () => $('startBtn').style.display = 'none');
 socket.on('yourTurn', () => {
   $('rollBtn').disabled = false;
-  $('rollBtn').textContent = "Lancer le dé";
+  $('rollBtn').textContent = 'Lancer le dé';
 });
 
 socket.on('rolled', data => {
-  lastRoll = data.roll;
-  alert(`Tu as fait ${data.roll} ! Choisis GAUCHE ou DROITE`);
-  $('directions').style.display = 'block';
+  roll = data.roll;
+  alert(`Tu as fait ${roll} ! Clique sur une case dorée`);
+  showPossibleCases(data.currentPos, roll);
 });
 
 socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c => c.classList.remove('currentAction'));
-  const idx = ACTIONS.findIndex(a => a.name === data.action);
-  if (idx >= 0) document.querySelectorAll('.actionCard')[idx].classList.add('currentAction');
-
-  if (data.timer) {
-    let t = data.timer;
-    $('flashTimer').style.display = 'block';
-    $('flashTimer').textContent = t + 's';
-    const int = setInterval(() => {
-      t--;
-      $('flashTimer').textContent = t + 's';
-      if (t <= 0) clearInterval(int);
-    }, 1000);
-  }
-});
-
-socket.on('question', q => {
-  $('themeTitle').textContent = 'Thème : ' + q.theme;
-  $('questionText').textContent = q.question;
-  $('questionBox').style.display = 'block';
-  $('answerInput').focus();
-});
-
-socket.on('results', data => {
-  $('results').innerHTML = `<h3>${data.action}</h3>` + data.results.map(r => `${r.correct ? 'Correct' : 'Faux'} ${r.player} → ${r.score} pts`).join('<br>');
-  $('questionBox').style.display = 'none';
-  $('flashTimer').style.display = 'none';
+  const card = [...document.querySelectorAll('.actionCard')].find(c => c.textContent.includes(data.action));
+  if (card) card.classList.add('currentAction');
 });
