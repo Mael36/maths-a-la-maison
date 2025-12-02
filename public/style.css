@@ -1,37 +1,65 @@
-body {font-family:Arial,sans-serif;background:#bbdefb;margin:0;padding:20px;color:#1565c0;text-align:center;}
-h1,h2,h3,h4{color:#1565c0;}
-button{background:#1976d2;color:white;padding:15px 30px;font-size:20px;border:none;border-radius:15px;cursor:pointer;margin:10px;}
-button:disabled{background:#999;cursor:not-allowed;}
-input{padding:12px;font-size:18px;border:3px solid #1565c0;border-radius:10px;}
-
-#boardContainer{position:relative;display:inline-block;margin:40px;}
-#plateau{max-width:100%;border-radius:50%;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
-#pions,#possibleCases{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
-
-#timer{
-  position:fixed;top:20px;right:20px;padding:15px 35px;border-radius:50px;
-  font-size:36px;font-weight:bold;color:white;box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  display:none;z-index:1000;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0; padding: 0;
+  background: #f5f5f5;
 }
 
-#actionGrid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:60px;
-  max-width:1800px;margin:80px auto;padding:40px;
-  background:#e3f2fd;border-radius:50px;
+#menu, #game {
+  text-align: center;
+  padding: 10px;
 }
-.actionCard{
-  background:white;border-radius:30px;padding:30px;
-  box-shadow:0 30px 80px rgba(0,0,0,0.4);border:16px solid #1565c0;
-  transition:transform 0.4s;
-}
-.round{width:320px;height:320px;background:white;border-radius:50%;overflow:hidden;margin:0 auto;position:relative;}
-.tree{width:100%;height:100%;background-size:70%;background-position:center;background-repeat:no-repeat;}
-.actionCard h3{font-size:48px;margin:40px 0 10px;}
-.actionCard h4{font-size:32px;margin:10px 0;}
-.actionCard p{font-size:20px;line-height:1.5;color:#000;}
 
-#questionBox,#resultBox{
-  background:white;padding:40px;border-radius:30px;box-shadow:0 20px 60px rgba(0,0,0,0.4);
-  max-width:800px;margin:40px auto;display:none;
+#boardContainer {
+  position: relative;
+  width: 90%;
+  max-width: 600px; /* réduit le plateau */
+  margin: 0 auto 20px auto;
 }
-#resultBox{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10000;font-size:60px;font-weight:bold;}
+
+#plateau {
+  width: 100%;
+  display: block;
+}
+
+#pions, #possibleCases {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; /* pions n’interfèrent pas */
+}
+
+#possibleCases > div {
+  pointer-events: auto; /* seules les cases dorées cliquables */
+}
+
+#actionGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.actionCard {
+  flex: 0 0 120px; /* taille réduite */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px;
+  font-size: 12px;
+  transition: transform 0.2s;
+  cursor: default;
+}
+
+#timer {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+#questionBox {
+  margin: 10px 0;
+}
+
+#resultBox {
+  margin: 10px 0;
+}
