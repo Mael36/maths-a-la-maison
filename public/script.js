@@ -5,24 +5,12 @@ let currentTimer = null;
 
 const $ = id => document.getElementById(id);
 
-// Chargement du plateau
 fetch('/data/board.json')
   .then(r => r.json())
   .then(data => { board = data; createActionCards(); });
 
-// CARTES ACTION RONDES EXACTEMENT COMME LES TIENNES (arbre + ACTION + nom)
 function createActionCards() {
   const grid = $('actionGrid');
-  grid.innerHTML = '';
-  grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  grid.style.gap = '50px';
-  grid.style.maxWidth = '1800px';
-  grid.style.margin = '80px auto';
-  grid.style.padding = '40px';
-  grid.style.background = '#bbdefb';
-  grid.style.borderRadius = '40px';
-
   const actions = [
     "Flash","Battle on left","Battle on right","Call a friend",
     "For you","Second life","No way","Double",
@@ -34,23 +22,14 @@ function createActionCards() {
     const card = document.createElement('div');
     card.className = 'actionCard';
     card.innerHTML = `
-      <div style="width:300px;height:300px;background:white;border-radius:50%;
-                  box-shadow:0 30px 80px rgba(0,0,0,0.4);display:flex;flex-direction:column;
-                  align-items:center;justify-content:center;border:16px solid #1565c0;margin:0 auto;">
-        <img src="assets/action-circle.png" style="width:260px;height:260px;object-fit:contain;">
-      </div>
-      <div style="text-align:center;margin-top:40px;font-size:40px;font-weight:bold;color:#1565c0;">
-        ACTION
-      </div>
-      <div style="text-align:center;margin-top:20px;font-size:32px;color:#000;">
-        ${name}
-      </div>
+      <div class="tree" style="background: url('assets/plateau.png') center/70% no-repeat;"></div>
+      <h3>ACTION</h3>
+      <p>${name}</p>
     `;
     grid.appendChild(card);
   });
 }
 
-// PIONS PARFAITEMENT CENTRÉS
 function updatePawns(players) {
   $('pions').innerHTML = '';
   const img = $('plateau');
@@ -64,33 +43,24 @@ function updatePawns(players) {
 
     const pawn = document.createElement('div');
     pawn.style.position = 'absolute';
-    pawn.style.width = '56px';
-    pawn.style.height = '56px';
+    pawn.style.width = '60px'; pawn.style.height = '60px';
     pawn.style.borderRadius = '50%';
     pawn.style.background = ['#d32f2f','#388e3c','#fbc02d','#1976d2','#f57c00','#7b1fa2'][i % 6];
-    pawn.style.border = '7px solid white';
-    pawn.style.boxShadow = '0 12px 40px rgba(0,0,0,0.8)';
-    pawn.style.color = 'white';
-    pawn.style.fontSize = '30px';
-    pawn.style.fontWeight = 'bold';
-    pawn.style.display = 'flex';
-    pawn.style.alignItems = 'center';
-    pawn.style.justifyContent = 'center';
-    pawn.style.left = x + 'px';
-    pawn.style.top = y + 'px';
+    pawn.style.border = '8px solid white';
+    pawn.style.boxShadow = '0 15px 40px rgba(0,0,0,0.8)';
+    pawn.style.color = 'white'; pawn.style.fontSize = '32px'; pawn.style.fontWeight = 'bold';
+    pawn.style.display = 'flex'; pawn.style.alignItems = 'center'; pawn.style.justifyContent = 'center';
+    pawn.style.left = x + 'px'; pawn.style.top = y + 'px';
     pawn.style.transform = 'translate(-50%, -50%)';
-    pawn.style.zIndex = '10';
     pawn.textContent = i + 1;
     pawn.title = `${p.name} – ${p.score} pts`;
     $('pions').appendChild(pawn);
   });
 }
 
-// CASES DORÉES PARFAITEMENT CENTRÉES
 function showPossibleCases(currentPos, steps) {
   const reachable = new Set();
   const queue = [{pos: currentPos, rem: steps}];
-
   while (queue.length) {
     const {pos, rem} = queue.shift();
     if (rem === 0) { reachable.add(pos); continue; }
@@ -101,8 +71,8 @@ function showPossibleCases(currentPos, steps) {
         if (b < 84) queue.push({pos: b, rem: rem - 1});
       }
     }
-    if (pos >= 48 && pos < 84) {
-      if (pos + 1 <= 84) queue.push({pos: pos + 1, rem: rem - 1});
+    if (pos >= 48 && pos < 84 && pos + 1 <= 84) {
+      queue.push({pos: pos + 1, rem: rem - 1});
     }
   }
 
@@ -117,17 +87,14 @@ function showPossibleCases(currentPos, steps) {
 
     const spot = document.createElement('div');
     spot.style.position = 'absolute';
-    spot.style.width = '80px';
-    spot.style.height = '80px';
+    spot.style.width = '90px'; spot.style.height = '90px';
     spot.style.background = 'radial-gradient(circle, gold, orange)';
     spot.style.border = '10px solid white';
     spot.style.borderRadius = '50%';
-    spot.style.left = x + 'px';
-    spot.style.top = y + 'px';
+    spot.style.left = x + 'px'; spot.style.top = y + 'px';
     spot.style.transform = 'translate(-50%, -50%)';
     spot.style.cursor = 'pointer';
-    spot.style.boxShadow = '0 0 100px gold, inset 0 0 40px white';
-    spot.style.zIndex = '999';
+    spot.style.boxShadow = '0 0 120px gold';
     spot.onclick = () => {
       socket.emit('moveTo', {code: room, targetPos: pos});
       $('possibleCases').innerHTML = '';
@@ -136,21 +103,17 @@ function showPossibleCases(currentPos, steps) {
   });
 }
 
-// TIMER 60s / 30s si Flash
 function startTimer(seconds) {
   if (currentTimer) clearInterval(currentTimer);
-  $('flashTimer').style.display = 'block';
-  let time = seconds;
-  $('flashTimer').textContent = `${time}s`;
-  $('flashTimer').style.background = seconds === 30 ? '#d32f2f' : '#1976d2';
+  $('timer').style.display = 'block';
+  let t = seconds;
+  $('timer').textContent = t + 's';
+  $('timer').style.background = seconds === 30 ? '#d32f2f' : '#1976d2';
 
   currentTimer = setInterval(() => {
-    time--;
-    $('flashTimer').textContent = `${time}s`;
-    if (time <= 0) {
-      clearInterval(currentTimer);
-      $('flashTimer').style.display = 'none';
-    }
+    t--;
+    $('timer').textContent = t + 's';
+    if (t <= 0) { clearInterval(currentTimer); $('timer').style.display = 'none'; }
   }, 1000);
 }
 
@@ -173,7 +136,6 @@ $('startBtn').onclick = () => socket.emit('start', room);
 socket.on('created', code => { room = code; showGame(code); });
 socket.on('joined', code => { room = code; showGame(code); });
 socket.on('error', msg => alert(msg));
-
 function showGame(code) {
   $('menu').style.display = 'none';
   $('game').style.display = 'block';
@@ -182,37 +144,31 @@ function showGame(code) {
 
 socket.on('players', players => updatePawns(players));
 socket.on('yourTurn', () => { $('rollBtn').disabled = false; $('rollBtn').textContent = 'Lancer le dé'; });
-
 socket.on('rolled', data => {
   alert(`Tu as fait ${data.roll} ! Clique sur une case dorée`);
   showPossibleCases(data.currentPos, data.roll);
 });
-
 socket.on('actionDrawn', data => {
   document.querySelectorAll('.actionCard').forEach(c => c.style.transform = 'scale(1)');
-  document.querySelectorAll('.actionCard').forEach(card => {
-    if (card.textContent.includes(data.action)) {
-      card.style.transform = 'scale(1.3)';
-      card.style.boxShadow = '0 0 120px gold, 0 40px 100px rgba(0,0,0,0.6)';
-    }
+  document.querySelectorAll('.actionCard').forEach(c => {
+    if (c.textContent.includes(data.action)) c.style.transform = 'scale(1.4)';
   });
 });
-
-// QUESTION + TIMER
 socket.on('question', q => {
-  $('themeTitle').textContent = q.theme || 'Maths à la maison';
+  $('themeTitle').textContent = q.theme || 'Maths';
   $('questionText').textContent = q.question;
   $('questionBox').style.display = 'block';
   $('answerInput').focus();
-
-  const isFlash = q.action === 'Flash';
-  startTimer(isFlash ? 30 : 60);
+  startTimer(q.action === 'Flash' ? 30 : 60);
 });
-
-// RÉSULTAT BONNE/MAUVAISE RÉPONSE
 socket.on('result', data => {
   clearInterval(currentTimer);
-  $('flashTimer').style.display = 'none';
-
-  const msg = data.correct
-   
+  $('timer').style.display = 'none';
+  $('resultText').textContent = data.correct ? `BRAVO ${data.player} ! +1 point` : `Dommage ${data.player}...`;
+  $('resultText').style.color = data.correct ? '#4caf50' : '#f44336';
+  $('resultBox').style.display = 'block';
+  setTimeout(() => {
+    $('questionBox').style.display = 'none';
+    $('resultBox').style.display = 'none';
+  }, 5000);
+});
