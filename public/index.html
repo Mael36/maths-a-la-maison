@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Maths à la Maison</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Socket.io client via CDN (fiable sur Railway) -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
@@ -22,16 +21,20 @@
     <h2>Salle : <span id="roomDisplay"></span></h2>
     <button id="startBtn">Démarrer la partie</button>
 
+    <div id="scoreBoard">
+      <h3>Scores</h3>
+      <ul id="scoreList"></ul>
+    </div>
+
     <div id="boardContainer">
       <img src="assets/plateau.png" id="plateau" alt="Plateau">
       <div id="pions"></div>
       <div id="possibleCases"></div>
     </div>
 
+    <div id="diceResult"></div>
     <div id="timer">60s</div>
-
     <div id="actionGrid"></div>
-
     <button id="rollBtn" disabled>Lancer le dé</button>
 
     <div id="questionBox" style="display:none;">
