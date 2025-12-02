@@ -8,9 +8,10 @@ let activePlayers = [];
 
 const $ = id => document.getElementById(id);
 
+// Crée les cartes actions
 function createActionCards() {
   const grid = $('actionGrid');
-  if (!grid || grid.children.length) return;
+  if (!grid) return;
 
   const actions = [
     "Flash","Battle on left","Battle on right","Call a friend","For you",
@@ -27,6 +28,7 @@ function createActionCards() {
   });
 }
 
+// Mise à jour des pions
 function updatePawns(players) {
   const container = $('pions');
   if (!container || !board) return;
@@ -53,6 +55,7 @@ function updatePawns(players) {
   });
 }
 
+// Affiche les cases dorées atteignables
 function showPossibleCases(currentPos, steps) {
   if(!board) return;
   const reachable = new Set();
@@ -83,6 +86,7 @@ function showPossibleCases(currentPos, steps) {
   });
 }
 
+// Timer
 function startTimer(sec){
   if(timer) clearInterval(timer);
   const el=$('timer');
@@ -96,6 +100,7 @@ function startTimer(sec){
   },1000);
 }
 
+// Tableau des scores
 function updateScoreTable(players){
   const container=$('scoreTable');
   if(!container){
@@ -125,7 +130,12 @@ function updateScoreTable(players){
 $('createBtn').onclick = () => socket.emit('create',$('playerName').value||'Hôte');
 $('joinBtn').onclick = () => socket.emit('join',{code:$('roomCode').value.trim().toUpperCase(),name:$('playerName').value||'Joueur'});
 $('startBtn').onclick = () => socket.emit('start', room);
-$('rollBtn').onclick = ()=>{ socket.emit('roll',room); $('rollBtn').disabled=true; };
+$('rollBtn').onclick = ()=>{
+  socket.emit('roll',room);
+  $('rollBtn').disabled=true;
+  // Réinitialise le résultat du dé
+  $('diceResult').textContent='Résultat du dé : -';
+};
 $('sendAnswerBtn').onclick = ()=>{
   const ans=$('answerInput').value.trim();
   if(ans) socket.emit('answer',{code:room,answer:ans});
@@ -147,6 +157,8 @@ socket.on('yourTurn', data=>{
 
 socket.on('rolled', data=>{
   if(!data) return;
+  // Affiche le résultat du dé sur l'interface
+  $('diceResult').textContent = `Résultat du dé : ${data.roll}`;
   const isActive = activePlayers.includes(socket.id);
   if(isActive) showPossibleCases(data.currentPos, data.roll);
 });
@@ -189,9 +201,19 @@ socket.on('results', data=>{
 
 socket.on('actionClear', ()=>{ document.querySelectorAll('.actionCard').forEach(c=>c.style.transform='scale(1)'); });
 
+// Affiche le jeu
 function showGame(){
   $('menu').style.display='none';
   $('game').style.display='block';
   $('roomDisplay').textContent=room;
   socket.emit('requestBoard');
+
+  // Création du div pour le résultat du dé
+  if(!$('diceResult')){
+    const div=document.createElement('div');
+    div.id='diceResult';
+    div.style.cssText='position:absolute;top:50px;right:10px;font-weight:bold;';
+    div.textContent='Résultat du dé : -';
+    document.body.appendChild(div);
+  }
 }
