@@ -1,65 +1,121 @@
+/* style.css */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0; padding: 0;
-  background: #f5f5f5;
+  margin:0;
+  font-family:sans-serif;
+  background:#f0f0f0;
+  text-align:center;
 }
 
-#menu, #game {
-  text-align: center;
-  padding: 10px;
+#menu {
+  padding:20px;
+}
+
+#menu input {
+  padding:8px;
+  font-size:16px;
+  margin:5px;
+  width:150px;
+}
+
+#menu button {
+  padding:8px 12px;
+  font-size:16px;
+  margin:5px;
+  cursor:pointer;
+}
+
+#game {
+  padding:10px;
 }
 
 #boardContainer {
-  position: relative;
-  width: 90%;
-  max-width: 600px; /* réduit le plateau */
-  margin: 0 auto 20px auto;
+  position:relative;
+  display:inline-block;
+  max-width:90vw;
+  margin:10px auto;
 }
 
 #plateau {
-  width: 100%;
-  display: block;
+  width:600px;
+  max-width:100%;
+  border:2px solid #333;
+  display:block;
 }
 
 #pions, #possibleCases {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  pointer-events: none; /* pions n’interfèrent pas */
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
 }
 
 #possibleCases > div {
-  pointer-events: auto; /* seules les cases dorées cliquables */
-}
-
-#actionGrid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.actionCard {
-  flex: 0 0 120px; /* taille réduite */
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 4px;
-  font-size: 12px;
-  transition: transform 0.2s;
-  cursor: default;
+  pointer-events:auto;
 }
 
 #timer {
-  font-size: 18px;
-  margin: 10px 0;
+  margin:10px;
+  padding:5px 10px;
+  font-size:18px;
+  font-weight:bold;
+  display:inline-block;
+  background:#1976d2;
+  color:white;
+  border-radius:4px;
 }
 
-#questionBox {
-  margin: 10px 0;
+#actionGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:8px;
+  margin:10px auto;
+  max-width:90vw;
 }
 
-#resultBox {
-  margin: 10px 0;
+.actionCard {
+  background:white;
+  padding:6px 8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+  font-size:14px;
+}
+
+#rollBtn, #startBtn, #sendAnswerBtn {
+  padding:8px 12px;
+  font-size:16px;
+  margin:5px;
+  cursor:pointer;
+}
+
+#questionBox, #resultBox {
+  margin-top:10px;
+  padding:10px;
+  border:1px solid #999;
+  border-radius:6px;
+  background:white;
+  display:inline-block;
+  min-width:250px;
+}
+
+#questionBox input {
+  padding:6px;
+  font-size:14px;
+  margin-top:5px;
+  width:120px;
+}
+
+#resultText {
+  font-weight:bold;
+  font-size:16px;
+}
+
+#possibleCases div {
+  transition: transform 0.2s;
+}
+#possibleCases div:hover {
+  transform:scale(1.2);
 }
