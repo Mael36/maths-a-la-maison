@@ -1,11 +1,11 @@
-/* style.css */
 body {
   margin:0;
-  font-family:sans-serif;
-  background:#f0f0f0;
+  font-family:Arial, sans-serif;
+  background:#eef;
   text-align:center;
 }
 
+/* MENU */
 #menu {
   padding:20px;
 }
@@ -13,36 +13,64 @@ body {
 #menu input {
   padding:8px;
   font-size:16px;
+  width:180px;
   margin:5px;
-  width:150px;
 }
 
 #menu button {
-  padding:8px 12px;
+  padding:8px 14px;
   font-size:16px;
-  margin:5px;
   cursor:pointer;
 }
 
+/* GAME */
 #game {
-  padding:10px;
+  padding:15px;
+  display:none;
 }
 
-#boardContainer {
+#topBar {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:5px 20px;
+}
+
+/* SCORE TABLE */
+#scoreTable {
+  background:white;
+  padding:10px;
+  border-radius:6px;
+  font-size:14px;
+  box-shadow:0 0 5px #0003;
+  min-width:130px;
+  text-align:left;
+}
+
+/* DICE */
+#diceZone {
+  margin-top:10px;
+  font-size:18px;
+}
+
+/* PLATEAU */
+#plateauContainer {
   position:relative;
-  display:inline-block;
-  max-width:90vw;
-  margin:10px auto;
+  width:80vw;
+  max-width:800px;
+  margin:20px auto;
 }
 
 #plateau {
-  width:600px;
-  max-width:100%;
+  width:100%;
+  border-radius:10px;
   border:2px solid #333;
   display:block;
 }
 
-#pions, #possibleCases {
+/* Pions + cases accessibles */
+#pions,
+#possibleCases {
   position:absolute;
   top:0;
   left:0;
@@ -51,71 +79,52 @@ body {
   pointer-events:none;
 }
 
-#possibleCases > div {
+#possibleCases div {
   pointer-events:auto;
 }
 
-#timer {
-  margin:10px;
-  padding:5px 10px;
-  font-size:18px;
-  font-weight:bold;
-  display:inline-block;
-  background:#1976d2;
-  color:white;
-  border-radius:4px;
-}
-
+/* CARTES ACTIONS */
 #actionGrid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-  gap:8px;
-  margin:10px auto;
+  gap:10px;
+  margin:20px auto;
   max-width:90vw;
 }
 
 .actionCard {
   background:white;
-  padding:6px 8px;
+  padding:10px;
   border-radius:6px;
   border:1px solid #ccc;
   box-shadow:0 2px 5px rgba(0,0,0,0.2);
-  transition: transform 0.2s;
+  transition: transform 0.25s;
   font-size:14px;
-}
-
-#rollBtn, #startBtn, #sendAnswerBtn {
-  padding:8px 12px;
-  font-size:16px;
-  margin:5px;
   cursor:pointer;
 }
 
+/* QUESTION BOX */
 #questionBox, #resultBox {
-  margin-top:10px;
-  padding:10px;
-  border:1px solid #999;
-  border-radius:6px;
+  display:none;
   background:white;
-  display:inline-block;
-  min-width:250px;
+  border-radius:8px;
+  padding:15px;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 10px #0004;
+  width:300px;
 }
 
-#questionBox input {
-  padding:6px;
-  font-size:14px;
-  margin-top:5px;
+#answerInput {
+  padding:8px;
+  margin-top:10px;
   width:120px;
 }
 
-#resultText {
+#timer {
+  font-size:22px;
+  margin-top:10px;
   font-weight:bold;
-  font-size:16px;
-}
-
-#possibleCases div {
-  transition: transform 0.2s;
-}
-#possibleCases div:hover {
-  transform:scale(1.2);
 }
