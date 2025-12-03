@@ -4,40 +4,39 @@ let board = null;
 let timer = null;
 let currentPlayerId = null;
 let activePlayers = [];
+let pendingChoice = null; // pour stocker le choix avant question
 
 const $ = id => document.getElementById(id);
 
-/* ----------------------------------------------------- */
-/* ACTION CARDS */
-function createActionCards() {
+/* ------------------ ACTION CARDS ------------------ */
+function createActionCards(actions = [
+  "Flash","Battle on left","Battle on right","Call a friend","For you",
+  "Second life","No way","Double","Téléportation","+1 ou -1",
+  "Everybody","Double or quits","It's your choice","Quadruple"
+]){
   const grid = $('actionGrid');
   grid.innerHTML = '';
-
-  const actions = [
-    "Flash","Battle on left","Battle on right","Call a friend","For you",
-    "Second life","No way","Double","Téléportation","+1 ou -1",
-    "Everybody","Double or quits","It's your choice","Quadruple"
-  ];
-
   actions.forEach(a=>{
     const c=document.createElement('div');
     c.className='actionCard';
     c.textContent=a;
     c.dataset.action=a;
     c.onclick = ()=>{
-      socket.emit("choiceAction",{code:room,action:a});
+      if(pendingChoice && pendingChoice.type==="action") {
+        socket.emit("choiceMade",{code:room,action:a});
+        pendingChoice=null;
+        hideChoiceOverlay();
+      }
     };
     grid.appendChild(c);
   });
 }
 
-/* ----------------------------------------------------- */
-/* PIONS */
+/* ------------------ PIONS ------------------ */
 function updatePawns(players){
   const cont=$('pions');
   if(!cont || !board) return;
   cont.innerHTML='';
-
   const img=$('plateau');
   const w=img.offsetWidth, h=img.offsetHeight;
 
@@ -58,18 +57,15 @@ function updatePawns(players){
   });
 }
 
-/* ----------------------------------------------------- */
-/* CASES ACCESSIBLES */
+/* ------------------ CASES ACCESSIBLES ------------------ */
 function showPossibleCases(currentPos, steps){
   const el=$('possibleCases');
   el.innerHTML='';
-
   const img=$('plateau');
   const w=img.offsetWidth, h=img.offsetHeight;
 
   const reachable=new Set();
   const q=[{pos:currentPos,rem:steps}];
-
   while(q.length){
     const {pos,rem}=q.shift();
     if(rem===0){ reachable.add(pos); continue; }
@@ -80,7 +76,6 @@ function showPossibleCases(currentPos, steps){
   reachable.forEach(pos=>{
     const p=board.positions[pos];
     const x=(p.x/100)*w, y=(p.y/100)*h;
-
     const d=document.createElement('div');
     d.style.cssText=`
       position:absolute;width:50px;height:50px;border-radius:50%;
@@ -96,8 +91,7 @@ function showPossibleCases(currentPos, steps){
   });
 }
 
-/* ----------------------------------------------------- */
-/* TIMER */
+/* ------------------ TIMER ------------------ */
 function startTimer(sec){
   if(timer) clearInterval(timer);
   const t=$('timer');
@@ -115,30 +109,49 @@ function startTimer(sec){
   },1000);
 }
 
-/* ----------------------------------------------------- */
-/* SCORE TABLE */
+/* ------------------ SCORE ------------------ */
 function updateScoreTable(players){
   const table=$('scoreTable');
   table.innerHTML="<b>Scores :</b><br>";
-
   players.forEach(p=>{
     const line=document.createElement('div');
     line.textContent=`${p.name}: ${p.score} pts`;
     line.dataset.id = p.id;
     line.style.cursor="pointer";
     line.onclick = ()=>{
-      socket.emit("selectPlayer",{code:room,target:p.id});
+      if(pendingChoice && pendingChoice.type==="player"){
+        socket.emit("choiceMade",{code:room,target:p.id});
+        pendingChoice=null;
+        hideChoiceOverlay();
+      }
     };
-
     if(activePlayers.includes(p.id))
       line.style.fontWeight="bold";
-
     table.appendChild(line);
   });
 }
 
-/* ----------------------------------------------------- */
-/* UI */
+/* ------------------ CHOICE OVERLAY ------------------ */
+function showChoiceOverlay(type,message){
+  const overlay = document.createElement('div');
+  overlay.id='choiceOverlay';
+  overlay.style.cssText=`
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:1000;
+  `;
+  const box=document.createElement('div');
+  box.style.cssText='background:white;padding:15px;border-radius:8px;text-align:center;';
+  box.innerHTML=`<h3>${message}</h3>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+function hideChoiceOverlay(){
+  const overlay=document.getElementById('choiceOverlay');
+  if(overlay) overlay.remove();
+}
+
+/* ------------------ UI ------------------ */
 $('createBtn').onclick = ()=> socket.emit('create',$('playerName').value||"Hôte");
 $('joinBtn').onclick = ()=> socket.emit('join',{
   code:$('roomCode').value.trim().toUpperCase(),
@@ -155,8 +168,7 @@ $('sendAnswerBtn').onclick = ()=>{
   $('answerInput').value='';
 };
 
-/* ----------------------------------------------------- */
-/* SOCKET EVENTS */
+/* ------------------ SOCKET EVENTS ------------------ */
 socket.on("created", code=>{ room=code; showGame(); });
 socket.on("joined", code=>{ room=code; showGame(); });
 
@@ -172,14 +184,9 @@ socket.on("yourTurn", data=>{
 
 socket.on("rolled", data=>{
   $('diceResult').textContent = data.roll;
-
   if(socket.id === currentPlayerId){
     showPossibleCases(data.currentPos,data.roll);
   }
-});
-
-socket.on("teleport", data=>{
-  $('diceResult').textContent="TP";
 });
 
 socket.on("actionDrawn", data=>{
@@ -188,33 +195,34 @@ socket.on("actionDrawn", data=>{
     if(c.dataset.action===data.action)
       c.style.transform="scale(1.2)";
   });
+
+  // gérer choix avant question
+  if(["for you","call a friend"].includes(data.action.toLowerCase())){
+    pendingChoice={type:"player"};
+    showChoiceOverlay("player","Choisis un joueur pour cette action");
+  } else if(data.action.toLowerCase()==="it's your choice"){
+    pendingChoice={type:"action"};
+    showChoiceOverlay("action","Choisis ton action");
+  }
 });
 
-socket.on("activePlayers", ids=>{
-  activePlayers = ids;
-});
+socket.on("activePlayers", ids=>{ activePlayers = ids; });
 
 socket.on("question", data=>{
   if(!activePlayers.includes(socket.id)) return;
-
   $('themeTitle').textContent=data.theme;
   $('questionText').textContent=data.question;
   $('questionBox').style.display='block';
-
   startTimer(data.timer);
 });
 
 socket.on("results", data=>{
   clearInterval(timer);
   $('timer').style.display="none";
-
   $('resultText').textContent = data.correct ? "Bonne réponse" : "Mauvaise réponse";
   $('resultText').style.color = data.correct ? "#2e7d32" : "#c62828";
-
   $('resultBox').style.display='block';
-
   updateScoreTable(data.players);
-
   setTimeout(()=>{
     $('questionBox').style.display='none';
     $('resultBox').style.display='none';
@@ -226,7 +234,7 @@ socket.on("clearQuestion", ()=>{
   $('resultBox').style.display='none';
 });
 
-/* ----------------------------------------------------- */
+/* ------------------ SHOW GAME ------------------ */
 function showGame(){
   $('menu').style.display='none';
   $('game').style.display='block';
