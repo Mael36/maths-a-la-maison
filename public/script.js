@@ -219,15 +219,24 @@ socket.on("question", data=>{
 socket.on("results", data=>{
   clearInterval(timer);
   $('timer').style.display="none";
-  $('resultText').textContent = data.correct ? "Bonne réponse" : "Mauvaise réponse";
-  $('resultText').style.color = data.correct ? "#2e7d32" : "#c62828";
+
+  // Vérifie que data.correct est défini
+  const isCorrect = data?.correct === true;
+  $('resultText').textContent = isCorrect ? "Bonne réponse" : "Mauvaise réponse";
+  $('resultText').style.color = isCorrect ? "#2e7d32" : "#c62828";
+
   $('resultBox').style.display='block';
+
+  // Mise à jour du score
   updateScoreTable(data.players);
+
+  // Affiche le résultat au moins 2.5 secondes
   setTimeout(()=>{
     $('questionBox').style.display='none';
     $('resultBox').style.display='none';
-  },2000);
+  }, 2500);
 });
+
 
 socket.on("clearQuestion", ()=>{
   $('questionBox').style.display='none';
@@ -241,3 +250,4 @@ function showGame(){
   $('roomDisplay').textContent=room;
   socket.emit('requestBoard');
 }
+
