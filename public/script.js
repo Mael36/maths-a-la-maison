@@ -171,7 +171,7 @@ socket.on("yourTurn", data=>{
 });
 
 socket.on("rolled", data=>{
-  $('diceResult').textContent = data.roll; // ✔ mise à jour du score du dé
+  $('diceResult').textContent = data.roll;
 
   if(socket.id === currentPlayerId){
     showPossibleCases(data.currentPos,data.roll);
