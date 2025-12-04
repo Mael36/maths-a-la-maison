@@ -1,46 +1,131 @@
-/* --- FIX PIONS --- */
-#pions .pawn {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: red;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid white;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  pointer-events: none; /* important : laisse les clics sur plateaux/cases */
+css actuel :
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#eef;
+  text-align:center;
 }
 
-/* --- FIX CASES ACCESSIBLES --- */
-#possibleCases .spot {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, gold, orange);
-  border: 4px solid white;
-  cursor: pointer;
-  pointer-events: auto;
-  box-shadow: 0 0 25px rgba(255,180,0,0.75);
-  z-index: 900;
+/* MENU */
+#menu {
+  padding:20px;
 }
 
-/* Assure une vraie superposition */
+#menu input {
+  padding:8px;
+  font-size:16px;
+  width:180px;
+  margin:5px;
+}
+
+#menu button {
+  padding:8px 14px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* GAME */
+#game {
+  padding:15px;
+  display:none;
+}
+
+#topBar {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:5px 20px;
+}
+
+/* SCORE TABLE */
+#scoreTable {
+  background:white;
+  padding:10px;
+  border-radius:6px;
+  font-size:14px;
+  box-shadow:0 0 5px #0003;
+  min-width:130px;
+  text-align:left;
+}
+
+/* DICE */
+#diceZone {
+  margin-top:10px;
+  font-size:18px;
+}
+
+/* PLATEAU */
 #plateauContainer {
-  position: relative;
+  position:relative;
+  width:80vw;
+  max-width:800px;
+  margin:20px auto;
 }
 
-#pions, #possibleCases {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+#plateau {
+  width:100%;
+  border-radius:10px;
+  border:2px solid #333;
+  display:block;
+}
+
+/* Pions + cases accessibles */
+#pions,
+#possibleCases {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+#possibleCases div {
+  pointer-events:auto;
+}
+
+/* CARTES ACTIONS */
+#actionGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:10px;
+  margin:20px auto;
+  max-width:90vw;
+}
+
+.actionCard {
+  background:white;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  transition: transform 0.25s;
+  font-size:14px;
+  cursor:pointer;
+}
+
+/* QUESTION BOX */
+#questionBox, #resultBox {
+  display:none;
+  background:white;
+  border-radius:8px;
+  padding:15px;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 10px #0004;
+  width:300px;
+}
+
+#answerInput {
+  padding:8px;
+  margin-top:10px;
+  width:120px;
+}
+
+#timer {
+  font-size:22px;
+  margin-top:10px;
+  font-weight:bold;
 }
