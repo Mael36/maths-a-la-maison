@@ -1,29 +1,31 @@
-// public/script.js
+// public/script.js (corrigé)
+// Assure-toi que le client charge socket.io et que les IDs HTML existent.
+
 const socket = io();
 let room = null;
 let board = null;
 let lastPlayers = [];
 let currentTurnPlayerId = null;
 let activePlayers = [];
-let waitingForSelection = null; // { type:'player'|'action', message, initiator }
+let clientTimer = null;
 
+// raccourci DOM
 const $ = id => document.getElementById(id);
 
-// UI elements assumed present in your HTML (adapt if different)
+// éléments attendus (adapte si tu as des IDs différents)
 const elMenu = $('menu');
 const elGame = $('game');
-const elRoomDisplay = $('roomDisplay');
-const elPions = $('pions');
+const elPlayerName = $('playerName');
+const elCreateBtn = $('createBtn');
+const elJoinBtn = $('joinBtn');
+const elRoomCode = $('roomCode');
+const elStartBtn = $('startBtn');
+const elRollBtn = $('rollBtn');
 const elPlateau = $('plateau');
+const elPions = $('pions');
 const elPossible = $('possibleCases');
 const elActionGrid = $('actionGrid');
 const elScoreTable = $('scoreTable');
-const elRollBtn = $('rollBtn');
-const elStartBtn = $('startBtn');
-const elCreateBtn = $('createBtn');
-const elJoinBtn = $('joinBtn');
-const elPlayerName = $('playerName');
-const elRoomCode = $('roomCode');
 const elQuestionBox = $('questionBox');
 const elThemeTitle = $('themeTitle');
 const elQuestionText = $('questionText');
@@ -32,261 +34,198 @@ const elSendAnswerBtn = $('sendAnswerBtn');
 const elTimer = $('timer');
 const elResultBox = $('resultBox');
 const elResultText = $('resultText');
-const elDiceResult = $('diceResult') || document.createElement('span');
-const elChoice = $('choice'); // container for selection choices
+const elRoomDisplay = $('roomDisplay');
+const elDiceResult = $('diceResult') || null;
+const elChoice = $('choice') || (function(){ const d=document.createElement('div'); d.id='choice'; document.body.appendChild(d); return d; })();
 
-// start handlers
-elCreateBtn.onclick = () => socket.emit('create', elPlayerName.value || 'Hôte');
-elJoinBtn.onclick = () => {
+// ---------- UI event wiring ----------
+elCreateBtn && (elCreateBtn.onclick = () => {
+  socket.emit('create', elPlayerName.value || 'Hôte');
+});
+elJoinBtn && (elJoinBtn.onclick = () => {
   const code = (elRoomCode.value || '').trim().toUpperCase();
-  if (!code) return alert('Code requis');
+  if (!code) return alert('Code requis !');
   socket.emit('join', { code, name: elPlayerName.value || 'Joueur' });
-};
-elStartBtn.onclick = () => { if (room) socket.emit('start', room); };
-elRollBtn.onclick = () => { if (room) { socket.emit('roll', room); elRollBtn.disabled = true; } };
-elSendAnswerBtn.onclick = () => {
-  const v = elAnswerInput.value.trim();
+});
+elStartBtn && (elStartBtn.onclick = () => {
+  if (!room) return alert('Pas de salle');
+  socket.emit('start', room);
+});
+elRollBtn && (elRollBtn.onclick = () => {
+  if (!room) return;
+  socket.emit('roll', room);
+  // désactiver immédiatement côté client jusqu'au prochain tour
+  elRollBtn.disabled = true;
+});
+elSendAnswerBtn && (elSendAnswerBtn.onclick = () => {
+  const v = (elAnswerInput.value || '').trim();
   if (!v) return;
   socket.emit('answer', { code: room, answer: v });
   elAnswerInput.value = '';
+  // on masque la question après envoi (le serveur renverra résultats)
   elQuestionBox.style.display = 'none';
-};
+  stopClientTimer();
+});
 
-// request board when game shown
-function requestBoard() { socket.emit('requestBoard'); }
+// ---------- socket handlers ----------
+socket.on('created', code => {
+  room = code;
+  showGame(code);
+});
+socket.on('joined', code => {
+  room = code;
+  showGame(code);
+});
+socket.on('error', msg => alert(msg));
+socket.on('gameStart', () => {
+  // visible si besoin ; le serveur enverra 'yourTurn'
+  console.log('Partie démarrée');
+});
 
-// Show game UI
-function showGame(rc) {
-  room = rc;
-  elMenu.style.display = 'none';
-  elGame.style.display = 'block';
-  if (elRoomDisplay) elRoomDisplay.textContent = room;
-  // request board explicitly
-  requestBoard();
-}
-
-// Board data
-socket.on('boardData', (b) => {
+// receive board data
+socket.on('boardData', b => {
   board = b;
-  // ensure image src matches board, but typically you have assets/plateau.png in HTML
-  // If you used a different path, adjust accordingly.
-  // place pions after image loaded
-  if (elPlateau.complete) updatePawns(lastPlayers);
+  // si l'image plateau est déjà chargée, on met à jour
+  updatePawns(lastPlayers);
 });
 
-// Created / joined
-socket.on('created', (code) => { room = code; showGame(code); });
-socket.on('joined', (code) => { room = code; showGame(code); });
-socket.on('error', (msg) => alert(msg));
-
-// Players update
-socket.on('players', (players) => {
+// players list update
+socket.on('players', players => {
   lastPlayers = players || [];
-  renderScoreTable(players);
-  updatePawns(players);
+  renderScoreTable(lastPlayers);
+  updatePawns(lastPlayers);
 });
 
-// your turn
-socket.on('yourTurn', (data) => {
-  currentTurnPlayerId = data.playerId;
-  // set active players to only current by default
+// when it's your turn (server tells the single socket)
+socket.on('yourTurn', data => {
+  // data: { playerId }
+  currentTurnPlayerId = data && data.playerId ? data.playerId : null;
   activePlayers = [currentTurnPlayerId];
   renderActiveState();
-  // enable roll button only for current player
-  if (socket.id === currentTurnPlayerId) elRollBtn.disabled = false;
+  // enable roll only for the player who must play (socket.id)
+  if (socket.id === currentTurnPlayerId) {
+    elRollBtn.disabled = false;
+  } else {
+    elRollBtn.disabled = true;
+  }
 });
 
-// rolled (both to player and broadcast) -> show dice result and possible cases for current player only
-socket.on('rolled', (data) => {
+// rolled: show dice result and possible cases (only visible for roller)
+socket.on('rolled', data => {
+  // data: { roll, currentPos }
   if (!data) return;
   if (elDiceResult) elDiceResult.textContent = data.roll;
-  // show possible cases to the player who rolled (client receives this event for everyone but only show for the roller)
-  // The server sends 'rolled' as both to roller socket and broadcast; the 'currentPos' identifies the roller
-  // show possible only for the roller (we assume server emits rolled to roller and to everyone)
-  // We need to know whether this client is the roller: server previously emitted rolled to roller by socket.emit and to room
-  // The simplest: the client that is allowed to roll will be the current player; we show possible cases only if socket.id === currentTurnPlayerId
+  // Show possible cases only to the player who rolled (the server will emit rolled to everyone; we show only if we are the active roller)
   if (socket.id === currentTurnPlayerId) {
     showPossibleCases(data.currentPos, data.roll);
   }
 });
 
-// action drawn
-socket.on('actionDrawn', (data) => {
-  // highlight action in grid
+// action drawn highlight
+socket.on('actionDrawn', data => {
   highlightAction(data.action);
 });
 
-// requestSelection (server asks initiator to choose a player or an action)
-socket.on('requestSelection', (payload) => {
-  waitingForSelection = payload;
+// requestSelection (server asks initiator to pick player or action)
+socket.on('requestSelection', payload => {
+  // payload: { type: 'player'|'action', message, initiatorId }
   showSelection(payload);
 });
 
-// question: shown only for targeted clients (server sends to those)
-socket.on('question', (payload) => {
+// question event (server sends only to relevant clients)
+socket.on('question', payload => {
   // payload: { theme, question, timer }
-  // display only if we are an active player for that question (server sends only to actives)
+  if (!payload) return;
+  // show question UI
   elThemeTitle.textContent = payload.theme || 'Maths';
   elQuestionText.textContent = payload.question || '';
   elQuestionBox.style.display = 'block';
-  startTimer(payload.timer || 60);
+  startClientTimer(payload.timer || 60);
 });
 
-// timeOut
-socket.on('timeOut', (d) => {
-  stopTimer();
+// timeOut from server
+socket.on('timeOut', d => {
+  stopClientTimer();
   showResult({ correct: false, message: d && d.message ? d.message : 'Temps écoulé' });
 });
 
-// results
-socket.on('results', (data) => {
-  stopTimer();
-  // data: { players, correct: boolean, winnerId? }
-  // update score table
+// results event
+socket.on('results', data => {
+  stopClientTimer();
+  // data: { players, correct, winnerId? }
   if (data && data.players) {
-    renderScoreTable(data.players);
+    lastPlayers = data.players;
+    renderScoreTable(lastPlayers);
+    updatePawns(lastPlayers);
   }
-  // show result text: for actions like everybody we can show who won
-  if (data && typeof data.correct !== 'undefined') {
-    showResult({ correct: data.correct, winnerId: data.winnerId });
-  } else {
-    showResult({ correct: false });
-  }
+  const correct = data && typeof data.correct !== 'undefined' ? data.correct : null;
+  showResult({ correct, message: null, winnerId: data && data.winnerId });
 });
 
-// actionClear
+// actionClear: cleanup UI
 socket.on('actionClear', () => {
-  // cleanup UI of question/choice
   elQuestionBox.style.display = 'none';
   elPossible.innerHTML = '';
-  elResultBox.style.display = 'none';
   elChoice.innerHTML = '';
-  waitingForSelection = null;
-  activePlayers = [];
-  renderActiveState();
+  stopClientTimer();
 });
 
-// requestBoard isn't used by server in this code, but keep handler
-socket.on('boardData', (b) => {
-  board = b;
-  updatePawns(lastPlayers);
+// board request (server might not implement but keep)
+socket.on('requestBoard', () => {
+  socket.emit('requestBoard');
 });
 
-// Helper: show selection choices
-function showSelection(payload) {
-  // payload: { type:'player'|'action', message }
-  elChoice.innerHTML = `<div class="choiceTitle">${payload.message}</div>`;
-  if (payload.type === 'player') {
-    // list players
-    lastPlayers.forEach(p => {
-      const btn = document.createElement('button');
-      btn.textContent = p.name;
-      btn.onclick = () => {
-        socket.emit('selectPlayer', { code: room, targetId: p.id });
-        elChoice.innerHTML = '';
-        waitingForSelection = null;
-      };
-      elChoice.appendChild(btn);
-    });
-  } else if (payload.type === 'action') {
-    // show a small subset of actions client-side for choice
-    const actions = ['second_life', 'double', 'quadruple', 'no_way', 'flash'];
-    actions.forEach(a => {
-      const btn = document.createElement('button');
-      btn.textContent = a;
-      btn.onclick = () => {
-        socket.emit('chooseAction', { code: room, chosenAction: a });
-        elChoice.innerHTML = '';
-        waitingForSelection = null;
-      };
-      elChoice.appendChild(btn);
-    });
-  }
+// ---------- UI helpers ----------
+
+function showGame(code) {
+  if (elMenu) elMenu.style.display = 'none';
+  if (elGame) elGame.style.display = 'block';
+  if (elRoomDisplay) elRoomDisplay.textContent = code;
+  // ask for players list and board if not already received
+  socket.emit('requestPlayers', code);
+  socket.emit('requestBoard');
+  // ensure roll disabled until server grants yourTurn
+  elRollBtn.disabled = true;
 }
 
-// Render and UI helpers
 function renderScoreTable(players) {
+  if (!elScoreTable) return;
   elScoreTable.innerHTML = '<b>Scores</b><br/>';
   players.forEach((p, i) => {
     const line = document.createElement('div');
     line.className = 'scoreLine';
-    if (p.id === currentTurnPlayerId) line.style.fontWeight = 'bold';
-    line.innerHTML = `${i + 1}. ${p.name} — ${p.score || 0} pts`;
-    // allow clicking to select player when waitingForSelection is type player and this client is the initiator
+    line.textContent = `${i+1}. ${p.name} — ${p.score || 0} pts`;
+    // make clickable when there is a pending selection and this client is the initiator
     line.onclick = () => {
-      if (waitingForSelection && waitingForSelection.type === 'player' && socket.id === waitingForSelection.initiator) {
-        socket.emit('selectPlayer', { code: room, targetId: p.id });
+      // If our client initiated selection and server asked for select, emit accordingly (server expects selectPlayer)
+      // We don't keep waitingFor state client-side tied to server — server will emit requestSelection and that payload includes initiator
+      // So allow clicking only if the server asked selection and this client is initiator (we check presence of elChoice content)
+      const initiatorFlag = elChoice && elChoice.dataset && elChoice.dataset.initiator === socket.id;
+      if (elChoice && elChoice.dataset && elChoice.dataset.type === 'player' && elChoice.dataset.initiator === socket.id) {
+        socket.emit('selectPlayer', { code: room, targetId: (players[i] && players[i].id) ? players[i].id : null });
         elChoice.innerHTML = '';
-        waitingForSelection = null;
       }
     };
+    // mark current turn player
+    if (p.id === currentTurnPlayerId) line.style.fontWeight = 'bold';
     elScoreTable.appendChild(line);
   });
-  lastPlayers = players;
 }
 
-// Highlight action card
-function highlightAction(name) {
-  document.querySelectorAll('#actionGrid .actionCard').forEach(c => {
-    c.style.transform = 'scale(1)';
-    if (c.textContent.trim() === name) c.style.transform = 'scale(1.1)';
-  });
-}
+// ---------- pawn rendering ----------
 
-// Show dice-accessible positions
-function showPossibleCases(currentPos, steps) {
-  if (!board || !board.positions) return;
-  elPossible.innerHTML = '';
-  // If steps is zero or invalid, nothing to show
-  steps = parseInt(steps || 0, 10);
-  if (steps <= 0) return;
-
-  // BFS-like reachable along board linear forward (wrap disabled here). Adjust per your board rules.
-  const reachable = new Set();
-  const q = [{ pos: currentPos, rem: steps }];
-  const maxIndex = board.positions.length - 1;
-
-  while (q.length) {
-    const { pos, rem } = q.shift();
-    if (rem === 0) { reachable.add(pos); continue; }
-    if (pos < maxIndex) q.push({ pos: pos + 1, rem: rem - 1 });
-  }
-
-  // map positions to pixel coords
-  if (!elPlateau.complete || elPlateau.naturalWidth === 0) {
-    // try again shortly
-    setTimeout(() => showPossibleCases(currentPos, steps), 50);
-    return;
-  }
-  const w = elPlateau.clientWidth, h = elPlateau.clientHeight;
-
-  reachable.forEach(pos => {
-    const p = board.positions[pos];
-    if (!p) return;
-    const x = (p.x / 100) * w;
-    const y = (p.y / 100) * h;
-    const spot = document.createElement('div');
-    spot.className = 'spot';
-    spot.style.left = x + 'px';
-    spot.style.top = y + 'px';
-    spot.onclick = () => {
-      socket.emit('moveTo', { code: room, pos });
-      elPossible.innerHTML = '';
-    };
-    elPossible.appendChild(spot);
-  });
-}
-
-// Pawn rendering — robust to image load & resize
 function updatePawns(players) {
   if (!board || !board.positions) return;
-  elPions.innerHTML = '';
-  const img = elPlateau;
-  if (!img.complete || img.naturalWidth === 0) {
+  // ensure plateau image loaded
+  if (!elPlateau.complete || elPlateau.naturalWidth === 0) {
+    // try again shortly
     setTimeout(() => updatePawns(players), 50);
     return;
   }
-  const w = img.clientWidth, h = img.clientHeight;
+
+  elPions.innerHTML = '';
+  const w = elPlateau.clientWidth;
+  const h = elPlateau.clientHeight;
   (players || []).forEach((p, idx) => {
     const posIndex = Math.max(0, Math.min(board.positions.length - 1, p.pos || 0));
     const pos = board.positions[posIndex] || { x: 50, y: 50 };
@@ -295,48 +234,148 @@ function updatePawns(players) {
 
     const pawn = document.createElement('div');
     pawn.className = 'pawn';
-    pawn.style.left = x + 'px';
-    pawn.style.top = y + 'px';
+    // pixel-accurate centering
+    pawn.style.left = `${x}px`;
+    pawn.style.top = `${y}px`;
+    pawn.style.transform = 'translate(-50%, -50%)';
     pawn.textContent = (idx + 1);
-    pawn.style.background = ['#d32f2f', '#388e3c', '#fbc02d', '#1976d2', '#f57c00', '#7b1fa2'][idx % 6];
+    // color
+    pawn.style.background = ['#e53935','#43a047','#fb8c00','#1e88e5','#8e24aa','#fdd835'][idx % 6];
     elPions.appendChild(pawn);
   });
 }
 
-// Timer UI
-let clientTimer = null;
-function startTimer(sec) {
+// ---------- show possible target cases (after roll) ----------
+function showPossibleCases(currentPos, steps) {
+  if (!board || !board.positions) return;
+  elPossible.innerHTML = '';
+  steps = parseInt(steps || 0, 10);
+  if (steps <= 0) return;
+
+  const reachable = new Set();
+  const q = [{ pos: currentPos, rem: steps }];
+  const maxIndex = board.positions.length - 1;
+  while (q.length) {
+    const { pos, rem } = q.shift();
+    if (rem === 0) { reachable.add(pos); continue; }
+    if (pos < maxIndex) q.push({ pos: pos + 1, rem: rem - 1 });
+  }
+
+  if (!elPlateau.complete || elPlateau.naturalWidth === 0) {
+    setTimeout(() => showPossibleCases(currentPos, steps), 50);
+    return;
+  }
+  const w = elPlateau.clientWidth, h = elPlateau.clientHeight;
+  reachable.forEach(pos => {
+    const p = board.positions[pos];
+    if (!p) return;
+    const x = (p.x / 100) * w;
+    const y = (p.y / 100) * h;
+    const spot = document.createElement('div');
+    spot.className = 'spot';
+    spot.style.left = `${x}px`;
+    spot.style.top = `${y}px`;
+    spot.onclick = () => {
+      socket.emit('moveTo', { code: room, pos });
+      elPossible.innerHTML = '';
+    };
+    elPossible.appendChild(spot);
+  });
+}
+
+// ---------- highlight action ----------
+function highlightAction(name) {
+  document.querySelectorAll('#actionGrid .actionCard').forEach(c => {
+    c.style.transform = (c.textContent.trim() === name) ? 'scale(1.08)' : 'scale(1)';
+  });
+}
+
+// ---------- selection UI (when server asks) ----------
+function showSelection(payload) {
+  // payload: { type, message, initiatorId }
+  elChoice.innerHTML = `<div class="choiceTitle">${payload.message || 'Choisissez'}</div>`;
+  if (payload.type === 'player') {
+    // list players for selection
+    lastPlayers.forEach(p => {
+      const btn = document.createElement('button');
+      btn.textContent = p.name;
+      btn.onclick = () => {
+        socket.emit('selectPlayer', { code: room, targetId: p.id });
+        elChoice.innerHTML = '';
+      };
+      elChoice.appendChild(btn);
+    });
+    // mark initiator so score table clicks can also work if needed
+    elChoice.dataset.type = 'player';
+    elChoice.dataset.initiator = payload.initiatorId || '';
+  } else if (payload.type === 'action') {
+    const actions = ['second_life','double','quadruple','no_way','flash'];
+    actions.forEach(a => {
+      const btn = document.createElement('button');
+      btn.textContent = a;
+      btn.onclick = () => {
+        socket.emit('chooseAction', { code: room, chosenAction: a });
+        elChoice.innerHTML = '';
+      };
+      elChoice.appendChild(btn);
+    });
+    elChoice.dataset.type = 'action';
+    elChoice.dataset.initiator = payload.initiatorId || '';
+  }
+}
+
+// ---------- client timer UI ----------
+function startClientTimer(seconds) {
   if (clientTimer) clearInterval(clientTimer);
+  let t = seconds;
   elTimer.style.display = 'inline-block';
-  let t = sec;
   elTimer.textContent = t + 's';
   clientTimer = setInterval(() => {
     t--;
     elTimer.textContent = t + 's';
-    if (t <= 0) { clearInterval(clientTimer); elTimer.style.display = 'none'; }
+    if (t <= 0) {
+      clearInterval(clientTimer);
+      elTimer.style.display = 'none';
+    }
   }, 1000);
 }
-function stopTimer() {
+function stopClientTimer() {
   if (clientTimer) clearInterval(clientTimer);
   elTimer.style.display = 'none';
 }
 
-// Result display
-function showResult({ correct, message, winnerId }) {
+// ---------- show result box ----------
+function showResult({ correct = null, message = null, winnerId = null }) {
   elResultBox.style.display = 'block';
-  if (typeof correct !== 'undefined') {
-    elResultText.textContent = correct ? (message || 'Bonne réponse') : (message || 'Mauvaise réponse');
-    elResultText.style.color = correct ? '#2e7d32' : '#c62828';
+  if (correct === true) {
+    elResultText.textContent = message || 'Bonne réponse';
+    elResultText.style.color = '#2e7d32';
+  } else if (correct === false) {
+    elResultText.textContent = message || 'Mauvaise réponse';
+    elResultText.style.color = '#c62828';
   } else {
     elResultText.textContent = message || '';
+    elResultText.style.color = '#1976d2';
   }
+  // show 2.5s
   setTimeout(() => {
     elResultBox.style.display = 'none';
   }, 2500);
 }
 
-// Build action grid (smaller cards)
+// ---------- render active state (UI feedback for who can act) ----------
+function renderActiveState() {
+  // mark score table entries or action grid
+  document.querySelectorAll('#scoreTable .scoreLine').forEach(el => {
+    if (!el) return;
+  });
+  // ensure roll button state consistent
+  elRollBtn.disabled = socket.id !== currentTurnPlayerId;
+}
+
+// ---------- build a minimal action grid if not present ----------
 function buildActionGrid() {
+  if (!elActionGrid) return;
   const actions = [
     "Flash","Battle on left","Battle on right","Call a friend","For you",
     "Second life","No way","Double","Téléportation","+1 ou -1",
@@ -344,17 +383,14 @@ function buildActionGrid() {
   ];
   elActionGrid.innerHTML = '';
   actions.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'actionCard';
-    card.textContent = a;
-    elActionGrid.appendChild(card);
+    const c = document.createElement('div');
+    c.className = 'actionCard';
+    c.textContent = a;
+    elActionGrid.appendChild(c);
   });
 }
 buildActionGrid();
 
-// make sure plateau image is responsive: on load update pawns
+// ensure plateau pions reposition when image loads or on resize
 elPlateau.addEventListener('load', () => updatePawns(lastPlayers));
 window.addEventListener('resize', () => updatePawns(lastPlayers));
-
-// initial UI setup: hide game
-if (elGame) elGame.style.display = 'none';
