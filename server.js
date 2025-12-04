@@ -12,7 +12,7 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.use(express.static(path.join(__dirname, 'public')));
 
 // CONFIG
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const MAX_PLAYERS = 6;
 
 // Load questions (public/data.json expected)
@@ -616,3 +616,4 @@ io.on('connection', socket => {
 });
 
 server.listen(PORT, () => console.log('Serveur lancé sur le port', PORT));
+
