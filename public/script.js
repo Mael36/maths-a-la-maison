@@ -267,9 +267,21 @@ socket.on('rolled', data => {
   if (elDiceResult) elDiceResult.textContent = data.roll;
   if (socket.id === currentPlayerId) showPossibleCases(data.currentPos, data.roll);
 });
-socket.on('actionDrawn', data => {
-  highlightAction(data.action);
+socket.on("actionDrawn", data => {
+  // Réinitialise toutes les cartes
+  document.querySelectorAll('.actionCard').forEach(c=>{
+    c.classList.remove("activeAction");
+  });
+
+  // Met en valeur celle tirée
+  const selected = [...document.querySelectorAll('.actionCard')]
+    .find(c => c.dataset.action === data.action);
+
+  if (selected) {
+    selected.classList.add("activeAction");
+  }
 });
+
 socket.on('requestSelection', payload => {
   // show selection to current player only
   if (!payload) return;
@@ -325,3 +337,4 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
