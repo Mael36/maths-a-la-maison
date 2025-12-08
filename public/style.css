@@ -136,6 +136,14 @@ body {
   text-align:center;
 }
 
+.actionCard.activeAction {
+  transform: scale(1.2);
+  background:#ffecb3 !important;  /* jaune clair */
+  border:2px solid #ff9800 !important; /* orange */
+  box-shadow:0 0 10px #ff9800;
+}
+
+
 /* QUESTION BOX */
 #questionBox, #resultBox {
   display:none;
@@ -169,3 +177,4 @@ body {
   width:fit-content;
   margin:8px auto 0;
 }
+
