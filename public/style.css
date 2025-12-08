@@ -137,12 +137,13 @@ body {
 }
 
 .actionCard.activeAction {
-  transform: scale(1.2);
-  background:#ffecb3 !important;  /* jaune clair */
-  border:2px solid #ff9800 !important; /* orange */
-  box-shadow:0 0 10px #ff9800;
+    transform: scale(1.25) !important;
+    border: 3px solid #ffd54f;
+    box-shadow: 0 0 20px #ffeb3b;
+    z-index: 10;
+    background: #fff8e1;
+    transition: 0.25s ease;
 }
-
 
 /* QUESTION BOX */
 #questionBox, #resultBox {
@@ -177,4 +178,5 @@ body {
   width:fit-content;
   margin:8px auto 0;
 }
+
 
