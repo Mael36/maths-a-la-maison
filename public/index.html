@@ -1,67 +1,63 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Jeu</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maths à la Maison</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Socket.io client (served by the server) -->
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-
-<div id="menu">
-  <h2>Créer / Rejoindre une partie</h2>
-
-  <input id="playerName" placeholder="Pseudo"><br><br>
-
-  <button id="createBtn">Créer une partie</button>
-  <br><br>
-
-  <input id="roomCode" placeholder="Code">
-  <button id="joinBtn">Rejoindre</button>
-</div>
-
-<div id="game">
-  <div id="topBar">
-    <h3>Code : <span id="roomDisplay"></span></h3>
-    <div id="scoreTable"></div>
+  <div id="menu">
+    <h1>Maths à la Maison</h1>
+    <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
+    <button id="createBtn">Créer une partie</button>
+    <p>OU</p>
+    <input type="text" id="roomCode" placeholder="Code (ex: ABCD)" maxlength="4">
+    <button id="joinBtn">Rejoindre</button>
   </div>
 
-  <button id="startBtn">Démarrer la partie</button>
+  <div id="game" style="display:none;">
+    <div id="topBar">
+      <div>
+        <h2>Salle : <span id="roomDisplay">-</span></h2>
+        <button id="startBtn">Démarrer la partie</button>
+      </div>
+      <div id="scoreTable"></div>
+    </div>
 
-  <div id="diceZone">
-    Résultat du dé : <span id="diceResult">-</span>
-    <br>
-    <button id="rollBtn" disabled>Lancer le dé</button>
+    <div id="diceZone">
+      Résultat du dé : <span id="diceResult">-</span>
+      <button id="rollBtn" disabled>Lancer le dé</button>
+    </div>
+
+    <div id="plateauContainer">
+      <!-- Assure-toi d'avoir public/assets/plateau.png -->
+      <img src="assets/plateau.png" id="plateau" alt="Plateau">
+      <div id="pions"></div>
+      <div id="possibleCases"></div>
+    </div>
+
+    <h3>Actions</h3>
+    <div id="actionGrid"></div>
+
+    <div id="questionBox" style="display:none;">
+      <h3 id="themeTitle"></h3>
+      <p id="questionText"></p>
+      <div id="timer" style="display:none;"></div>
+      <input type="text" id="answerInput" placeholder="Ta réponse">
+      <button id="sendAnswerBtn">Envoyer</button>
+    </div>
+
+    <div id="resultBox" style="display:none;">
+      <h2 id="resultText"></h2>
+    </div>
+
+    <!-- zone de sélection temporaire (choisir joueur / action) -->
+    <div id="choice" style="display:none; position:fixed; bottom:20px; left:20px; background:#fff; padding:10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2);"></div>
   </div>
 
-  <div id="plateauContainer">
-    <img id="plateau" src="assets/plateau.png">
-    <div id="pions"></div>
-    <div id="possibleCases"></div>
-  </div>
-
-  <h3>Actions</h3>
-  <div id="actionGrid"></div>
-
-</div>
-
-<!-- Question -->
-<div id="questionBox">
-  <h3 id="themeTitle"></h3>
-  <div id="questionText"></div>
-  <div id="timer"></div>
-
-  <input id="answerInput" placeholder="Réponse">
-  <button id="sendAnswerBtn">Valider</button>
-</div>
-
-<!-- Résultat -->
-<div id="resultBox">
-  <h3 id="resultText"></h3>
-</div>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-
