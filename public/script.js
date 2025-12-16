@@ -273,9 +273,11 @@ socket.on('rolled', data => {
 });
 socket.on("actionDrawn", data => {
   if (!data || !data.action) return;
-  highlightAction(data.action);
-});
 
+  // Réinitialise toutes les cartes
+  document.querySelectorAll('.actionCard').forEach(c => {
+    c.classList.remove("activeAction");
+  });
 
   // Met en valeur celle tirée
   const selected = [...document.querySelectorAll('.actionCard')]
@@ -285,6 +287,7 @@ socket.on("actionDrawn", data => {
     selected.classList.add("activeAction");
   }
 });
+
 
 socket.on('requestSelection', payload => {
   // show selection to current player only
@@ -341,5 +344,6 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
