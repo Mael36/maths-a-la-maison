@@ -346,94 +346,110 @@ io.on('connection', socket => {
 
   // Helpers
   function proceedToQuestion(room, initiator, action, meta = {}) {
-    room.actionMeta = meta;
-    room.currentAction = action;
-    // Teleport handling: move initiator to random pos (then question)
-    if (action && action.name === 'Téléportation') {
-      const randPos = Math.floor(Math.random() * room.board.positions.length);
-      initiator.pos = randPos;
-      io.to(room.code).emit('teleport', { pos: randPos });
-      io.to(room.code).emit('players', room.players);
+  room.actionMeta = meta;
+  room.currentAction = action;
+
+  // --- TELEPORTATION : effet immédiat ---
+  if (action && action.name === 'Téléportation') {
+    const randPos = Math.floor(Math.random() * room.board.positions.length);
+    initiator.pos = randPos;
+
+    io.to(room.code).emit('players', room.players);
+    io.to(room.code).emit('teleport', {
+      playerId: initiator.id,
+      pos: randPos
+    });
+    // on continue volontairement vers la question
+  }
+
+  // --- pick question ---
+  const q = pickQuestion();
+  if (!q) {
+    io.to(room.code).emit('error', 'Aucune question disponible');
+    endTurn(room);
+    return;
+  }
+
+  room.currentQuestion = q.question;
+  room.currentCorrection = (q.correction || '')
+    .toString()
+    .trim()
+    .toLowerCase();
+
+  // --- recipients & timer ---
+  let recipients = [];
+  let timerSec = action?.timer || 60;
+
+  switch (action?.name) {
+    case 'Flash':
+      recipients = [initiator.id];
+      timerSec = 30;
+      break;
+
+    case 'Battle on left': {
+      const leftIdx = (room.currentIndex - 1 + room.players.length) % room.players.length;
+      recipients = [initiator.id, room.players[leftIdx].id];
+      break;
     }
 
-    // pick question
-    const q = pickQuestion();
-    if (!q) {
-      io.to(room.code).emit('error', 'Aucune question disponible');
-      endTurn(room);
+    case 'Battle on right': {
+      const rightIdx = (room.currentIndex + 1) % room.players.length;
+      recipients = [initiator.id, room.players[rightIdx].id];
+      break;
+    }
+
+    case 'Call a friend': {
+      const selected = meta.selectedPlayer;
+      recipients = [initiator.id, selected];
+      break;
+    }
+
+    case 'For you':
+      recipients = [meta.selectedPlayer || initiator.id];
+      break;
+
+    case 'Everybody':
+      recipients = room.players.map(p => p.id);
+      break;
+
+    default:
+      recipients = [initiator.id];
+  }
+
+  room.activePlayers = recipients.slice();
+  room.pendingAnswers = new Map();
+
+  recipients.forEach(id => {
+    io.to(id).emit('question', {
+      theme: 'Général',
+      question: room.currentQuestion,
+      timer: timerSec,
+      recipients
+    });
+  });
+
+  // --- timer serveur ---
+  clearRoomTimer(room);
+  room.timer = setTimeout(() => {
+    if (action?.name === 'Second life' && !room.secondLifeRetry) {
+      room.secondLifeRetry = true;
+      room.pendingAnswers.clear();
+
+      io.to(initiator.id).emit('question', {
+        theme: 'Général',
+        question: room.currentQuestion,
+        timer: timerSec
+      });
+
+      clearRoomTimer(room);
+      room.timer = setTimeout(() => finalizeFalse(room), timerSec * 1000);
       return;
     }
-    room.currentQuestion = q.question;
-    room.currentCorrection = (q.correction || '').toString().trim().toLowerCase();
 
-    // define recipients & timer
-    let recipients = [];
-    let timerSec = (action && action.timer) ? action.timer : 60;
+    finalizeFalse(room);
+  }, timerSec * 1000);
+}
 
-    switch (action && action.name) {
-      case 'Flash':
-        recipients = [initiator.id];
-        timerSec = 30;
-        break;
-      case 'Battle on left': {
-        const leftIdx = (room.currentIndex - 1 + room.players.length) % room.players.length;
-        recipients = [initiator.id, room.players[leftIdx].id];
-        break;
-      }
-      case 'Battle on right': {
-        const rightIdx = (room.currentIndex + 1) % room.players.length;
-        recipients = [initiator.id, room.players[rightIdx].id];
-        break;
-      }
-      case 'Call a friend': {
-        const selected = meta.selectedPlayer || room.players.find(p => p.id !== initiator.id).id;
-        recipients = [initiator.id, selected];
-        break;
-      }
-      case 'For you': {
-        const chosen = meta.selectedPlayer || initiator.id;
-        recipients = [chosen];
-        break;
-      }
-      case 'Second life':
-      case 'Double':
-      case '+1 ou -1':
-      case 'No way':
-      case 'Double or quits':
-      case 'Quadruple':
-      case 'Téléportation':
-        recipients = [initiator.id];
-        break;
-      case 'Everybody':
-        recipients = room.players.map(p => p.id);
-        break;
-      default:
-        recipients = [initiator.id];
-    }
-
-    room.activePlayers = recipients.slice();
-    room.pendingAnswers = new Map();
-
-    // send question to recipients (include recipients list)
-    recipients.forEach(id => {
-      io.to(id).emit('question', { theme: 'Général', question: room.currentQuestion, timer: timerSec, recipients });
-    });
-
-    // server-side timer
-    clearRoomTimer(room);
-    room.timer = setTimeout(() => {
-      // special second life handling
-      if (action && action.name === 'Second life' && !room.secondLifeRetry) {
-        room.secondLifeRetry = true;
-        room.pendingAnswers = new Map();
-        io.to(initiator.id).emit('question', { theme: 'Général', question: room.currentQuestion, timer: timerSec });
-        clearRoomTimer(room);
-        room.timer = setTimeout(() => finalizeFalse(room), timerSec * 1000);
-        return;
-      }
-      finalizeFalse(room);
-    }, timerSec * 1000);
-  }
 
   function resolveSinglePlayerAction(room, player, correct, actionName) {
     const code = room.code;
@@ -562,3 +578,4 @@ io.on('connection', socket => {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
