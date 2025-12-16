@@ -245,10 +245,14 @@ function renderScoreTable(list) {
 
 // highlight action drawn
 function highlightAction(name) {
-  Array.from(document.querySelectorAll('.actionCard')).forEach(c => {
-    c.style.transform = (c.textContent.trim() === name) ? 'scale(1.05)' : 'scale(1)';
+  document.querySelectorAll('.actionCard').forEach(c => {
+    c.classList.toggle(
+      'activeAction',
+      c.dataset.action === name
+    );
   });
 }
+
 
 // socket events
 socket.on('created', code => { room = code; showGame(); });
@@ -268,10 +272,10 @@ socket.on('rolled', data => {
   if (socket.id === currentPlayerId) showPossibleCases(data.currentPos, data.roll);
 });
 socket.on("actionDrawn", data => {
-  // Réinitialise toutes les cartes
-  document.querySelectorAll('.actionCard').forEach(c=>{
-    c.classList.remove("activeAction");
-  });
+  if (!data || !data.action) return;
+  highlightAction(data.action);
+});
+
 
   // Met en valeur celle tirée
   const selected = [...document.querySelectorAll('.actionCard')]
@@ -337,4 +341,5 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
