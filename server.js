@@ -4,7 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { Server } = require('socket.io');
-
+const MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x"  
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -20,16 +20,23 @@ try {
   console.error('Error loading board.json:', e.message);
   process.exit(1);
 }
-
-// load questions (optional)
-let QUESTIONS_RAW = null;
+let QUESTIONS = [];
 try {
-  QUESTIONS_RAW = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'data.json')));
-  console.log('Questions loaded');
+  QUESTIONS = JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'public', 'data.json'), 'utf-8')
+  );
+
+  if (!Array.isArray(QUESTIONS)) {
+    console.warn('data.json n’est pas une liste → questions désactivées');
+    QUESTIONS = [];
+  } else {
+    console.log(`Questions chargées : ${QUESTIONS.length}`);
+  }
 } catch (e) {
-  console.warn('No data.json or invalid JSON; questions disabled');
-  QUESTIONS_RAW = { categories: {} };
+  console.warn('Aucun data.json valide, questions désactivées');
+  QUESTIONS = [];
 }
+
 
 const ACTIONS = [
   { name: "Flash", timer: 30 },
@@ -57,14 +64,17 @@ function genCode() {
 }
 
 function pickQuestion() {
-  const categories = QUESTIONS_RAW.categories || {};
-  const pool = Object.values(categories).flat();
-  if (!pool || pool.length === 0) return null;
-  const raw = pool[Math.floor(Math.random() * pool.length)];
-  const questionText = raw.question || raw.expression || raw.consigne || '';
-  const correctionText = (raw.correction || raw.answer || raw.reponse || '').toString();
-  return { question: questionText, correction: correctionText };
+  if (!QUESTIONS.length) return null;
+
+  const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+
+  return {
+    question: q.q || '',
+    correction: (q.a || '').toString(),
+    detail: q.d || null // optionnel
+  };
 }
+
 
 function findRoomBySocket(id) {
   return Object.values(rooms).find(r => r.players.some(p => p.id === id));
@@ -203,7 +213,7 @@ io.on('connection', socket => {
     proceedToQuestion(room, initiator, room.currentAction);
   });
 
-  socket.on('answer', ({ code, answer }) => {
+  socket.on('answer', async ({ code, answer }) => {
     const room = rooms[code];
     if (!room) return;
     const player = room.players.find(p => p.id === socket.id);
@@ -212,7 +222,10 @@ io.on('connection', socket => {
     if (!room.currentQuestion) return;
 
     const given = (answer || '').toString().trim().toLowerCase();
-    const correct = given === (room.currentCorrection || '').toString().trim().toLowerCase();
+    const correct = await checkWithMistral(
+      answer,
+      room.currentCorrection
+    );
 
     room.pendingAnswers.set(socket.id, { correct, playerId: socket.id });
 
@@ -573,9 +586,54 @@ io.on('connection', socket => {
       io.to(room.code).emit('actionClear');
     }
   }
-
+  async function checkWithMistral(userAnswer, expectedAnswer) {
+    try {
+      const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${MISTRAL_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'mistral-small-latest',
+          messages: [{
+            role: 'user',
+            content: `
+  Compare deux réponses de mathématiques.
+  
+  Réponse attendue :
+  ${expectedAnswer}
+  
+  Réponse utilisateur :
+  ${userAnswer}
+  
+  Règles :
+  - Réponds UNIQUEMENT par "true" ou "false"
+  - true si les réponses sont équivalentes mathématiquement ou sémantiquement
+  - false si la réponse est fausse, incomplète ou hors sujet
+  - false si l'utilisateur répond par des phrases vagues comme :
+    "c'est la même réponse", "idem", "voir question", etc.
+  - false si l'utilisateur reformule la question au lieu de répondre
+  
+  Aucune explication. Un seul mot : true ou false.
+  `
+          }],
+          temperature: 0,
+          max_tokens: 5
+        })
+      });
+  
+      const data = await res.json();
+      const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase();
+      return answer === 'true';
+    } catch (e) {
+      console.error('Erreur Mistral:', e.message);
+      return false;
+    }
+  }
 }); // end connection
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
