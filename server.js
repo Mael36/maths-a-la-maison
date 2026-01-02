@@ -21,21 +21,26 @@ try {
   process.exit(1);
 }
 let QUESTIONS = [];
+
 try {
-  QUESTIONS = JSON.parse(
+  const raw = JSON.parse(
     fs.readFileSync(path.join(__dirname, 'public', 'data.json'), 'utf-8')
   );
 
-  if (!Array.isArray(QUESTIONS)) {
-    console.warn('data.json n’est pas une liste → questions désactivées');
-    QUESTIONS = [];
-  } else {
-    console.log(`Questions chargées : ${QUESTIONS.length}`);
+  if (Array.isArray(raw)) {
+    // Cas rare : déjà une liste
+    QUESTIONS = raw;
+  } else if (typeof raw === 'object' && raw !== null) {
+    // Cas normal : catégories → on aplatit
+    QUESTIONS = Object.values(raw).flat();
   }
+
+  console.log(`Questions chargées : ${QUESTIONS.length}`);
 } catch (e) {
-  console.warn('Aucun data.json valide, questions désactivées');
+  console.warn('data.json invalide → questions désactivées');
   QUESTIONS = [];
 }
+
 
 
 const ACTIONS = [
@@ -635,5 +640,6 @@ io.on('connection', socket => {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
