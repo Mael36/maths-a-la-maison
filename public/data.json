@@ -1,6 +1,6 @@
 
 {
-    "Calcul litteral": 
+    "Calcul litteral": [
 
         {"id":233,"q":"Réduire\n7x × 3 + 9 + 8x² − 5x + 6 − 7x²","a":"x² + 16x + 15"},
         {"id":234,"q":"Réduire\n8x + 10 + 6x² − 3x + 6 + 2x² × 4","a":"14x² + 5x + 16"},
@@ -675,4 +675,5 @@
 
     ]
 }
+
 
