@@ -198,6 +198,12 @@ body {
   font-size: 14px;
 }
 
+#questionBox img {
+  display: block;
+  margin: 10px auto 0 auto;
+  max-width: 100%;
+}
+
 
 
 
