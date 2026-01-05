@@ -27,7 +27,7 @@ const elDiceResult = $('diceResult');
 const elQuestionBox = $('questionBox');
 const elThemeTitle = $('themeTitle');
 const elQuestionText = $('questionText');
-const elQuestionImg= $('questionImage');
+const elQuestionImg= $('questionImg');
 const elAnswerInput = $('answerInput');
 const elSendAnswer = $('sendAnswerBtn');
 const elTimer = $('timer');
@@ -206,13 +206,15 @@ function showQuestion(payload) {
 
 
 
-// hide question
 function hideQuestion() {
   elQuestionBox.style.display = 'none';
-  elQuestionImage.style.display = 'none';
-  elQuestionImage.src = '';
+  if (elQuestionImg) {
+    elQuestionImg.style.display = 'none';
+    elQuestionImg.src = '';
+  }
   stopTimer();
 }
+
 
 
 // timer
@@ -359,6 +361,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
