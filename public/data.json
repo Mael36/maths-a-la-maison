@@ -457,8 +457,8 @@
         {"id":76,"q":"Quelle est la mesure de l’angle ∠NMO arrondie au degré ?","img":"./image/Question76.png","a":"42°","d":"Triangle MNO rectangle en N\nsin(∠OMN) = opposé/hypoténuse = NO/MO = 4/6 ≈ 0,6667\n∠OMN ≈ sin⁻¹(0,6667) ≈ 42°"},
         {"id":77,"q":"On se place dans un triangle rectangle. Parmi ces résultats, lesquels sont impossibles ? Justifier.\na/ cos(angle) ≈ 1,4\nb/ cos(105°)\nc/ cos(angle) ≈ −0,5\nd/ cos(angle) ≈ 0,99","a":"a, b et c","d":"Dans un triangle rectangle, les angles aigus sont < 90°.\nCosinus d’un angle aigu est compris entre 0 et 1.\na : >1 impossible\nb : angle >90° impossible dans triangle rectangle\nc : négatif impossible pour angle aigu"},
         {"id":78,"q":"Voici l’extrait du tableur dans GeoGebra. Que faut-il saisir comme formule en B2 et B3 ?","img":"./image/Question78.png","a":"B2 : =YL/LS\nB3 : =YS/SL"},
-        {"id":79,"q":"Déterminer l’arrondi au mm près de DB.\","img":"./image/Question79.png","a":"149 mm","d":"Triangle ABD rectangle en A\ncos(61°) = adjacent/hypoténuse = 72/DB\nDB = 72 / cos(61°) ≈ 148,5 mm → 149 mm"},
-        {"id":80,"q":"Déterminer l’arrondi au mm près de AB.\","img":"./image/Question80.png","a":"130 mm","d":"Triangle ABD rectangle en A\ntan(61°) = opposé/adjacent = AB/72\nAB = 72 × tan(61°) ≈ 129,8 mm → 130 mm"}
+        {"id":79,"q":"Déterminer l’arrondi au mm près de DB.","img":"./image/Question79.png","a":"149 mm","d":"Triangle ABD rectangle en A\ncos(61°) = adjacent/hypoténuse = 72/DB\nDB = 72 / cos(61°) ≈ 148,5 mm → 149 mm"},
+        {"id":80,"q":"Déterminer l’arrondi au mm près de AB.","img":"./image/Question80.png","a":"130 mm","d":"Triangle ABD rectangle en A\ntan(61°) = opposé/adjacent = AB/72\nAB = 72 × tan(61°) ≈ 129,8 mm → 130 mm"}
     
     ],
 
@@ -675,5 +675,6 @@
 
     ]
 }
+
 
 
