@@ -89,9 +89,11 @@ function pickQuestion() {
   return {
     question: q.q || '',
     correction: (q.a || '').toString(),
-    detail: q.d || null // optionnel
+    detail: q.d || null,      // optionnel
+    img: q.img || null        // <-- ajouter le chemin de l'image
   };
 }
+
 
 
 function findRoomBySocket(id) {
@@ -451,13 +453,22 @@ io.on('connection', socket => {
   room.pendingAnswers = new Map();
 
   recipients.forEach(id => {
-    io.to(id).emit('question', {
-      theme: 'Général',
-      question: room.currentQuestion,
-      timer: timerSec,
-      recipients
-    });
+  io.to(id).emit('question', {
+    theme: 'Général',
+    question: room.currentQuestion,
+    timer: timerSec,
+    recipients,
+    img: q.img || null,        // <-- ajouté pour que le client voie l'image
+    detail: q.detail || null   // <-- optionnel, pour texte explicatif
   });
+});
+
+console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
+  question: room.currentQuestion,
+  img: q.img,
+  recipients
+});
+
 
   // --- timer serveur ---
   clearRoomTimer(room);
@@ -653,6 +664,7 @@ io.on('connection', socket => {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
