@@ -44,15 +44,29 @@
 
     <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>
+    
       <p id="questionText"></p>
+    
+      <!-- image associée à la question -->
+      <img id="questionImage" style="display:none;" />
+    
       <div id="timer" style="display:none;"></div>
+    
       <input type="text" id="answerInput" placeholder="Ta réponse">
       <button id="sendAnswerBtn">Envoyer</button>
     </div>
 
+
     <div id="resultBox" style="display:none;">
       <h2 id="resultText"></h2>
+    
+      <!-- texte de correction -->
+      <pre id="correctionText" style="display:none;"></pre>
+    
+      <!-- image de correction -->
+      <img id="correctionImage" style="display:none;" />
     </div>
+
 
     <!-- zone de sélection temporaire (choisir joueur / action) -->
     <div id="choice" style="display:none; position:fixed; bottom:20px; left:20px; background:#fff; padding:10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2);"></div>
@@ -61,3 +75,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
