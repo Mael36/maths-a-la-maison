@@ -183,13 +183,14 @@ function showSelection(payload) {
   }
 }
 
-// question UI
 function showQuestion(payload) {
   if (!payload) return;
   if (payload.recipients && Array.isArray(payload.recipients) && !payload.recipients.includes(socket.id)) return;
 
-  elThemeTitle.textContent = payload.theme || 'Maths';
-  elQuestionText.textContent = payload.question || '';
+  const elQuestionImg = $('questionImg'); // récupéré ici
+
+  $('themeTitle').textContent = payload.theme || 'Maths';
+  $('questionText').textContent = payload.question || '';
 
   if (payload.img) {
     elQuestionImg.src = payload.img;
@@ -199,7 +200,7 @@ function showQuestion(payload) {
     elQuestionImg.style.display = 'none';
   }
 
-  elQuestionBox.style.display = 'block';
+  $('questionBox').style.display = 'block';
   startTimer(payload.timer || 60);
 }
 
@@ -358,6 +359,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
