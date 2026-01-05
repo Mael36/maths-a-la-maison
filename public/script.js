@@ -184,18 +184,39 @@ function showSelection(payload) {
 }
 
 function showQuestion(payload) {
-  if (!payload) return;
-  if (payload.recipients && Array.isArray(payload.recipients) && !payload.recipients.includes(socket.id)) return;
+  console.log('[showQuestion] payload reçu :', payload);
 
-  const elQuestionImg = $('questionImg'); // récupéré ici
+  if (!payload) {
+    console.log('[showQuestion] payload vide, rien à faire');
+    return;
+  }
 
+  // Vérifier si ce client fait partie des destinataires
+  if (payload.recipients && Array.isArray(payload.recipients) && !payload.recipients.includes(socket.id)) {
+    console.log('[showQuestion] client non destinataire, on sort');
+    return;
+  }
+
+  // Récupération sécurisée de l'image
+  const elQuestionImg = $('questionImg');
+  console.log('[showQuestion] elQuestionImg :', elQuestionImg);
+
+  // Texte
   $('themeTitle').textContent = payload.theme || 'Maths';
   $('questionText').textContent = payload.question || '';
 
-  if (payload.img) {
+  // Image
+  if (payload.img && elQuestionImg) {
+    console.log('[showQuestion] image à afficher :', payload.img);
     elQuestionImg.src = payload.img;
+
+    // Tester si l'image est correctement chargée
+    elQuestionImg.onload = () => console.log('[showQuestion] image chargée avec succès');
+    elQuestionImg.onerror = () => console.error('[showQuestion] échec chargement image', elQuestionImg.src);
+
     elQuestionImg.style.display = 'block';
-  } else {
+  } else if (elQuestionImg) {
+    console.log('[showQuestion] pas d’image à afficher');
     elQuestionImg.src = '';
     elQuestionImg.style.display = 'none';
   }
@@ -204,16 +225,20 @@ function showQuestion(payload) {
   startTimer(payload.timer || 60);
 }
 
-
-
 function hideQuestion() {
-  elQuestionBox.style.display = 'none';
+  console.log('[hideQuestion] cache question');
+  const elQuestionImg = $('questionImg');
+
+  $('questionBox').style.display = 'none';
+
   if (elQuestionImg) {
     elQuestionImg.style.display = 'none';
     elQuestionImg.src = '';
   }
+
   stopTimer();
 }
+
 
 
 
@@ -361,6 +386,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
