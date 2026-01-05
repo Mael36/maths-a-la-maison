@@ -20,6 +20,7 @@ try {
   console.error('Error loading board.json:', e.message);
   process.exit(1);
 }
+
 let QUESTIONS = [];
 
 try {
@@ -27,19 +28,31 @@ try {
     fs.readFileSync(path.join(__dirname, 'public', 'data.json'), 'utf-8')
   );
 
-  if (Array.isArray(raw)) {
-    // Cas rare : déjà une liste
-    QUESTIONS = raw;
-  } else if (typeof raw === 'object' && raw !== null) {
-    // Cas normal : catégories → on aplatit
-    QUESTIONS = Object.values(raw).flat();
+  if (typeof raw !== 'object' || raw === null) {
+    throw new Error('data.json n’est pas un objet');
   }
+
+  // Aplatit toutes les catégories
+  QUESTIONS = Object.values(raw)
+    .flat()
+    .filter(q => q && q.q && q.a) // sécurité minimale
+    .map(q => ({
+      id: q.id ?? null,
+      q: q.q,
+      a: q.a,
+
+      // champs optionnels (nouveau format)
+      d: q.d ?? null,
+      img: q.img ?? null,
+      imgrep: q.imgrep ?? null
+    }));
 
   console.log(`Questions chargées : ${QUESTIONS.length}`);
 } catch (e) {
-  console.warn('data.json invalide → questions désactivées');
+  console.error('Erreur data.json → questions désactivées :', e.message);
   QUESTIONS = [];
 }
+
 
 
 
@@ -640,6 +653,7 @@ io.on('connection', socket => {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
