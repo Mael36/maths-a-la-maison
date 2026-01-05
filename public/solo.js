@@ -7,7 +7,7 @@ let questions = [];
 async function loadQuestions() {
   try {
     // adapte l'URL selon ton serveur
-    const res = await fetch('/data.json');
+    const res = await fetch('./data.json');
     const data = await res.json();
 
     // aplatir toutes les catégories si data.categories existe
@@ -111,3 +111,4 @@ if (sendBtn) {
 // --- initialisation ---
 updateStats();
 loadQuestions();
+
