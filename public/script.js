@@ -27,7 +27,7 @@ const elDiceResult = $('diceResult');
 const elQuestionBox = $('questionBox');
 const elThemeTitle = $('themeTitle');
 const elQuestionText = $('questionText');
-const elQuestionImage = $('questionImage');
+const elQuestionImg= $('questionImage');
 const elAnswerInput = $('answerInput');
 const elSendAnswer = $('sendAnswerBtn');
 const elTimer = $('timer');
@@ -365,6 +365,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
