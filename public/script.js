@@ -186,24 +186,17 @@ function showSelection(payload) {
 // question UI
 function showQuestion(payload) {
   if (!payload) return;
-
-  if (payload.recipients && Array.isArray(payload.recipients)
-      && !payload.recipients.includes(socket.id)) return;
+  if (payload.recipients && Array.isArray(payload.recipients) && !payload.recipients.includes(socket.id)) return;
 
   elThemeTitle.textContent = payload.theme || 'Maths';
+  elQuestionText.textContent = payload.question || '';
 
-  // Texte de la question
-  let q = payload.question || '';
-  q = q.replace(/\bimage\b$/i, '').trim(); // sécurité
-  elQuestionText.textContent = q;
-
-  // Gestion de l'image
   if (payload.img) {
-    elQuestionImage.src = payload.img;
-    elQuestionImage.style.display = 'block';
+    elQuestionImg.src = payload.img;
+    elQuestionImg.style.display = 'block';
   } else {
-    elQuestionImage.style.display = 'none';
-    elQuestionImage.src = '';
+    elQuestionImg.src = '';
+    elQuestionImg.style.display = 'none';
   }
 
   elQuestionBox.style.display = 'block';
@@ -365,6 +358,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
