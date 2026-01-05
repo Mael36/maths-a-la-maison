@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Parcours Brevet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Parcours Brevet 🧠</h1>
+  <div id="stats">
+    Niveau : <span id="levelDisplay">1</span> / 600<br>
+    Vies : <span id="livesDisplay">❤️ 3</span>
+  </div>
+
+  <div id="questionBox">
+    <h3 id="themeTitle">Thème</h3>
+    <p id="questionText">Question ici</p>
+    <input type="text" id="answerInput" placeholder="Ta réponse">
+    <button id="sendAnswerBtn">Envoyer</button>
+  </div>
+
+  <div id="resultBox" style="display:none;">
+    <h2 id="resultText"></h2>
+  </div>
+
+  <script src="solo.js"></script>
+</body>
+</html>
