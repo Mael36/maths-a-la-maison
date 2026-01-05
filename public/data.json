@@ -1,6 +1,6 @@
 
 {
-    "Calcul litteral": [
+    "Calcul litteral": 
 
         {"id":233,"q":"Réduire\n7x × 3 + 9 + 8x² − 5x + 6 − 7x²","a":"x² + 16x + 15"},
         {"id":234,"q":"Réduire\n8x + 10 + 6x² − 3x + 6 + 2x² × 4","a":"14x² + 5x + 16"},
@@ -424,41 +424,41 @@
         {"id":47,"q":"Citer les propriétés des parallélogrammes (axes et centre de symétrie, côtés, angles, diagonales)","a":"Aucun axe de symétrie (sauf rectangle ou losange)\n1 centre de symétrie\nCôtés opposés égaux et parallèles\nDiagonales se coupant en leur milieu"},
         {"id":48,"q":"Que faut-il au losange pour obtenir un carré ?","a":"Il faut qu’il ait un angle droit (ou que ses diagonales soient de même longueur)"},
 
-        {"id":49,"q":"Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?\nimage","img":"./image/Question49.png","a":"DF/DG = DE/DH = EF/GH"},
-        {"id":50,"q":"Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?\nimage","img":"./image/Question50.png","a":"DB/DC = DA/DE = AB/EC"},
-        {"id":51,"q":"(EF) et (GH) sont-elles parallèles ?\nimage","img":"./image/Question51.png","a":"Non","d":"3/5 = 0,6 ; 4/6 ≈ 0,667\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
-        {"id":52,"q":"(EF) et (GH) sont-elles parallèles ?\nimage","img":"./image/Question52.png","a":"Oui","d":"3/5 = 0,6 ; 6/10 = 0,6\nLes quotients sont égaux → les droites sont parallèles."},
-        {"id":53,"q":"(AB) et (EC) sont-elles parallèles ?\nimage","img":"./image/Question53.png","a":"Non","d":"3/9 = 1/3 ; 18/6 = 3\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
-        {"id":54,"q":"(AB) et (EC) sont-elles parallèles ?\nimage","img":"./image/Question54.png","a":"Oui","d":"3/9 = 1/3 ; 6/18 = 1/3\nLes quotients sont égaux → les droites sont parallèles."},
+        {"id":49,"q":"Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?","img":"./image/Question49.png","a":"DF/DG = DE/DH = EF/GH"},
+        {"id":50,"q":"Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?","img":"./image/Question50.png","a":"DB/DC = DA/DE = AB/EC"},
+        {"id":51,"q":"(EF) et (GH) sont-elles parallèles ?","img":"./image/Question51.png","a":"Non","d":"3/5 = 0,6 ; 4/6 ≈ 0,667\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
+        {"id":52,"q":"(EF) et (GH) sont-elles parallèles ?","img":"./image/Question52.png","a":"Oui","d":"3/5 = 0,6 ; 6/10 = 0,6\nLes quotients sont égaux → les droites sont parallèles."},
+        {"id":53,"q":"(AB) et (EC) sont-elles parallèles ?","img":"./image/Question53.png","a":"Non","d":"3/9 = 1/3 ; 18/6 = 3\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
+        {"id":54,"q":"(AB) et (EC) sont-elles parallèles ?","img":"./image/Question54.png","a":"Oui","d":"3/9 = 1/3 ; 6/18 = 1/3\nLes quotients sont égaux → les droites sont parallèles."},
         {"id":55,"q":"Citer la formule pour calculer le périmètre d’un disque","a":"2 × π × rayon"},
         {"id":56,"q":"Quelle est la définition de deux triangles égaux ?","a":"Deux triangles sont égaux si leurs côtés homologues ont la même longueur (et donc leurs angles homologues aussi)"},
 
-        {"id":57,"q":"Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?\nimage","img":"./image/Question57.png","a":"DF/DG = DE/DH = EF/GH"},
-        {"id":58,"q":"Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?\nimage","img":"./image/Question58.png","a":"DB/DC = DA/DE = AB/EC"},
-        {"id":59,"q":"(EF) et (GH) sont-elles parallèles ?\nimage","img":"./image/Question59.png","a":"Non","d":"3/5 = 0,6 ; 4/6 ≈ 0,667\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
-        {"id":60,"q":"(EF) et (GH) sont-elles parallèles ?\nimage","img":"./image/Question60.png","a":"Oui","d":"3/5 = 0,6 ; 6/10 = 0,6\nLes quotients sont égaux → les droites sont parallèles."},
-        {"id":61,"q":"(AB) et (EC) sont-elles parallèles ?\nimage","img":"./image/Question61.png","a":"Non","d":"3/9 = 1/3 ; 18/6 = 3\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
-        {"id":62,"q":"(AB) et (EC) sont-elles parallèles ?\nimage","img":"./image/Question62.png","a":"Oui","d":"3/9 = 1/3 ; 6/18 = 1/3\nLes quotients sont égaux → les droites sont parallèles."},
+        {"id":57,"q":"Sachant que (EF) et (GH) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?","img":"./image/Question57.png","a":"DF/DG = DE/DH = EF/GH"},
+        {"id":58,"q":"Sachant que (EC) et (AB) sont parallèles, quels sont les quotients de Thalès associés à cette figure ?","img":"./image/Question58.png","a":"DB/DC = DA/DE = AB/EC"},
+        {"id":59,"q":"(EF) et (GH) sont-elles parallèles ?","img":"./image/Question59.png","a":"Non","d":"3/5 = 0,6 ; 4/6 ≈ 0,667\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
+        {"id":60,"q":"(EF) et (GH) sont-elles parallèles ?","img":"./image/Question60.png","a":"Oui","d":"3/5 = 0,6 ; 6/10 = 0,6\nLes quotients sont égaux → les droites sont parallèles."},
+        {"id":61,"q":"(AB) et (EC) sont-elles parallèles ?","img":"./image/Question61.png","a":"Non","d":"3/9 = 1/3 ; 18/6 = 3\nLes quotients ne sont pas égaux → les droites ne sont pas parallèles."},
+        {"id":62,"q":"(AB) et (EC) sont-elles parallèles ?","img":"./image/Question62.png","a":"Oui","d":"3/9 = 1/3 ; 6/18 = 1/3\nLes quotients sont égaux → les droites sont parallèles."},
         {"id":63,"q":"Citer la formule pour calculer le périmètre d’un disque","a":"2 × π × rayon"},
         {"id":64,"q":"Quelle est la définition de deux triangles égaux ?","a":"Deux triangles sont égaux si leurs côtés homologues ont la même longueur (et donc leurs angles homologues aussi)"},
 
-        {"id":65,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DH ?\nimage","img":"./image/Question65.png","a":"3,6","d":"DF/DG = DE/DH = EF/GH → 2/6 = 1,2/DH → DH = 1,2 × 6 / 2 = 3,6"},
-        {"id":66,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DG ?\nimage","img":"./image/Question66.png","a":"2,2","d":"DF/DG = DE/DH = EF/GH → 0,6/DG = 3/11 → DG = 0,6 × 11 / 3 = 2,2"},
-        {"id":67,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur EF ?\nimage","img":"./image/Question67.png","a":"2,1","d":"DF/DG = DE/DH = EF/GH → EF/3 = 10,5/15 → EF = 3 × 10,5 / 15 = 2,1"},
-        {"id":68,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur GH ?\nimage","img":"./image/Question68.png","a":"4","d":"DF/DG = DE/DH = EF/GH → 1,1/GH = 4,4/16 → GH = 1,1 × 16 / 4,4 = 4"},
-        {"id":69,"q":"Sachant que (AB) et (EC) sont parallèles, quelle est la longueur ED ?\nimage","img":"./image/Question69.png","a":"48","d":"DB/DC = DA/DE = AB/CE → 3/8 = 18/DE → DE = 8 × 18 / 3 = 48"},
-        {"id":70,"q":"Sachant que (AB) et (EC) sont parallèles, quelle est la longueur EC ?\nimage","img":"./image/Question70.png","a":"12,5","d":"DB/DC = DA/DE = AB/CE → 4/5 = 10/CE → CE = 5 × 10 / 4 = 12,5"},
-        {"id":71,"q":"Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?\nimage","img":"./image/Question71.png","a":"Oui","d":"(MN) ⊥ (AN) et (AB) ⊥ (AN) → (MN) // (AB)\nThalès applicable : ON/OA = OM/OB = MN/AB"},
-        {"id":72,"q":"Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?\nimage","img":"./image/Question72.png","a":"Non","d":"On ne sait pas si (AB) et (EC) sont parallèles → Thalès non applicable"},
+        {"id":65,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DH ?","img":"./image/Question65.png","a":"3,6","d":"DF/DG = DE/DH = EF/GH → 2/6 = 1,2/DH → DH = 1,2 × 6 / 2 = 3,6"},
+        {"id":66,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur DG ?","img":"./image/Question66.png","a":"2,2","d":"DF/DG = DE/DH = EF/GH → 0,6/DG = 3/11 → DG = 0,6 × 11 / 3 = 2,2"},
+        {"id":67,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur EF ?","img":"./image/Question67.png","a":"2,1","d":"DF/DG = DE/DH = EF/GH → EF/3 = 10,5/15 → EF = 3 × 10,5 / 15 = 2,1"},
+        {"id":68,"q":"Sachant que (EF) et (GH) sont parallèles, quelle est la longueur GH ?","img":"./image/Question68.png","a":"4","d":"DF/DG = DE/DH = EF/GH → 1,1/GH = 4,4/16 → GH = 1,1 × 16 / 4,4 = 4"},
+        {"id":69,"q":"Sachant que (AB) et (EC) sont parallèles, quelle est la longueur ED ?","img":"./image/Question69.png","a":"48","d":"DB/DC = DA/DE = AB/CE → 3/8 = 18/DE → DE = 8 × 18 / 3 = 48"},
+        {"id":70,"q":"Sachant que (AB) et (EC) sont parallèles, quelle est la longueur EC ?","img":"./image/Question70.png","a":"12,5","d":"DB/DC = DA/DE = AB/CE → 4/5 = 10/CE → CE = 5 × 10 / 4 = 12,5"},
+        {"id":71,"q":"Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?","img":"./image/Question71.png","a":"Oui","d":"(MN) ⊥ (AN) et (AB) ⊥ (AN) → (MN) // (AB)\nThalès applicable : ON/OA = OM/OB = MN/AB"},
+        {"id":72,"q":"Peut-on appliquer le théorème de Thalès ? Justifier. Si oui, quels sont les quotients égaux ?","img":"./image/Question72.png","a":"Non","d":"On ne sait pas si (AB) et (EC) sont parallèles → Thalès non applicable"},
 
-        {"id":73,"q":"Quelle est la longueur MN ?\nimage","img":"./image/Question73.png","a":"√{20}","d":"Triangle MNO rectangle en N\nMO² = MN² + NO² → MN² = 6² − 4² = 36 − 16 = 20\nMN = √{20}"},
-        {"id":74,"q":"Quelle est la longueur AB ?\nimage","img":"./image/Question74.png","a":"√{980}","d":"(MN) ⊥ (NA) et (AB) ⊥ (NA) → (MN) // (AB)\nThalès → OB = 42\nTriangle ABO rectangle en A\nBO² = OA² + AB² → AB² = 42² − 28² = 1 764 − 784 = 980\nAB = √{980}"},
-        {"id":75,"q":"Quelle est la mesure de l’angle ∠MON arrondie au degré ?\nimage","img":"./image/Question75.png","a":"48°","d":"Triangle MNO rectangle en N\ncos(∠MON) = adjacent/hypoténuse = NO/MO = 4/6 ≈ 0,6667\n∠MON ≈ cos⁻¹(0,6667) ≈ 48°"},
-        {"id":76,"q":"Quelle est la mesure de l’angle ∠NMO arrondie au degré ?\nimage","img":"./image/Question76.png","a":"42°","d":"Triangle MNO rectangle en N\nsin(∠OMN) = opposé/hypoténuse = NO/MO = 4/6 ≈ 0,6667\n∠OMN ≈ sin⁻¹(0,6667) ≈ 42°"},
+        {"id":73,"q":"Quelle est la longueur MN ?","img":"./image/Question73.png","a":"√{20}","d":"Triangle MNO rectangle en N\nMO² = MN² + NO² → MN² = 6² − 4² = 36 − 16 = 20\nMN = √{20}"},
+        {"id":74,"q":"Quelle est la longueur AB ?","img":"./image/Question74.png","a":"√{980}","d":"(MN) ⊥ (NA) et (AB) ⊥ (NA) → (MN) // (AB)\nThalès → OB = 42\nTriangle ABO rectangle en A\nBO² = OA² + AB² → AB² = 42² − 28² = 1 764 − 784 = 980\nAB = √{980}"},
+        {"id":75,"q":"Quelle est la mesure de l’angle ∠MON arrondie au degré ?","img":"./image/Question75.png","a":"48°","d":"Triangle MNO rectangle en N\ncos(∠MON) = adjacent/hypoténuse = NO/MO = 4/6 ≈ 0,6667\n∠MON ≈ cos⁻¹(0,6667) ≈ 48°"},
+        {"id":76,"q":"Quelle est la mesure de l’angle ∠NMO arrondie au degré ?","img":"./image/Question76.png","a":"42°","d":"Triangle MNO rectangle en N\nsin(∠OMN) = opposé/hypoténuse = NO/MO = 4/6 ≈ 0,6667\n∠OMN ≈ sin⁻¹(0,6667) ≈ 42°"},
         {"id":77,"q":"On se place dans un triangle rectangle. Parmi ces résultats, lesquels sont impossibles ? Justifier.\na/ cos(angle) ≈ 1,4\nb/ cos(105°)\nc/ cos(angle) ≈ −0,5\nd/ cos(angle) ≈ 0,99","a":"a, b et c","d":"Dans un triangle rectangle, les angles aigus sont < 90°.\nCosinus d’un angle aigu est compris entre 0 et 1.\na : >1 impossible\nb : angle >90° impossible dans triangle rectangle\nc : négatif impossible pour angle aigu"},
-        {"id":78,"q":"Voici l’extrait du tableur dans GeoGebra. Que faut-il saisir comme formule en B2 et B3 ?\nimage","img":"./image/Question78.png","a":"B2 : =YL/LS\nB3 : =YS/SL"},
-        {"id":79,"q":"Déterminer l’arrondi au mm près de DB.\nimage","img":"./image/Question79.png","a":"149 mm","d":"Triangle ABD rectangle en A\ncos(61°) = adjacent/hypoténuse = 72/DB\nDB = 72 / cos(61°) ≈ 148,5 mm → 149 mm"},
-        {"id":80,"q":"Déterminer l’arrondi au mm près de AB.\nimage","img":"./image/Question80.png","a":"130 mm","d":"Triangle ABD rectangle en A\ntan(61°) = opposé/adjacent = AB/72\nAB = 72 × tan(61°) ≈ 129,8 mm → 130 mm"}
+        {"id":78,"q":"Voici l’extrait du tableur dans GeoGebra. Que faut-il saisir comme formule en B2 et B3 ?","img":"./image/Question78.png","a":"B2 : =YL/LS\nB3 : =YS/SL"},
+        {"id":79,"q":"Déterminer l’arrondi au mm près de DB.\","img":"./image/Question79.png","a":"149 mm","d":"Triangle ABD rectangle en A\ncos(61°) = adjacent/hypoténuse = 72/DB\nDB = 72 / cos(61°) ≈ 148,5 mm → 149 mm"},
+        {"id":80,"q":"Déterminer l’arrondi au mm près de AB.\","img":"./image/Question80.png","a":"130 mm","d":"Triangle ABD rectangle en A\ntan(61°) = opposé/adjacent = AB/72\nAB = 72 × tan(61°) ≈ 129,8 mm → 130 mm"}
     
     ],
 
@@ -675,3 +675,4 @@
 
     ]
 }
+
