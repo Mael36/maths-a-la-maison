@@ -27,6 +27,7 @@ const elDiceResult = $('diceResult');
 const elQuestionBox = $('questionBox');
 const elThemeTitle = $('themeTitle');
 const elQuestionText = $('questionText');
+const elQuestionImage = $('questionImage');
 const elAnswerInput = $('answerInput');
 const elSendAnswer = $('sendAnswerBtn');
 const elTimer = $('timer');
@@ -185,25 +186,24 @@ function showSelection(payload) {
 // question UI
 function showQuestion(payload) {
   if (!payload) return;
-  console.log('QUESTION PAYLOAD:', payload);
-  // Vérifie si le joueur est concerné
-  if (
-    payload.recipients &&
-    Array.isArray(payload.recipients) &&
-    !payload.recipients.includes(socket.id)
-  ) return;
+
+  if (payload.recipients && Array.isArray(payload.recipients)
+      && !payload.recipients.includes(socket.id)) return;
 
   elThemeTitle.textContent = payload.theme || 'Maths';
-  elQuestionText.textContent = payload.question || '';
 
-  // IMAGE DE QUESTION
-  const imgEl = document.getElementById('questionImage');
+  // Texte de la question
+  let q = payload.question || '';
+  q = q.replace(/\bimage\b$/i, '').trim(); // sécurité
+  elQuestionText.textContent = q;
+
+  // Gestion de l'image
   if (payload.img) {
-    imgEl.src = payload.img;
-    imgEl.style.display = 'block';
+    elQuestionImage.src = payload.img;
+    elQuestionImage.style.display = 'block';
   } else {
-    imgEl.style.display = 'none';
-    imgEl.src = '';
+    elQuestionImage.style.display = 'none';
+    elQuestionImage.src = '';
   }
 
   elQuestionBox.style.display = 'block';
@@ -211,11 +211,15 @@ function showQuestion(payload) {
 }
 
 
+
 // hide question
 function hideQuestion() {
   elQuestionBox.style.display = 'none';
+  elQuestionImage.style.display = 'none';
+  elQuestionImage.src = '';
   stopTimer();
 }
+
 
 // timer
 function startTimer(seconds) {
@@ -361,6 +365,7 @@ function showGame() {
   socket.emit('requestPlayers');
   if (elRoll) elRoll.disabled = true;
 }
+
 
 
 
