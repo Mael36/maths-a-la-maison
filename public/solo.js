@@ -65,28 +65,22 @@ function showNextQuestion() {
     resetGame();
     return;
   }
-
   const q = pickQuestion();
   console.log('[SOLO] Affichage question', q);
   if (!q) {
     alert('🎉 Félicitations, tu as terminé toutes les questions !');
     return;
   }
-
   currentQuestion = q;
-
   const themeEl = document.getElementById('themeTitle');
   const questionEl = document.getElementById('questionText');
   const imgEl = document.getElementById('questionImg');
-
   if (themeEl) {
     themeEl.textContent = `📘 Question ${playerState.level} / ${questions.length}`;
   }
-
   if (questionEl) {
     questionEl.textContent = q.q;
   }
-
   if (imgEl) {
     if (q.img) {
       imgEl.src = q.img;
@@ -95,10 +89,12 @@ function showNextQuestion() {
       imgEl.style.display = 'none';
     }
   }
-
+  const questionBoxEl = document.getElementById('questionBox');
+  if (questionBoxEl) {
+    questionBoxEl.style.display = 'block';
+  }
   updateStats();
 }
-
 // =====================
 // Vérification réponse via backend (Mistral)
 // =====================
@@ -199,3 +195,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   loadQuestions();
 });
+
