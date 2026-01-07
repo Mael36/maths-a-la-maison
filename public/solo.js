@@ -1,4 +1,5 @@
 // public/solo.js
+console.log('🟢 solo.js chargé');
 
 let playerState = {
   level: 1,
@@ -195,4 +196,5 @@ function resetGame() {
 // =====================
 updateStats();
 loadQuestions();
+
 
