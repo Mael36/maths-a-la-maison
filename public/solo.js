@@ -13,7 +13,7 @@ let currentQuestion = null;
 // =====================
 async function loadQuestions() {
   try {
-    const res = await fetch('/data.json');
+    const res = await fetch('./data.json');
     const data = await res.json();
 
     questions = [];
@@ -195,3 +195,4 @@ function resetGame() {
 // =====================
 updateStats();
 loadQuestions();
+
