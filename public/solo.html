@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Parcours Brevet</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #questionImg {
+      display: none;
+      max-width: 90%;
+      margin: 10px auto 0 auto;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <h1>Parcours Brevet 🧠</h1>
@@ -16,6 +24,8 @@
   <div id="questionBox">
     <h3 id="themeTitle">Thème</h3>
     <p id="questionText">Question ici</p>
+    <!-- Image de la question -->
+    <img id="questionImg" src="" alt="Illustration question">
     <input type="text" id="answerInput" placeholder="Ta réponse">
     <button id="sendAnswerBtn">Envoyer</button>
   </div>
