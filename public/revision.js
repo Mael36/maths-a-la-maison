@@ -1,73 +1,87 @@
-// public/revision.js
-
 const container = document.getElementById('revisionContainer');
 
-async function loadRevision() {
-  try {
-    const res = await fetch('/data.json');
-    const data = await res.json();
+fetch('/data.json')
+  .then(res => res.json())
+  .then(data => buildRevision(data))
+  .catch(() => {
+    container.textContent = 'Erreur de chargement des questions';
+  });
 
-    container.innerHTML = '';
+function buildRevision(data) {
+  Object.entries(data).forEach(([category, questions]) => {
+    // catégorie
+    const cat = document.createElement('div');
+    cat.className = 'category';
 
-    Object.entries(data).forEach(([theme, questions]) => {
-      // Titre de catégorie
-      const themeTitle = document.createElement('h2');
-      themeTitle.textContent = theme;
-      container.appendChild(themeTitle);
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.textContent = `▶ ${category} (${questions.length} questions)`;
 
-      questions.forEach((q, index) => {
-        const block = document.createElement('div');
-        block.className = 'revisionQuestion';
+    const content = document.createElement('div');
+    content.className = 'category-content';
 
-        // --- Question texte ---
-        if (q.q) {
-          const question = document.createElement('p');
-          question.innerHTML = `<strong>Q${index + 1} :</strong> ${q.q}`;
-          block.appendChild(question);
-        }
+    header.onclick = () => {
+      const open = content.style.display === 'block';
+      content.style.display = open ? 'none' : 'block';
+      header.textContent = `${open ? '▶' : '▼'} ${category} (${questions.length} questions)`;
+    };
 
-        // --- Image de la question ---
-        if (q.img) {
-          const img = document.createElement('img');
-          img.src = q.img;
-          img.alt = 'Illustration question';
-          img.className = 'revisionImage';
-          block.appendChild(img);
-        }
+    questions.forEach((q, index) => {
+      const block = document.createElement('div');
+      block.className = 'question-block';
 
-        // --- Réponse texte ---
-        if (q.a) {
-          const answer = document.createElement('p');
-          answer.innerHTML = `<strong>Réponse :</strong> ${q.a}`;
-          answer.className = 'revisionAnswer';
-          block.appendChild(answer);
-        }
+      // numéro
+      const num = document.createElement('div');
+      num.className = 'question-number';
+      num.textContent = `Question ${index + 1}`;
+      block.appendChild(num);
 
-        // --- Détail / explication ---
-        if (q.d) {
-          const detail = document.createElement('p');
-          detail.innerHTML = `<strong>Détail :</strong> ${q.d}`;
-          detail.className = 'revisionDetail';
-          block.appendChild(detail);
-        }
+      const question = document.createElement('p');
+      question.textContent = q.q;
+      block.appendChild(question);
 
-        // --- Image de correction ---
-        if (q.imgrep) {
-          const imgRep = document.createElement('img');
-          imgRep.src = q.imgrep;
-          imgRep.alt = 'Correction';
-          imgRep.className = 'revisionImage';
-          block.appendChild(imgRep);
-        }
+      if (q.img) {
+        const img = document.createElement('img');
+        img.src = q.img.replace('./', '/');
+        block.appendChild(img);
+      }
 
-        container.appendChild(block);
-      });
+      const btn = document.createElement('button');
+      btn.className = 'reveal-btn';
+      btn.textContent = 'Voir la réponse';
+
+      const answer = document.createElement('div');
+      answer.className = 'answer';
+
+      const repText = document.createElement('p');
+      repText.textContent = `Réponse : ${q.a}`;
+      answer.appendChild(repText);
+
+      if (q.d) {
+        const detail = document.createElement('p');
+        detail.textContent = q.d;
+        answer.appendChild(detail);
+      }
+
+      if (q.imgrep) {
+        const imgRep = document.createElement('img');
+        imgRep.src = q.imgrep.replace('./', '/');
+        answer.appendChild(imgRep);
+      }
+
+      btn.onclick = () => {
+        const visible = answer.style.display === 'block';
+        answer.style.display = visible ? 'none' : 'block';
+        btn.textContent = visible ? 'Voir la réponse' : 'Cacher la réponse';
+      };
+
+      block.appendChild(btn);
+      block.appendChild(answer);
+      content.appendChild(block);
     });
 
-  } catch (err) {
-    console.error(err);
-    container.textContent = 'Erreur de chargement des questions';
-  }
+    cat.appendChild(header);
+    cat.appendChild(content);
+    container.appendChild(cat);
+  });
 }
-
-loadRevision();
