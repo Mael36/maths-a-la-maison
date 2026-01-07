@@ -663,28 +663,31 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
   }
 
   app.post('/api/solo/check', async (req, res) => {
-  try {
-    const { answer, expected } = req.body;
-
-    if (
-      typeof answer !== 'string' ||
-      typeof expected !== 'string'
-    ) {
-      return res.status(400).json({ correct: false });
+    try {
+      const { answer, expected } = req.body;
+  
+      if (
+        typeof answer !== 'string' ||
+        typeof expected !== 'string'
+      ) {
+        return res.status(400).json({ correct: false });
+      }
+  
+      const correct = await checkWithMistral(answer, expected);
+  
+      res.json({ correct });
+    } catch (e) {
+      console.error('[SOLO] Erreur vérification:', e.message);
+      res.status(500).json({ correct: false });
     }
+  });
 
-    const correct = await checkWithMistral(answer, expected);
-
-    res.json({ correct });
-  } catch (e) {
-    console.error('[SOLO] Erreur vérification:', e.message);
-    res.status(500).json({ correct: false });
-  }
 
 }); // end connection
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
