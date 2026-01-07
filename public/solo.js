@@ -61,7 +61,6 @@ function pickQuestion() {
 // Affichage question
 // =====================
 function showNextQuestion() {
-  console.log('[SOLO] Affichage question', q);
   if (playerState.lives <= 0) {
     alert('💀 Tu n’as plus de vies. Reviens demain.');
     resetGame();
@@ -69,6 +68,7 @@ function showNextQuestion() {
   }
 
   const q = pickQuestion();
+  console.log('[SOLO] Affichage question', q);
   if (!q) {
     alert('🎉 Félicitations, tu as terminé toutes les questions !');
     return;
@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   loadQuestions();
 });
+
 
 
 
