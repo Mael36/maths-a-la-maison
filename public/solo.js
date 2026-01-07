@@ -10,7 +10,7 @@ let questions = [];
 let currentQuestion = null;
 
 // =====================
-// Chargement des questions (MÊME LOGIQUE QUE PYTHON)
+// Chargement des questions (comme Python)
 // =====================
 async function loadQuestions() {
   try {
@@ -19,8 +19,7 @@ async function loadQuestions() {
 
     questions = [];
 
-    // équivalent exact de :
-    // for category in data.values(): questions.extend(category)
+    // pour chaque catégorie, ajoute toutes les questions
     Object.values(data).forEach(category => {
       if (Array.isArray(category)) {
         category.forEach(q => {
@@ -50,7 +49,7 @@ async function loadQuestions() {
 }
 
 // =====================
-// Choix question (ordre progressif comme Python)
+// Choix question (ordre progressif)
 // =====================
 function pickQuestion() {
   if (playerState.level - 1 >= questions.length) return null;
@@ -101,7 +100,7 @@ function showNextQuestion() {
 }
 
 // =====================
-// Vérification réponse → BACKEND (MISTRAL)
+// Vérification réponse via backend (Mistral)
 // =====================
 async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
   try {
@@ -123,7 +122,7 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
 }
 
 // =====================
-// Résultat
+// Affichage résultat
 // =====================
 function showResult(correct) {
   const resultBox = document.getElementById('resultBox');
@@ -200,8 +199,3 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   loadQuestions();
 });
-
-
-
-
-
