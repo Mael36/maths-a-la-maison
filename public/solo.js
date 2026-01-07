@@ -1,13 +1,46 @@
 // public/solo.js
 console.log('🟢 solo.js chargé');
-
 let playerState = {
   level: 1,
-  lives: 3
+  lives: 3,
+  lastResetDate: null
 };
-
 let questions = [];
 let currentQuestion = null;
+
+// =====================
+// Chargement de l'état du joueur depuis localStorage
+// =====================
+function loadPlayerState() {
+  const savedState = localStorage.getItem('playerState');
+  if (savedState) {
+    playerState = JSON.parse(savedState);
+    console.log('[SOLO] État chargé depuis localStorage:', playerState);
+  } else {
+    console.log('[SOLO] Aucun état sauvegardé, utilisation des valeurs par défaut.');
+  }
+}
+
+// =====================
+// Sauvegarde de l'état du joueur dans localStorage
+// =====================
+function savePlayerState() {
+  localStorage.setItem('playerState', JSON.stringify(playerState));
+  console.log('[SOLO] État sauvegardé dans localStorage:', playerState);
+}
+
+// =====================
+// Vérification et reset des vies quotidiennes
+// =====================
+function checkAndResetDailyLives() {
+  const today = new Date().toISOString().split('T')[0];
+  if (playerState.lastResetDate !== today) {
+    playerState.lives = 3;
+    playerState.lastResetDate = today;
+    savePlayerState();
+    console.log('[SOLO] Vies reset à 3 pour la nouvelle journée:', today);
+  }
+}
 
 // =====================
 // Chargement des questions (comme Python)
@@ -16,9 +49,7 @@ async function loadQuestions() {
   try {
     const res = await fetch('./data.json');
     const data = await res.json();
-
     questions = [];
-
     // pour chaque catégorie, ajoute toutes les questions
     Object.values(data).forEach(category => {
       if (Array.isArray(category)) {
@@ -33,14 +64,11 @@ async function loadQuestions() {
         });
       }
     });
-
     console.log('[SOLO] Questions chargées :', questions.length);
-
     if (questions.length === 0) {
       alert('Aucune question disponible');
       return;
     }
-
     showNextQuestion();
   } catch (e) {
     console.error('[SOLO] Erreur chargement questions:', e);
@@ -60,9 +88,13 @@ function pickQuestion() {
 // Affichage question
 // =====================
 function showNextQuestion() {
+  checkAndResetDailyLives(); // Vérifier reset à chaque affichage
   if (playerState.lives <= 0) {
     alert('💀 Tu n’as plus de vies. Reviens demain.');
-    resetGame();
+    const questionBoxEl = document.getElementById('questionBox');
+    if (questionBoxEl) {
+      questionBoxEl.style.display = 'none';
+    }
     return;
   }
   const q = pickQuestion();
@@ -95,6 +127,7 @@ function showNextQuestion() {
   }
   updateStats();
 }
+
 // =====================
 // Vérification réponse via backend (Mistral)
 // =====================
@@ -108,7 +141,6 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
         expected: expectedAnswer
       })
     });
-
     const data = await res.json();
     return data.correct === true;
   } catch (e) {
@@ -123,23 +155,19 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
 function showResult(correct) {
   const resultBox = document.getElementById('resultBox');
   const resultText = document.getElementById('resultText');
-
   if (!resultBox || !resultText) return;
-
   resultText.textContent = correct ? '✅ Bonne réponse' : '❌ Mauvaise réponse';
   resultText.style.color = correct ? '#2e7d32' : '#c62828';
   resultBox.style.display = 'block';
-
   setTimeout(() => {
     resultBox.style.display = 'none';
-
     if (correct) {
       playerState.level++;
     } else {
       playerState.lives--;
       alert(`📌 Correction : ${currentQuestion.d}`);
     }
-
+    savePlayerState(); // Sauvegarde après changement
     showNextQuestion();
   }, 1200);
 }
@@ -150,7 +178,6 @@ function showResult(correct) {
 function updateStats() {
   const levelEl = document.getElementById('levelDisplay');
   const livesEl = document.getElementById('livesDisplay');
-
   if (levelEl) levelEl.textContent = playerState.level;
   if (livesEl) livesEl.textContent = `❤️ ${playerState.lives}`;
 }
@@ -163,26 +190,23 @@ if (sendBtn) {
   sendBtn.onclick = async () => {
     const input = document.getElementById('answerInput');
     if (!input || !currentQuestion) return;
-
     const userAnswer = input.value.trim();
     if (!userAnswer) return;
-
     input.value = '';
-
     const isCorrect = await checkAnswerWithBackend(
       userAnswer,
       currentQuestion.a
     );
-
     showResult(isCorrect);
   };
 }
 
 // =====================
-// Reset
+// Reset complet (optionnel, par exemple via un bouton)
 // =====================
 function resetGame() {
-  playerState = { level: 1, lives: 3 };
+  playerState = { level: 1, lives: 3, lastResetDate: new Date().toISOString().split('T')[0] };
+  savePlayerState();
   updateStats();
   showNextQuestion();
 }
@@ -192,7 +216,8 @@ function resetGame() {
 // =====================
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🟢 DOM prêt');
+  loadPlayerState();
+  checkAndResetDailyLives(); // Vérifier reset au démarrage
   updateStats();
   loadQuestions();
 });
-
