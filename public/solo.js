@@ -1,74 +1,155 @@
 // public/solo.js
 
-let playerState = { level: 1, lives: 3 };
-let questions = [];
+let playerState = {
+  level: 1,
+  lives: 3
+};
 
-// --- charger les questions depuis le JSON serveur ---
+let questions = [];
+let currentQuestion = null;
+
+// =====================
+// Chargement des questions (MÊME LOGIQUE QUE PYTHON)
+// =====================
 async function loadQuestions() {
   try {
-    // adapte l'URL selon ton serveur
-    const res = await fetch('./data.json');
+    const res = await fetch('/data.json');
     const data = await res.json();
 
-    // aplatir toutes les catégories si data.categories existe
-    if (data.categories) {
-      questions = Object.entries(data.categories).flatMap(([theme, qs]) =>
-        qs.map(q => ({ theme, question: q.question || q.expression || q.consigne || '', answer: q.correction || q.answer || q.reponse || '' }))
-      );
-    }
+    questions = [];
+
+    // équivalent exact de :
+    // for category in data.values(): questions.extend(category)
+    Object.values(data).forEach(category => {
+      if (Array.isArray(category)) {
+        category.forEach(q => {
+          questions.push({
+            id: q.id,
+            q: q.q,
+            a: q.a,
+            d: q.d || q.a,
+            img: q.img || null
+          });
+        });
+      }
+    });
+
+    console.log('[SOLO] Questions chargées :', questions.length);
 
     if (questions.length === 0) {
-      alert('Aucune question disponible !');
-    } else {
-      showNextQuestion();
+      alert('Aucune question disponible');
+      return;
     }
+
+    showNextQuestion();
   } catch (e) {
-    console.error('Impossible de charger les questions :', e);
+    console.error('[SOLO] Erreur chargement questions:', e);
     alert('Erreur de chargement des questions');
   }
 }
 
-// --- choisir une question au hasard ---
+// =====================
+// Choix question (ordre progressif comme Python)
+// =====================
 function pickQuestion() {
-  if (!questions || questions.length === 0) return null;
-  return questions[Math.floor(Math.random() * questions.length)];
+  if (playerState.level - 1 >= questions.length) return null;
+  return questions[playerState.level - 1];
 }
 
-// --- afficher question ---
+// =====================
+// Affichage question
+// =====================
 function showNextQuestion() {
-  const q = pickQuestion();
-  if (!q) {
-    alert('Aucune question disponible');
+  if (playerState.lives <= 0) {
+    alert('💀 Tu n’as plus de vies. Reviens demain.');
+    resetGame();
     return;
   }
-  window.currentQuestion = q; // stocker pour vérifier la réponse
+
+  const q = pickQuestion();
+  if (!q) {
+    alert('🎉 Félicitations, tu as terminé toutes les questions !');
+    return;
+  }
+
+  currentQuestion = q;
 
   const themeEl = document.getElementById('themeTitle');
   const questionEl = document.getElementById('questionText');
+  const imgEl = document.getElementById('questionImg');
 
-  if (themeEl) themeEl.textContent = q.theme || 'Général';
-  if (questionEl) questionEl.textContent = q.question || '';
+  if (themeEl) {
+    themeEl.textContent = `📘 Question ${playerState.level} / ${questions.length}`;
+  }
+
+  if (questionEl) {
+    questionEl.textContent = q.q;
+  }
+
+  if (imgEl) {
+    if (q.img) {
+      imgEl.src = q.img;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.style.display = 'none';
+    }
+  }
+
+  updateStats();
 }
 
-// --- afficher résultat ---
+// =====================
+// Vérification réponse → BACKEND (MISTRAL)
+// =====================
+async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
+  try {
+    const res = await fetch('/api/solo/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        answer: userAnswer,
+        expected: expectedAnswer
+      })
+    });
+
+    const data = await res.json();
+    return data.correct === true;
+  } catch (e) {
+    console.error('[SOLO] Erreur backend:', e);
+    return false;
+  }
+}
+
+// =====================
+// Résultat
+// =====================
 function showResult(correct) {
   const resultBox = document.getElementById('resultBox');
   const resultText = document.getElementById('resultText');
 
   if (!resultBox || !resultText) return;
 
-  resultText.textContent = correct ? 'Bonne réponse ✅' : 'Mauvaise réponse ❌';
+  resultText.textContent = correct ? '✅ Bonne réponse' : '❌ Mauvaise réponse';
   resultText.style.color = correct ? '#2e7d32' : '#c62828';
   resultBox.style.display = 'block';
 
   setTimeout(() => {
     resultBox.style.display = 'none';
-    updateStats();
+
+    if (correct) {
+      playerState.level++;
+    } else {
+      playerState.lives--;
+      alert(`📌 Correction : ${currentQuestion.d}`);
+    }
+
     showNextQuestion();
   }, 1200);
 }
 
-// --- mettre à jour le compteur niveau/vies ---
+// =====================
+// Stats
+// =====================
 function updateStats() {
   const levelEl = document.getElementById('levelDisplay');
   const livesEl = document.getElementById('livesDisplay');
@@ -77,38 +158,40 @@ function updateStats() {
   if (livesEl) livesEl.textContent = `❤️ ${playerState.lives}`;
 }
 
-// --- gestion du clic "Envoyer" ---
+// =====================
+// Bouton envoyer
+// =====================
 const sendBtn = document.getElementById('sendAnswerBtn');
 if (sendBtn) {
-  sendBtn.onclick = () => {
+  sendBtn.onclick = async () => {
     const input = document.getElementById('answerInput');
-    const q = window.currentQuestion;
-    if (!q || !input) return;
+    if (!input || !currentQuestion) return;
 
-    const answer = input.value.trim().toLowerCase();
-    const correctAnswer = (q.answer || '').toString().trim().toLowerCase();
-
-    if (answer === correctAnswer) {
-      playerState.level++;
-      showResult(true);
-    } else {
-      playerState.lives--;
-      showResult(false);
-    }
+    const userAnswer = input.value.trim();
+    if (!userAnswer) return;
 
     input.value = '';
 
-    // fin de partie si plus de vies
-    if (playerState.lives <= 0) {
-      alert('Game Over 😢');
-      playerState = { level: 1, lives: 3 };
-      updateStats();
-      showNextQuestion();
-    }
+    const isCorrect = await checkAnswerWithBackend(
+      userAnswer,
+      currentQuestion.a
+    );
+
+    showResult(isCorrect);
   };
 }
 
-// --- initialisation ---
+// =====================
+// Reset
+// =====================
+function resetGame() {
+  playerState = { level: 1, lives: 3 };
+  updateStats();
+  showNextQuestion();
+}
+
+// =====================
+// Init
+// =====================
 updateStats();
 loadQuestions();
-
