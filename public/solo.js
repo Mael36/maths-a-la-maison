@@ -7,40 +7,60 @@ let playerState = {
 };
 let questions = [];
 let currentQuestion = null;
+let currentUser = null;
+let STORAGE_KEY = null;
+
+async function loadCurrentUser() {
+  const res = await fetch('/api/me');
+  if (!res.ok) {
+    alert('Non connecté');
+    window.location.href = '/login.html';
+    return;
+  }
+  const data = await res.json();
+  currentUser = data.username;
+  STORAGE_KEY = `soloState_${currentUser}`;
+  console.log('[SOLO] Utilisateur:', currentUser);
+}
+
 
 // =====================
 // Chargement de l'état du joueur depuis localStorage
 // =====================
 function loadPlayerState() {
-  const savedState = localStorage.getItem('playerState');
+  if (!STORAGE_KEY) return;
+
+  const savedState = localStorage.getItem(STORAGE_KEY);
   if (savedState) {
     playerState = JSON.parse(savedState);
-    console.log('[SOLO] État chargé depuis localStorage:', playerState);
-  } else {
-    console.log('[SOLO] Aucun état sauvegardé, utilisation des valeurs par défaut.');
+    console.log('[SOLO] État chargé pour', currentUser, playerState);
   }
 }
+
 
 // =====================
 // Sauvegarde de l'état du joueur dans localStorage
 // =====================
 function savePlayerState() {
-  localStorage.setItem('playerState', JSON.stringify(playerState));
-  console.log('[SOLO] État sauvegardé dans localStorage:', playerState);
+  if (!STORAGE_KEY) return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(playerState));
+  console.log('[SOLO] État sauvegardé pour', currentUser, playerState);
 }
 
 // =====================
 // Vérification et reset des vies quotidiennes
 // =====================
-function checkAndResetDailyLives() {
-  const today = new Date().toISOString().split('T')[0];
+function checkDailyReset() {
+  const today = new Date().toISOString().slice(0, 10);
+
   if (playerState.lastResetDate !== today) {
     playerState.lives = 3;
     playerState.lastResetDate = today;
     savePlayerState();
-    console.log('[SOLO] Vies reset à 3 pour la nouvelle journée:', today);
+    console.log('[SOLO] Reset quotidien pour', currentUser);
   }
 }
+
 
 // =====================
 // Chargement des questions (comme Python)
@@ -214,10 +234,15 @@ function resetGame() {
 // =====================
 // Init
 // =====================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   console.log('🟢 DOM prêt');
-  loadPlayerState();
-  checkAndResetDailyLives(); // Vérifier reset au démarrage
+
+  await loadCurrentUser();   
+  loadPlayerState();         
+  checkDailyReset();        
+
   updateStats();
   loadQuestions();
 });
+
+
