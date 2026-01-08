@@ -11,9 +11,12 @@
     "express": "^4.21.2",
     "fs-extra": "^11.3.2",
     "pdf-parse": "^2.4.5",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "express-session": "^1.17.3",
+    "bcrypt": "^5.1.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC"
 }
+
