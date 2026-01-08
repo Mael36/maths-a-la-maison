@@ -71,8 +71,9 @@ app.post('/api/login', async (req, res) => {
 
   if (!user) return res.status(401).json({ error: 'Utilisateur inconnu' });
 
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) return res.status(401).json({ error: 'Mot de passe incorrect' });
+  const ok = await dcodeIO.bcrypt.compare(password, user.passwordHash);
+  if (!ok) return alert('Mot de passe incorrect');
+
 
   req.session.user = { username: user.username, role: user.role };
   res.json({ success: true });
@@ -791,6 +792,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
