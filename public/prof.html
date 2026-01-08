@@ -1,48 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Professeur - Gestion des comptes</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
-  <script src="/usersState.js"></script>
+<meta charset="UTF-8">
+<title>Page Prof</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+<script src="/usersState.js"></script>
 </head>
-<body class="prof">
-  <h1>Bienvenue, professeur !</h1>
-  <button onclick="window.location.href='login.html'">Déconnexion</button>
-  <section id="create-user">
-    <h2>Créer un compte élève</h2>
-    <form id="createUserForm">
-      <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-      <input type="password" name="password" placeholder="Mot de passe" required>
-      <button type="submit">Créer l'élève</button>
-    </form>
-    <p id="message"></p>
-  </section>
+<body>
+<h2>Page Professeur</h2>
+<p>Bienvenue, <span id="profUsername"></span></p>
 
-  <script>
-    const form = document.getElementById('createUserForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = {
-        username: form.username.value,
-        password: form.password.value
-      };
+<form id="createStudentForm">
+  <input type="text" id="newUsername" placeholder="Nom élève" required>
+  <input type="password" id="newPassword" placeholder="Mot de passe" required>
+  <button type="submit">Créer élève</button>
+</form>
 
-      const res = await fetch('/api/create-user', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      const msg = document.getElementById('message');
-      if (result.success) {
-        msg.textContent = "Élève créé !";
-        form.reset();
-      } else {
-        msg.textContent = result.error || "Erreur";
-      }
-    });
-  </script>
+<button id="logoutBtn">Déconnexion</button>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!currentUser) window.location.href = '/login.html';
+if (currentUser.role !== 'prof') window.location.href = '/index.html';
+document.getElementById('profUsername').textContent = currentUser.username;
+
+document.getElementById('createStudentForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('newUsername').value;
+  const password = document.getElementById('newPassword').value;
+
+  if (Object.values(usersState).some(u => u.username === username)) {
+    return alert('Utilisateur déjà existant');
+  }
+
+  await createUser(username, password, 'student');
+  alert(`Élève "${username}" créé ✅`);
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('currentUser');
+  window.location.href = '/login.html';
+});
+</script>
 </body>
 </html>
