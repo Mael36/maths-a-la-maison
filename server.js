@@ -1,4 +1,4 @@
-// server.js
+/// server.js
 const express = require('express');
 const http = require('http');
 const fs = require('fs');
@@ -31,6 +31,75 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', ensureAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+ app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    const users = loadUsers();
+    const user = Object.values(users).find(u => u.username === username);
+  
+    if (!user) {
+      return res.status(401).json({ error: 'Utilisateur inconnu' });
+    }
+  
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Mot de passe incorrect' });
+    }
+  
+    req.session.user = {
+      username: user.username,
+      role: user.role
+    };
+  
+    res.json({ success: true });
+  });
+  
+  app.get('/api/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/login.html'));
+  });
+
+  app.post('/api/create-user', ensureAuth('prof'), async (req, res) => {
+    const { username, password } = req.body;
+    const users = loadUsers();
+  
+    if (Object.values(users).some(u => u.username === username)) {
+      return res.status(400).json({ error: 'Utilisateur déjà existant' });
+    }
+  
+    const id = Date.now();
+  
+    users[id] = {
+      id,
+      username,
+      role: 'student',
+      passwordHash: await bcrypt.hash(password, 10)
+    };
+  
+    saveUsers(users);
+    res.json({ success: true });
+  });
+
+  app.post('/api/change-password', ensureAuth(), async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const users = loadUsers();
+  
+    const user = Object.values(users)
+      .find(u => u.username === req.session.user.username);
+  
+    if (!user) {
+      return res.status(400).json({ error: 'Utilisateur introuvable' });
+    }
+  
+    const ok = await bcrypt.compare(oldPassword, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Mot de passe incorrect' });
+    }
+  
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    saveUsers(users);
+  
+    res.json({ success: true });
+  });
 
 
 const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
@@ -726,79 +795,11 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
       res.status(500).json({ correct: false });
     }
   });
-
-  app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
-    const users = loadUsers();
-    const user = Object.values(users).find(u => u.username === username);
-  
-    if (!user) {
-      return res.status(401).json({ error: 'Utilisateur inconnu' });
-    }
-  
-    const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) {
-      return res.status(401).json({ error: 'Mot de passe incorrect' });
-    }
-  
-    req.session.user = {
-      username: user.username,
-      role: user.role
-    };
-  
-    res.json({ success: true });
-  });
-  
-  app.get('/api/logout', (req, res) => {
-    req.session.destroy(() => res.redirect('/login.html'));
-  });
-
-  app.post('/api/create-user', ensureAuth('prof'), async (req, res) => {
-    const { username, password } = req.body;
-    const users = loadUsers();
-  
-    if (Object.values(users).some(u => u.username === username)) {
-      return res.status(400).json({ error: 'Utilisateur déjà existant' });
-    }
-  
-    const id = Date.now();
-  
-    users[id] = {
-      id,
-      username,
-      role: 'student',
-      passwordHash: await bcrypt.hash(password, 10)
-    };
-  
-    saveUsers(users);
-    res.json({ success: true });
-  });
-
-  app.post('/api/change-password', ensureAuth(), async (req, res) => {
-    const { oldPassword, newPassword } = req.body;
-    const users = loadUsers();
-  
-    const user = Object.values(users)
-      .find(u => u.username === req.session.user.username);
-  
-    if (!user) {
-      return res.status(400).json({ error: 'Utilisateur introuvable' });
-    }
-  
-    const ok = await bcrypt.compare(oldPassword, user.passwordHash);
-    if (!ok) {
-      return res.status(401).json({ error: 'Mot de passe incorrect' });
-    }
-  
-    user.passwordHash = await bcrypt.hash(newPassword, 10);
-    saveUsers(users);
-  
-    res.json({ success: true });
-  });
 }); // end connection
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
