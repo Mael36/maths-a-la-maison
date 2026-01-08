@@ -22,6 +22,20 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
+// Auth middleware avec rôle optionnel
+function ensureAuth(role = null) {
+  return (req, res, next) => {
+    if (!req.session.user) return res.redirect('/login.html');
+    if (role && req.session.user.role !== role) return res.status(403).send('Accès interdit');
+    next();
+  };
+}
+
+app.get('/', ensureAuth(), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- HELPERS ---
@@ -32,15 +46,6 @@ function loadUsers() {
 
 function saveUsers(users) {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-// Auth middleware avec rôle optionnel
-function ensureAuth(role = null) {
-  return (req, res, next) => {
-    if (!req.session.user) return res.redirect('/login.html');
-    if (role && req.session.user.role !== role) return res.status(403).send('Accès interdit');
-    next();
-  };
 }
 
 // --- ROUTES LOGIN / USERS ---
@@ -94,11 +99,6 @@ app.post('/api/change-password', ensureAuth(), async (req, res) => {
   user.passwordHash = await bcrypt.hash(newPassword, 10);
   saveUsers(users);
   res.json({ success: true });
-});
-
-// --- ROUTE PRINCIPALE ---
-app.get('/', ensureAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // --- LOAD BOARD ---
@@ -776,6 +776,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
