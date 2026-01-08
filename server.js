@@ -28,7 +28,7 @@ function ensureAuth(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', ensureAuth(), (req, res) => {
+app.get('/', ensureAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -799,6 +799,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
