@@ -108,7 +108,7 @@ function pickQuestion() {
 // Affichage question
 // =====================
 function showNextQuestion() {
-  checkAndResetDailyLives(); // Vérifier reset à chaque affichage
+  checkDailyReset(); // Vérifier reset à chaque affichage
   if (playerState.lives <= 0) {
     alert('💀 Tu n’as plus de vies. Reviens demain.');
     const questionBoxEl = document.getElementById('questionBox');
@@ -244,5 +244,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateStats();
   loadQuestions();
 });
+
 
 
