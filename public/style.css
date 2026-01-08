@@ -1,183 +1,230 @@
+/* ==========================
+   GLOBAL
+========================== */
 body {
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#eef;
-  text-align:center;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef;
+  text-align: center;
 }
 
-/* MENU */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1976d2;
+  color: white;
+  padding: 15px 20px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+header button {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  color: #1976d2;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: 0.2s;
+}
+
+header button:hover {
+  background: #f0f0f0;
+}
+
+/* ==========================
+   MENU
+========================== */
 #menu {
-  padding:20px;
+  padding: 20px;
 }
 
 #menu input {
-  padding:8px;
-  font-size:16px;
-  width:180px;
-  margin:5px;
+  padding: 8px;
+  font-size: 16px;
+  width: 180px;
+  margin: 5px;
 }
 
 #menu button {
-  padding:8px 14px;
-  font-size:16px;
-  cursor:pointer;
+  padding: 8px 14px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
 }
 
-/* GAME */
+/* ==========================
+   GAME
+========================== */
 #game {
-  padding:15px;
-  display:none;
+  padding: 15px;
+  display: none;
 }
 
 #topBar {
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  padding:5px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px 20px;
 }
 
-/* SCORE TABLE */
+/* ==========================
+   SCORE TABLE
+========================== */
 #scoreTable {
-  background:white;
-  padding:10px;
-  border-radius:6px;
-  font-size:14px;
-  box-shadow:0 0 5px #0003;
-  min-width:130px;
-  text-align:left;
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 0 5px #0003;
+  min-width: 130px;
+  text-align: left;
 }
 
-/* DICE */
+/* ==========================
+   DICE
+========================== */
 #diceZone {
-  margin-top:10px;
-  font-size:18px;
+  margin-top: 10px;
+  font-size: 18px;
 }
 
-/* PLATEAU */
+/* ==========================
+   PLATEAU
+========================== */
 #plateauContainer {
-  position:relative;
-  width:80vw;
-  max-width:800px;
-  margin:20px auto;
+  position: relative;
+  width: 80vw;
+  max-width: 800px;
+  margin: 20px auto;
 }
 
 #plateau {
-  width:100%;
-  border-radius:10px;
-  border:2px solid #333;
-  display:block;
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid #333;
+  display: block;
 }
 
-/* Pions + cases accessibles */
 #pions,
 #possibleCases {
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  pointer-events:none; /* overlay: default none; spots will be pointer-events:auto */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 #possibleCases div {
-  pointer-events:auto;
+  pointer-events: auto;
 }
 
-/* Pawn style (was missing) */
 .pawn {
-  position:absolute;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  font-weight:bold;
-  border:3px solid white;
-  transform:translate(-50%,-50%);
-  box-shadow:0 6px 14px rgba(0,0,0,0.25);
-  pointer-events:none; /* pawns themselves don't intercept clicks */
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  border: 3px solid white;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
   z-index: 600;
 }
 
-/* Spot (reachable case) */
 .spot {
-  position:absolute;
-  width:44px;
-  height:44px;
-  border-radius:50%;
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   background: radial-gradient(circle, gold, orange);
-  border:3px solid white;
-  transform:translate(-50%,-50%);
-  cursor:pointer;
-  box-shadow:0 6px 20px rgba(255,165,0,0.5);
-  z-index:700;
+  border: 3px solid white;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 165, 0, 0.5);
+  z-index: 700;
 }
 
-/* CARTES ACTIONS */
+/* ==========================
+   CARTES ACTIONS
+========================== */
 #actionGrid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-  gap:10px;
-  margin:20px auto;
-  max-width:90vw;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 90vw;
 }
 
 .actionCard {
-  background:white;
-  padding:10px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.25s;
-  font-size:14px;
-  cursor:pointer;
-  text-align:center;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
 }
 
 .actionCard.activeAction {
-    transform: scale(1.25) !important;
-    border: 3px solid #ffd54f;
-    box-shadow: 0 0 20px #ffeb3b;
-    z-index: 10;
-    background: #fff8e1;
-    transition: 0.25s ease;
+  transform: scale(1.25) !important;
+  border: 3px solid #ffd54f;
+  box-shadow: 0 0 20px #ffeb3b;
+  z-index: 10;
+  background: #fff8e1;
+  transition: 0.25s ease;
 }
 
-/* QUESTION BOX */
+/* ==========================
+   QUESTION BOX
+========================== */
 #questionBox, #resultBox {
-  display:none;
-  background:white;
-  border-radius:8px;
-  padding:15px;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 10px #0004;
-  width:320px;
-  z-index:1000;
+  display: none;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px #0004;
+  width: 320px;
+  z-index: 1000;
 }
 
 #answerInput {
-  padding:8px;
-  margin-top:10px;
-  width:120px;
+  padding: 8px;
+  margin-top: 10px;
+  width: 120px;
 }
 
 #timer {
-  font-size:22px;
-  margin-top:10px;
-  font-weight:bold;
-  display:block;
-  background:#1976d2;
-  color:#fff;
-  padding:6px 8px;
-  border-radius:6px;
-  width:fit-content;
-  margin:8px auto 0;
+  font-size: 22px;
+  margin-top: 10px;
+  font-weight: bold;
+  display: block;
+  background: #1976d2;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  width: fit-content;
+  margin: 8px auto 0;
 }
+
 #questionImage,
 #correctionImage {
   max-width: 100%;
@@ -198,108 +245,86 @@ body {
   font-size: 14px;
 }
 
-#questionBox img {
-  display: block;
-  margin: 10px auto 0 auto; 
-  max-width: 100%;
-}
-
-#revisionContainer {
-  margin-top: 20px;
-}
-
-.revisionQuestion {
-  background: #f7f7f7;
-  padding: 12px;
-  margin-bottom: 15px;
+/* ==========================
+   PROFILE & STATS
+========================== */
+#change-password, #stats {
+  background: white;
+  padding: 20px;
   border-radius: 8px;
+  margin: 15px auto;
+  max-width: 400px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-.revisionAnswer {
-  color: #2e7d32;
-  margin-top: 6px;
+#change-password h2, #stats h2 {
+  margin-top: 0;
 }
 
-.revisionDetail {
-  color: #555;
-  font-style: italic;
-  margin-top: 4px;
-}
-
-.revisionImage {
+#passwordForm input {
   display: block;
-  max-width: 100%;
+  width: 80%;
+  padding: 8px;
   margin: 10px auto;
+  font-size: 14px;
   border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-.category {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  overflow: hidden;
-}
-
-.category-header {
-  background: #f5f5f5;
-  padding: 12px;
-  font-weight: bold;
+#passwordForm button {
+  padding: 8px 12px;
+  font-size: 14px;
   cursor: pointer;
-}
-
-.category-content {
-  display: none;
-  padding: 15px;
-}
-
-.question-block {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.question-block img {
-  max-width: 300px;
-  display: block;
-  margin: 10px 0;
-}
-
-.answer {
-  display: none;
-  background: #f0f8ff;
-  padding: 10px;
   border-radius: 6px;
-  margin-top: 10px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  font-weight: bold;
 }
 
-button.reveal-btn {
+#passwordForm button:hover {
+  background: #1565c0;
+}
+
+#msgPwd {
   margin-top: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-}
-
-.question-number {
+  color: green;
   font-weight: bold;
-  margin-bottom: 6px;
 }
 
-.question-block img {
-  max-width: 350px;
-  display: block;
-  margin: 12px auto; /* centrage horizontal */
+/* ==========================
+   PROF PAGE
+========================== */
+#create-user-form input, #create-user-form button {
+  padding: 8px;
+  margin: 5px;
+  border-radius: 6px;
 }
 
-.answer img {
-  max-width: 350px;
-  display: block;
-  margin: 12px auto;
+#create-user-form button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  font-weight: bold;
 }
 
+#create-user-form button:hover {
+  background: #1565c0;
+}
 
+/* ==========================
+   GENERAL BUTTONS
+========================== */
+button.logout-btn {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-
-
-
-
-
-
+button.logout-btn:hover {
+  background: #b71c1c;
+}
