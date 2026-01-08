@@ -23,6 +23,13 @@ app.use(session({
   saveUninitialized: false
 }));
 
+function ensureAuth(req, res, next) {
+  if (req.session.user) {
+    return next();
+  }
+  res.redirect('/login.html');
+}
+
 const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
 
 function loadUsers() {
@@ -789,6 +796,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
