@@ -3,14 +3,37 @@ const express = require('express');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 const { Server } = require('socket.io');
 const MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x"  
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+app.get('/', ensureAuth(), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'parcours-brevet-secret',
+  resave: false,
+  saveUninitialized: false
+}));
+
+const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
+
+function loadUsers() {
+  if (!fs.existsSync(USERS_FILE)) return {};
+  return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
+}
+
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
 
 // load board
 let BOARD = null;
@@ -584,6 +607,18 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     endTurn(room);
   }
 
+  function ensureAuth(role = null) {
+    return (req, res, next) => {
+      if (!req.session.user) {
+        return res.redirect('/login.html');
+      }
+      if (role && req.session.user.role !== role) {
+        return res.status(403).send('Accès interdit');
+      }
+      next();
+    };
+  }
+
   function finalizeFalse(room) {
     clearRoomTimer(room);
     io.to(room.code).emit('results', { correct: false, players: room.players, message: 'Mauvaise réponse / Temps écoulé' });
@@ -682,11 +717,79 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     }
   });
 
+  app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    const users = loadUsers();
+    const user = Object.values(users).find(u => u.username === username);
+  
+    if (!user) {
+      return res.status(401).json({ error: 'Utilisateur inconnu' });
+    }
+  
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Mot de passe incorrect' });
+    }
+  
+    req.session.user = {
+      username: user.username,
+      role: user.role
+    };
+  
+    res.json({ success: true });
+  });
+  
+  app.get('/api/logout', (req, res) => {
+    req.session.destroy(() => res.redirect('/login.html'));
+  });
 
+  app.post('/api/create-user', ensureAuth('prof'), async (req, res) => {
+    const { username, password } = req.body;
+    const users = loadUsers();
+  
+    if (Object.values(users).some(u => u.username === username)) {
+      return res.status(400).json({ error: 'Utilisateur déjà existant' });
+    }
+  
+    const id = Date.now();
+  
+    users[id] = {
+      id,
+      username,
+      role: 'student',
+      passwordHash: await bcrypt.hash(password, 10)
+    };
+  
+    saveUsers(users);
+    res.json({ success: true });
+  });
+
+  app.post('/api/change-password', ensureAuth(), async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const users = loadUsers();
+  
+    const user = Object.values(users)
+      .find(u => u.username === req.session.user.username);
+  
+    if (!user) {
+      return res.status(400).json({ error: 'Utilisateur introuvable' });
+    }
+  
+    const ok = await bcrypt.compare(oldPassword, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Mot de passe incorrect' });
+    }
+  
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    saveUsers(users);
+  
+    res.json({ success: true });
+  });
 }); // end connection
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
