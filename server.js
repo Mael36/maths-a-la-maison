@@ -40,6 +40,18 @@ app.get('/', ensureAuth(), (req, res) => {
   }
 });
 
+app.get('/api/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ logged: false });
+  }
+  res.json({
+    logged: true,
+    username: req.session.user.username,
+    role: req.session.user.role
+  });
+});
+
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -792,6 +804,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
