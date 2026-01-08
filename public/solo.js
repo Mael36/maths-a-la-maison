@@ -12,16 +12,19 @@ let STORAGE_KEY = null;
 
 async function loadCurrentUser() {
   const res = await fetch('/api/me');
-  if (!res.ok) {
-    alert('Non connecté');
+  const data = await res.json();
+
+  if (!data.connected) {
+    alert('Session expirée, merci de te reconnecter');
     window.location.href = '/login.html';
     return;
   }
-  const data = await res.json();
+
   currentUser = data.username;
   STORAGE_KEY = `soloState_${currentUser}`;
-  console.log('[SOLO] Utilisateur:', currentUser);
+  console.log('[SOLO] Utilisateur connecté :', currentUser);
 }
+
 
 
 // =====================
@@ -244,6 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateStats();
   loadQuestions();
 });
+
 
 
 
