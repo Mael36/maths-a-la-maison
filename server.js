@@ -21,6 +21,19 @@ app.use(session({
   saveUninitialized: false
 }));
 
+app.get('/api/me', (req, res) => {
+  if (!req.session.user) {
+    return res.json({ connected: false });
+  }
+
+  res.json({
+    connected: true,
+    username: req.session.user.username,
+    role: req.session.user.role
+  });
+});
+
+
 // Auth middleware avec rôle optionnel
 function ensureAuth(role = null) {
   return (req, res, next) => {
@@ -39,19 +52,6 @@ app.get('/', ensureAuth(), (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
   }
 });
-
-app.get('/api/me', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ logged: false });
-  }
-  res.json({
-    logged: true,
-    username: req.session.user.username,
-    role: req.session.user.role
-  });
-});
-
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -804,6 +804,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
