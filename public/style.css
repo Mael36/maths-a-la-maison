@@ -3,44 +3,89 @@
 ========================== */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #eef;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  min-height: 100vh;
   text-align: center;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #1976d2;
-  color: white;
-  padding: 15px 20px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 20px;
-}
-
-header button {
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background: #fff;
-  color: #1976d2;
-  font-weight: bold;
-  margin-left: 10px;
-  transition: 0.2s;
-}
-
-header button:hover {
-  background: #f0f0f0;
+/* ==========================
+   CONTAINERS
+========================== */
+.container {
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  margin: 50px auto;
 }
 
 /* ==========================
-   MENU
+   FORM ELEMENTS
+========================== */
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 5px #1976d2;
+}
+
+button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-top: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+button:hover {
+  background: #1565c0;
+}
+
+button.logout-btn {
+  background: #d32f2f;
+  margin-top: 20px;
+}
+
+button.logout-btn:hover {
+  background: #b71c1c;
+}
+
+/* ==========================
+   MESSAGES
+========================== */
+.message {
+  font-size: 14px;
+  margin-top: 10px;
+  color: green;
+  font-weight: bold;
+}
+
+.message.error {
+  color: #d32f2f;
+}
+
+/* ==========================
+   MENU & GAME
 ========================== */
 #menu {
   padding: 20px;
@@ -57,12 +102,8 @@ header button:hover {
   padding: 8px 14px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 6px;
 }
 
-/* ==========================
-   GAME
-========================== */
 #game {
   padding: 15px;
   display: none;
@@ -75,9 +116,6 @@ header button:hover {
   padding: 5px 20px;
 }
 
-/* ==========================
-   SCORE TABLE
-========================== */
 #scoreTable {
   background: white;
   padding: 10px;
@@ -88,17 +126,11 @@ header button:hover {
   text-align: left;
 }
 
-/* ==========================
-   DICE
-========================== */
 #diceZone {
   margin-top: 10px;
   font-size: 18px;
 }
 
-/* ==========================
-   PLATEAU
-========================== */
 #plateauContainer {
   position: relative;
   width: 80vw;
@@ -139,7 +171,7 @@ header button:hover {
   font-weight: bold;
   border: 3px solid white;
   transform: translate(-50%, -50%);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
   pointer-events: none;
   z-index: 600;
 }
@@ -153,13 +185,10 @@ header button:hover {
   border: 3px solid white;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 165, 0, 0.5);
+  box-shadow: 0 6px 20px rgba(255,165,0,0.5);
   z-index: 700;
 }
 
-/* ==========================
-   CARTES ACTIONS
-========================== */
 #actionGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -173,7 +202,7 @@ header button:hover {
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   transition: transform 0.25s;
   font-size: 14px;
   cursor: pointer;
@@ -190,7 +219,7 @@ header button:hover {
 }
 
 /* ==========================
-   QUESTION BOX
+   QUESTION BOX & RESULTS
 ========================== */
 #questionBox, #resultBox {
   display: none;
@@ -246,86 +275,120 @@ header button:hover {
 }
 
 /* ==========================
-   PROFILE & STATS
+   REVISION / QUESTIONS
 ========================== */
-#change-password, #stats {
-  background: white;
-  padding: 20px;
+#revisionContainer {
+  margin-top: 20px;
+}
+
+.revisionQuestion {
+  background: #f7f7f7;
+  padding: 12px;
+  margin-bottom: 15px;
   border-radius: 8px;
-  margin: 15px auto;
-  max-width: 400px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-#change-password h2, #stats h2 {
-  margin-top: 0;
+.revisionAnswer {
+  color: #2e7d32;
+  margin-top: 6px;
 }
 
-#passwordForm input {
+.revisionDetail {
+  color: #555;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.revisionImage {
   display: block;
-  width: 80%;
-  padding: 8px;
+  max-width: 100%;
   margin: 10px auto;
-  font-size: 14px;
   border-radius: 6px;
-  border: 1px solid #ccc;
 }
 
-#passwordForm button {
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 6px;
-  background: #1976d2;
-  color: white;
-  border: none;
+.category {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.category-header {
+  background: #f5f5f5;
+  padding: 12px;
   font-weight: bold;
+  cursor: pointer;
 }
 
-#passwordForm button:hover {
-  background: #1565c0;
+.category-content {
+  display: none;
+  padding: 15px;
 }
 
-#msgPwd {
+.question-block {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.question-block img {
+  max-width: 350px;
+  display: block;
+  margin: 12px auto;
+}
+
+.answer {
+  display: none;
+  background: #f0f8ff;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+button.reveal-btn {
   margin-top: 8px;
-  color: green;
-  font-weight: bold;
-}
-
-/* ==========================
-   PROF PAGE
-========================== */
-#create-user-form input, #create-user-form button {
-  padding: 8px;
-  margin: 5px;
-  border-radius: 6px;
-}
-
-#create-user-form button {
-  background: #1976d2;
-  color: white;
-  border: none;
-  font-weight: bold;
-}
-
-#create-user-form button:hover {
-  background: #1565c0;
-}
-
-/* ==========================
-   GENERAL BUTTONS
-========================== */
-button.logout-btn {
-  background: #d32f2f;
-  color: white;
-  border: none;
   padding: 6px 10px;
-  border-radius: 6px;
   cursor: pointer;
+}
+
+.question-number {
   font-weight: bold;
+  margin-bottom: 6px;
 }
 
-button.logout-btn:hover {
-  background: #b71c1c;
+/* ==========================
+   PROFILE / PROF PAGE
+========================== */
+#prof-actions {
+  margin-top: 20px;
 }
 
+#prof-actions button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* ==========================
+   LOGIN PAGE
+========================== */
+#login-form input,
+#login-form button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 500px) {
+  .container {
+    padding: 20px;
+  }
+
+  input, button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
