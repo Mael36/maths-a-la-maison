@@ -16,6 +16,20 @@
   <button onclick="window.location.href='login.html'">Déconnexion</button>
 </header>
 <body>
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) window.location.href = '/login.html';
+    if (currentUser.role !== 'student') window.location.href = '/prof.html';
+    
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      window.location.href = '/profile.html';
+    });
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('currentUser');
+      window.location.href = '/login.html';
+    });
+    </script>
   <div id="menu">
     <h1>Maths à la Maison</h1>
     <input type="text" id="playerName" placeholder="Ton prénom" value="Joueur">
@@ -87,6 +101,7 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
