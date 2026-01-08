@@ -43,14 +43,7 @@ app.get('/', ensureAuth(), (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Chemin vers le fichier users.json dans data/
-const DATA_DIR = path.join(__dirname, 'data');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-
-// Crée le dossier data si inexistant
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
-// Charge les utilisateurs depuis users.json
+const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
 function loadUsers() {
   if (!fs.existsSync(USERS_FILE)) return {};
   try {
@@ -61,7 +54,6 @@ function loadUsers() {
   }
 }
 
-// Sauvegarde les utilisateurs dans users.json
 function saveUsers(users) {
   try {
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
@@ -799,6 +791,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
