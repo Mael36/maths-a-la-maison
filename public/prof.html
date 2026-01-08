@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Professeur - Gestion des comptes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="prof">
+  <h1>Bienvenue, professeur !</h1>
+
+  <section id="create-user">
+    <h2>Créer un compte élève</h2>
+    <form id="createUserForm">
+      <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+      <input type="password" name="password" placeholder="Mot de passe" required>
+      <button type="submit">Créer l'élève</button>
+    </form>
+    <p id="message"></p>
+  </section>
+
+  <script>
+    const form = document.getElementById('createUserForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        username: form.username.value,
+        password: form.password.value
+      };
+
+      const res = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      const msg = document.getElementById('message');
+      if (result.success) {
+        msg.textContent = "Élève créé !";
+        form.reset();
+      } else {
+        msg.textContent = result.error || "Erreur";
+      }
+    });
+  </script>
+</body>
+</html>
