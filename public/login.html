@@ -25,9 +25,10 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
 
   const user = Object.values(usersState).find(u => u.username === username);
   if (!user) return alert('Utilisateur inconnu');
-
-  const ok = await bcrypt.compare(password, user.passwordHash);
+  
+  const ok = await dcodeIO.bcrypt.compare(password, user.passwordHash);
   if (!ok) return alert('Mot de passe incorrect');
+
 
   localStorage.setItem('currentUser', JSON.stringify({
     username: user.username,
