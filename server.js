@@ -33,8 +33,15 @@ function ensureAuth(role = null) {
 }
 
 app.get('/', ensureAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  if (req.session.user.role === 'prof') {
+    // Redirige le prof vers sa page de gestion
+    res.sendFile(path.join(__dirname, 'public', 'prof.html'));
+  } else {
+    // Redirige l'élève vers la page de jeu
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
 });
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -79,7 +86,7 @@ app.post('/api/create-user', ensureAuth('prof'), async (req, res) => {
   users[id] = {
     id,
     username,
-    role: 'student',
+    role: 'élève',
     passwordHash: await bcrypt.hash(password, 10)
   };
   saveUsers(users);
@@ -776,6 +783,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
