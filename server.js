@@ -11,17 +11,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.get('/', ensureAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'parcours-brevet-secret',
   resave: false,
   saveUninitialized: false
 }));
+
 
 function ensureAuth(req, res, next) {
   if (req.session.user) {
@@ -29,6 +25,13 @@ function ensureAuth(req, res, next) {
   }
   res.redirect('/login.html');
 }
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', ensureAuth(), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
 
@@ -796,6 +799,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
