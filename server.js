@@ -13,8 +13,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const USERS_FILE = path.join(__dirname, 'public', 'data', 'users.json');
-
 // --- MIDDLEWARES ---
 app.use(express.json());
 app.use(session({
@@ -45,15 +43,33 @@ app.get('/', ensureAuth(), (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- HELPERS ---
+// Chemin vers le fichier users.json dans data/
+const DATA_DIR = path.join(__dirname, 'data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+
+// Crée le dossier data si inexistant
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// Charge les utilisateurs depuis users.json
 function loadUsers() {
   if (!fs.existsSync(USERS_FILE)) return {};
-  return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
+  try {
+    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8'));
+  } catch (e) {
+    console.error('Erreur lecture users.json:', e.message);
+    return {};
+  }
 }
 
+// Sauvegarde les utilisateurs dans users.json
 function saveUsers(users) {
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Erreur écriture users.json:', e.message);
+  }
 }
+
 
 // --- ROUTES LOGIN / USERS ---
 app.post('/api/login', async (req, res) => {
@@ -783,6 +799,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
