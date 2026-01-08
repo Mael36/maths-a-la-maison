@@ -1,65 +1,45 @@
 console.log('🟢 usersState.js chargé');
 
-// Objet qui contiendra les comptes côté client
-let usersState = {};
-
-// =====================
-// Chargement des users depuis localStorage
-// =====================
-function loadUsersState() {
-  const saved = localStorage.getItem('usersState');
-  if (saved) {
-    usersState = JSON.parse(saved);
-    console.log('[USERS] État chargé depuis localStorage:', usersState);
-  } else {
-    // Initialisation avec le prof par défaut
-    usersState = {
-      1: {
-        id: 1,
-        username: "prof",
-        role: "prof",
-        passwordHash: "$2b$10$QqvmMCXGGu5ur.1ZGb1zcOQXSrfKFp5XepmbcERLWehVHbECdkX6e"
-      }
-    };
-    console.log('[USERS] Aucun état trouvé, création du prof par défaut.');
-    saveUsersState();
-  }
+// Users stockés dans localStorage
+if (!localStorage.getItem('usersState')) {
+  const defaultUsers = {
+    "1": {
+      id: 1,
+      username: "prof",
+      role: "prof",
+      passwordHash: "$2b$10$QqvmMCXGGu5ur.1ZGb1zcOQXSrfKFp5XepmbcERLWehVHbECdkX6e"
+    }
+  };
+  localStorage.setItem('usersState', JSON.stringify(defaultUsers));
 }
 
-// =====================
-// Sauvegarde des users dans localStorage
-// =====================
-function saveUsersState() {
-  localStorage.setItem('usersState', JSON.stringify(usersState));
-  console.log('[USERS] État sauvegardé dans localStorage:', usersState);
+function getUsers() {
+  return JSON.parse(localStorage.getItem('usersState') || '{}');
 }
 
-// =====================
-// Ajouter un utilisateur côté client
-// =====================
-async function createUser(username, password, role = 'student') {
-  // hash simple côté client pour éviter stockage clair (optionnel)
-  const hash = await bcrypt.hash(password, 10);
+function saveUsers(users) {
+  localStorage.setItem('usersState', JSON.stringify(users));
+}
+
+async function createUser(username, password, role='student') {
+  const users = getUsers();
   const id = Date.now();
-  usersState[id] = { id, username, role, passwordHash: hash };
-  saveUsersState();
-  console.log(`[USERS] Utilisateur créé: ${username} (${role})`);
+  const hash = await bcrypt.hash(password, 10);
+  users[id] = { id, username, role, passwordHash: hash };
+  saveUsers(users);
 }
 
-// =====================
-// Modifier le mot de passe côté client
-// =====================
 async function changePassword(username, oldPassword, newPassword) {
-  const user = Object.values(usersState).find(u => u.username === username);
+  const users = getUsers();
+  const user = Object.values(users).find(u => u.username === username);
   if (!user) return false;
+
   const ok = await bcrypt.compare(oldPassword, user.passwordHash);
   if (!ok) return false;
+
   user.passwordHash = await bcrypt.hash(newPassword, 10);
-  saveUsersState();
+  saveUsers(users);
   return true;
 }
 
-// =====================
-// Initialisation automatique
-// =====================
-loadUsersState();
+const usersState = getUsers();
