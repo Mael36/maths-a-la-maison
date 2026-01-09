@@ -22,10 +22,15 @@ app.use(session({
 }));
 
 app.get('/api/me', (req, res) => {
+  console.log('[API/ME] Session ID:', req.sessionID); // Log l'ID de session
+  console.log('[API/ME] Session data:', req.session); // Log toute la session
+  console.log('[API/ME] User in session:', req.session.user); // Log spécifiquement l'user
+
   if (!req.session.user) {
+    console.log('[API/ME] Pas d\'user → retourne false');
     return res.json({ connected: false });
   }
-
+  console.log('[API/ME] User trouvé → retourne true');
   res.json({
     connected: true,
     username: req.session.user.username,
@@ -804,6 +809,7 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
+
 
 
 
