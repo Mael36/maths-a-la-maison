@@ -11,7 +11,10 @@ let currentUser = null;
 let STORAGE_KEY = null;
 
 async function loadCurrentUser() {
-  const res = await fetch('/api/me');
+  const res = await fetch('/api/me', {
+    credentials: 'include'
+  });
+
   const data = await res.json();
 
   if (!data.connected) {
@@ -247,6 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateStats();
   loadQuestions();
 });
+
 
 
 
