@@ -18,5 +18,20 @@
     "username": "eleve3",
     "role": "élève",
     "passwordHash": "$2b$10$DkcOQ1pPYBK.qljZo0xAO.QDJMP/woWe2TBG8bUHjkJHWfnTnqimG"
+  },
+  "Maël": {
+    "username": "Maël",
+    "role": "élève",
+    "passwordHash": "$2b$10$0SMtaruWbZJOrywziSUIPOtOoeeH03DlEgqNstfJ/3MyXlUVZCSbG"
+  },
+  "Inaki": {
+    "username": "Inaki",
+    "role": "élève",
+    "passwordHash": "$2b$10$c4aIJzUULVOJKW6D89ZGMOqnASQnRm0.ctzZtl6UMlbKPGnUCTo5q"
+  },
+  "Emmeran": {
+    "username": "Emmeran",
+    "role": "élève",
+    "passwordHash": "$2b$10$r4C4xRLgI0/E7qUztE86luucDgc/LxVemjmlK5vitDikULz928Dx6"
   }
 }
