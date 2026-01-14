@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      background: #f4f4f4;
+      margin: 0;
+    }
+    .profile-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #34495e;
+    }
+    .stat {
+      font-size: 1.4em;
+      margin: 15px 0;
+      padding: 15px;
+      background: #ecf0f1;
+      border-radius: 8px;
+    }
+    .stat strong {
+      color: #2980b9;
+    }
+    form {
+      margin: 30px auto;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    input {
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 12px;
+      font-size: 1.1em;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 20px;
+    }
+    .success { color: #27ae60; }
+    .error { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <h1>Mon Profil</h1>
+    <p>Bienvenue, <strong id="username"></strong> !</p>
+
+    <h2>Mode Classique</h2>
+    <div class="stat">Score du jour : <strong id="dailyScore">0</strong> / 560</div>
+    <div class="stat">Meilleur score du jour : <strong id="dailyHighscore">0</strong></div>
+    <div class="stat">Score total (classique) : <strong id="totalScore">0</strong></div>
+
+    <h2>Mode Infini</h2>
+    <div class="stat">Score total : <strong id="infiniteScore">0</strong></div>
+
+    <h2>Changer mon mot de passe</h2>
+    <form id="changePasswordForm">
+      <input type="password" id="oldPassword" placeholder="Ancien mot de passe" required>
+      <input type="password" id="newPassword" placeholder="Nouveau mot de passe" required>
+      <input type="password" id="confirmPassword" placeholder="Confirmer le nouveau" required>
+      <button type="submit">Modifier le mot de passe</button>
+    </form>
+    <p id="message"></p>
+
+    <button onclick="window.location.href='/index.html'">Retour au menu principal</button>
+  </div>
+
+  <script>
+    // Vérification connexion
+    const currentUserData = localStorage.getItem('currentUser');
+    if (!currentUserData) {
+      alert('Vous devez être connecté pour voir votre profil.');
+      window.location.href = '/login.html';
+    }
+
+    const user = JSON.parse(currentUserData);
+    document.getElementById('username').textContent = user.username;
+
+    // === Stats Mode Classique ===
+    const classicKey = 'soloClassic_' + user.username;
+    const classicSaved = localStorage.getItem(classicKey);
+    if (classicSaved) {
+      const data = JSON.parse(classicSaved);
+      const today = new Date().toISOString().slice(0, 10);
+
+      let displayDaily = data.dailyScore || 0;
+      let displayHigh = data.dailyHighscore || 0;
+
+      // Simulation reset pour affichage (nouveau jour = score jour à 0)
+      if (data.lastResetDate !== today) {
+        displayDaily = 0;
+      }
+
+      document.getElementById('dailyScore').textContent = displayDaily;
+      document.getElementById('dailyHighscore').textContent = displayHigh;
+      document.getElementById('totalScore').textContent = data.totalScore || 0;
+    }
+
+    // === Stats Mode Infini (uniquement score total) ===
+    const infiniteKey = 'soloInfinite_' + user.username;
+    const infiniteSaved = localStorage.getItem(infiniteKey);
+    if (infiniteSaved) {
+      const data = JSON.parse(infiniteSaved);
+      document.getElementById('infiniteScore').textContent = data.score || 0;
+    }
+
+    // === Changement mot de passe ===
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const oldPass = document.getElementById('oldPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirmPass = document.getElementById('confirmPassword').value;
+      const messageEl = document.getElementById('message');
+
+      messageEl.textContent = '';
+      messageEl.className = '';
+
+      if (newPass !== confirmPass) {
+        messageEl.textContent = 'Les nouveaux mots de passe ne correspondent pas.';
+        messageEl.className = 'error';
+        return;
+      }
+
+      if (newPass.length < 6) {
+        messageEl.textContent = 'Le nouveau mot de passe doit faire au moins 6 caractères.';
+        messageEl.className = 'error';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: user.username,
+            oldPassword: oldPass,
+            newPassword: newPass
+          })
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          messageEl.textContent = 'Mot de passe modifié avec succès !';
+          messageEl.className = 'success';
+          document.getElementById('oldPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          messageEl.textContent = result.error || 'Erreur lors de la modification.';
+          messageEl.className = 'error';
+        }
+      } catch (err) {
+        messageEl.textContent = 'Erreur réseau ou serveur.';
+        messageEl.className = 'error';
+      }
+    });
+  </script>
+</body>
+</html>

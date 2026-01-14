@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Parcours Brevet - Mode Classique</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div style="text-align: center; margin: 20px 0;">
+    <button onclick="window.location.href='/index.html'" style="padding: 10px 20px; font-size: 1em; cursor: pointer;">
+      ← Retour au menu principal
+    </button>
+  </div>
+  <h1>Parcours Brevet - Mode Classique 🧠</h1>
+
+  <div id="stats">
+    Niveau : <span id="levelDisplay">1</span> / 560<br>
+    Vies : <span id="livesDisplay">❤️ 3</span>
+  </div>
+
+  <div id="extraStats" style="font-weight:bold; margin:15px 0; text-align:center;"></div>
+
+  <div id="questionBox">
+    <h3 id="themeTitle">Thème</h3>
+    <p id="questionText">Question ici</p>
+    <img id="questionImg" src="" alt="Illustration" style="display:none; max-width:90%; margin:10px auto;">
+    <input type="text" id="answerInput" placeholder="Ta réponse">
+    <button id="sendAnswerBtn">Envoyer</button>
+  </div>
+
+  <div id="resultBox" style="display:none; text-align:center; margin:20px;">
+    <h2 id="resultText"></h2>
+  </div>
+
+  <script src="solo-classic.js"></script>
+</body>
+</html>

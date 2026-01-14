@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Éditeur de Questions - Parcours Brevet</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Style simple pour modal */
+    #addQuestionModal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    #addQuestionModal form { display: flex; flex-direction: column; }
+    #addQuestionModal label { margin-top: 10px; }
+    #addQuestionModal input, #addQuestionModal textarea { width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>🛠 Éditeur de Questions</h1>
+  <a href="/" class="back-btn">⬅ Retour</a>
+  <button id="add-category-btn">Ajouter une catégorie</button>
+  <button id="save-all-btn">Sauvegarder tout</button>
+
+  <div id="editorContainer"></div>
+
+  <!-- Modal pour ajouter question -->
+  <div id="addQuestionModal">
+    <h2>Ajouter une question</h2>
+    <form id="addQuestionForm">
+      <label for="addQ">Question (q):</label>
+      <textarea id="addQ" required></textarea>
+
+      <label for="addA">Réponse (a):</label>
+      <textarea id="addA" required></textarea>
+
+      <label for="addD">Détails (d, facultatif):</label>
+      <textarea id="addD"></textarea>
+
+      <label for="addImg">Image question (img, facultatif):</label>
+      <input type="file" id="addImg" accept="image/*">
+
+      <label for="addImgrep">Image réponse (imgrep, facultatif):</label>
+      <input type="file" id="addImgrep" accept="image/*">
+
+      <button type="submit">Ajouter</button>
+      <button type="button" onclick="closeAddModal()">Annuler</button>
+    </form>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>

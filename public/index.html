@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maths à la Maison</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Socket.io client -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<header>
+  <h1>Bienvenue, élève !</h1>
+  <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 10px;">
+    <button id="btnBack" style="display: none;" onclick="window.location.href='/'">← Retour à l'accueil</button>
+    <button onclick="window.location.href='profile.html'">Mon Profil</button>
+    <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html'">Déconnexion</button>
+  </div>
+</header>
+
+  <script>
+    // Gestion des boutons header
+    document.getElementById('btnProfile').addEventListener('click', () => {
+      window.location.href = '/profile.html';
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      if (confirm('Veux-tu vraiment te déconnecter ?')) {
+        localStorage.removeItem('currentUser');
+        window.location.href = '/login.html';
+      }
+    });
+  </script>
+
+   <div id="menu">
+    <h1>Maths à la Maison</h1>
+    
+    <button id="createBtn">Créer une partie</button>
+    <p>OU</p>
+    <input type="text" id="roomCode" placeholder="Code (ex: ABCD)" maxlength="4">
+    <button id="joinBtn">Rejoindre</button>
+  </div>
+
+  <div id="game" style="display:none;">
+    <div id="topBar">
+      <div>
+        <h2>Salle : <span id="roomDisplay">-</span></h2>
+        <button id="startBtn">Démarrer la partie</button>
+      </div>
+      <div id="currentQuestionInfo" style="display: none; margin: 15px 0; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+        <strong>Question de :</strong> <span id="currentPlayerName"></span><br>
+        <strong>Thème :</strong> <span id="currentTheme"></span><br>
+        <strong>Question :</strong> <span id="currentQText"></span>
+        <img id="currentQImg" style="max-width: 100%; margin-top: 10px; display: none;" />
+      </div>
+      <div id="scoreTable"></div>
+    </div>
+    <div id="diceZone">
+      Résultat du dé : <span id="diceResult">-</span>
+      <button id="rollBtn" disabled>Lancer le dé</button>
+    </div>
+    <div id="plateauContainer">
+      <img src="assets/plateau.png" id="plateau" alt="Plateau">
+      <div id="pions"></div>
+      <div id="possibleCases"></div>
+    </div>
+
+    <h3>Actions</h3>
+    <div id="actionGrid"></div>
+
+    <div id="questionBox" style="display:none;">
+      <h3 id="themeTitle"></h3>
+      <p id="questionText"></p>
+      <img id="questionImg" src="" alt="" style="max-width:100%; display:none; margin-top:10px;">
+      <div id="timer" style="display:none;"></div>
+      <input type="text" id="answerInput" placeholder="Ta réponse">
+      <button id="sendAnswerBtn">Envoyer</button>
+    </div>
+
+    <div id="resultBox" style="display:none;">
+      <h2 id="resultText"></h2>
+      <pre id="correctionText" style="display:none;"></pre>
+      <img id="correctionImage" style="display:none; max-width:100%;" />
+    </div>
+
+    <div id="choice" style="display:none; position:fixed; bottom:20px; left:20px; background:#fff; padding:10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2);"></div>
+  </div>
+
+  <hr style="margin:30px 0">
+
+  <hr style="margin:30px 0">
+  <h2>Mode Solo Classique 🎮</h2>
+  <p>3 vies par jour · Ordre identique pour toute la classe · Score max 560/jour</p>
+  <button onclick="window.location.href='solo-classic.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+    Lancer le Parcours Brevet Classique
+  </button>
+
+  <h2>Mode Solo Infini 🎮</h2>
+  <p>Sans limite de vies · Score illimité · Ordre aléatoire</p>
+  <button onclick="window.location.href='solo-infinite.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+    Lancer le Parcours Brevet Infini
+  </button>
+
+  <h2>Mode Révision 🎮</h2>
+  <button onclick="window.location.href='revision.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+    Parcours Brevet
+  </button>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

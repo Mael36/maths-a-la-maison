@@ -1,0 +1,410 @@
+/* ==========================
+   GLOBAL
+========================== */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* ==========================
+   CONTAINERS
+========================== */
+.container {
+  background: #ffffff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  margin: 50px auto;
+}
+
+#btnBack {
+  display: none;          /* caché par défaut */
+  padding: 8px 16px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+
+/* ==========================
+   FORM ELEMENTS
+========================== */
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 5px #1976d2;
+}
+
+button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-top: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+button:hover {
+  background: #1565c0;
+}
+
+button.logout-btn {
+  background: #d32f2f;
+  margin-top: 20px;
+}
+
+button.logout-btn:hover {
+  background: #b71c1c;
+}
+
+/* ==========================
+   MESSAGES
+========================== */
+.message {
+  font-size: 14px;
+  margin-top: 10px;
+  color: green;
+  font-weight: bold;
+}
+
+.message.error {
+  color: #d32f2f;
+}
+
+/* ==========================
+   MENU & GAME
+========================== */
+#menu {
+  padding: 20px;
+}
+
+#menu input {
+  padding: 8px;
+  font-size: 16px;
+  width: 180px;
+  margin: 5px;
+}
+
+#menu button {
+  padding: 8px 14px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#game {
+  padding: 15px;
+  display: none;
+}
+
+#topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 5px 20px;
+}
+
+#scoreTable {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  box-shadow: 0 0 5px #0003;
+  min-width: 130px;
+  text-align: left;
+}
+
+#diceZone {
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+#plateauContainer {
+  position: relative;
+  width: 80vw;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+#plateau {
+  width: 100%;
+  border-radius: 10px;
+  border: 2px solid #333;
+  display: block;
+  position: relative;
+  z-index: 1;
+
+}
+
+#pions,
+#possibleCases {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  inset: 0;
+  z-index: 500;
+}
+
+#possibleCases div {
+  pointer-events: auto;
+}
+
+.pawn {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 36px;
+  font-size: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+  z-index: 10;
+  transform: translate(-50%, -50%);
+}
+
+.spot {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  background: gold;
+  border: 3px solid #d4af37;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255,215,0,0.9);
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+#actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 90vw;
+}
+
+.actionCard {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: transform 0.25s;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.actionCard.activeAction {
+  transform: scale(1.25) !important;
+  border: 3px solid #ffd54f;
+  box-shadow: 0 0 20px #ffeb3b;
+  z-index: 10;
+  background: #fff8e1;
+  transition: 0.25s ease;
+}
+
+/* ==========================
+   QUESTION BOX & RESULTS
+========================== */
+#questionBox, #resultBox {
+  display: none;
+  background: white;
+  border-radius: 8px;
+  margin-top: 40px;
+  padding: 15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px #0004;
+  width: 320px;
+  z-index: 1000;
+}
+
+#answerInput {
+  padding: 8px;
+  margin-top: 10px;
+  width: 120px;
+}
+
+#timer {
+  font-size: 22px;
+  margin-top: 10px;
+  font-weight: bold;
+  display: block;
+  background: #1976d2;
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  width: fit-content;
+  margin: 8px auto 0;
+}
+
+#questionImage,
+#correctionImage {
+  max-width: 100%;
+  max-height: 250px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#correctionText {
+  text-align: left;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+
+/* ==========================
+   REVISION / QUESTIONS
+========================== */
+#revisionContainer {
+  margin-top: 20px;
+}
+
+.revisionQuestion {
+  background: #f7f7f7;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.revisionAnswer {
+  color: #2e7d32;
+  margin-top: 6px;
+}
+
+.revisionDetail {
+  color: #555;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.revisionImage {
+  display: block;
+  max-width: 100%;
+  margin: 10px auto;
+  border-radius: 6px;
+}
+
+.category {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.category-header {
+  background: #f5f5f5;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.category-content {
+  display: none;
+  padding: 15px;
+}
+
+.question-block {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.question-block img {
+  max-width: 350px;
+  display: block;
+  margin: 12px auto;
+}
+
+.answer {
+  display: none;
+  background: #f0f8ff;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+button.reveal-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.question-number {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+/* ==========================
+   PROFILE / PROF PAGE
+========================== */
+#prof-actions {
+  margin-top: 20px;
+}
+
+#prof-actions button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+}
+
+/* ==========================
+   LOGIN PAGE
+========================== */
+#login-form input,
+#login-form button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+@media (max-width: 500px) {
+  .container {
+    padding: 20px;
+  }
+
+  input, button {
+    font-size: 14px;
+    padding: 10px;
+  }
+}

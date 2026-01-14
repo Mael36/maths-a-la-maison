@@ -1,0 +1,21 @@
+{
+  "name": "maths-maison-mvp",
+  "version": "1.0.0",
+  "description": "Jeu éducatif Maths à la Maison digitalisé",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "fs-extra": "^11.3.2",
+    "multer": "^2.0.2",
+    "pdf-parse": "^2.4.5",
+    "socket.io": "^4.8.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
