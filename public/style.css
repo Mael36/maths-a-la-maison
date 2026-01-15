@@ -135,6 +135,7 @@ button.logout-btn:hover {
   box-shadow: 0 0 5px #0003;
   min-width: 130px;
   text-align: left;
+   margin-top: 60px;
 }
 
 #diceZone {
@@ -432,3 +433,4 @@ button.reveal-btn {
     padding: 10px;
   }
 }
+
