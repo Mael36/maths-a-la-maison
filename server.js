@@ -1062,17 +1062,18 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     if (room.players && room.players.length > 0) {
       room.currentIndex = (room.currentIndex + 1) % room.players.length;
       const next = room.players[room.currentIndex];
-  
-      // Mise à jour visuelle des joueurs
+    
+      // 1. Mise à jour globale de la liste des joueurs
       io.to(room.code).emit('players', serializePlayers(room.players));
-  
-      // Envoi explicite du tour au joueur suivant (et à tous pour cohérence)
+    
+      // 2. Envoi yourTurn à TOUTE la room (important !)
       io.to(room.code).emit('yourTurn', { playerId: next.id });
+    
+      // 3. Envoi spécifique au joueur suivant (redondance)
       io.to(next.id).emit('yourTurn', { playerId: next.id });
-  
-      // Nettoyage interface
+    
+      // Nettoyage interface pour tout le monde
       io.to(room.code).emit('actionClear');
-      io.to(room.code).emit('results', { reset: true }); // optionnel, pour cacher les popups
     }
   }
 
@@ -1240,3 +1241,4 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
   }
 
 });
+
