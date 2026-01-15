@@ -7,7 +7,6 @@ let activePlayers = [];
 let clientTimer = null;
 let requiredCategories = [];
 
-// Récupération du username depuis localStorage (comme dans profile.html)
 let currentUser = null;
 try {
   const userData = localStorage.getItem('currentUser');
@@ -18,14 +17,12 @@ try {
   console.error('Erreur parsing currentUser:', e);
 }
 
-// Si pas connecté → redirection vers login
 if (!currentUser || !currentUser.username) {
   alert('Vous devez être connecté pour jouer.');
   window.location.href = '/login.html';
 }
 
 // Envoi automatique du username après connexion Socket
-// Juste après const socket = io();
 socket.on('connect', () => {
   const userData = localStorage.getItem('currentUser');
   if (!userData) {
@@ -81,7 +78,6 @@ const elResultBox = $('resultBox');
 const elResultText = $('resultText');
 const elChoice = $('choice');
 
-// Créer une partie (sans pseudo)
 elCreate.onclick = () => {
   if (!socket.connected) return alert('Connexion en cours...');
   socket.emit('create', currentUser.username);
@@ -112,7 +108,6 @@ elSendAnswer && (elSendAnswer.onclick = () => {
   hideQuestion();
 });
 
-// Voisins (inchangé)
 const voisins = {
     1: [2, 48],
     2: [1, 3],
@@ -287,10 +282,8 @@ function showSelection(payload) {
   elChoice.appendChild(title);
 
   if (payload.type === 'player') {
-    // Filtre : on retire le joueur actuel (socket.id)
     const otherPlayers = (players || []).filter(p => p.id !== socket.id);
 
-    // Affichage des autres joueurs seulement
     otherPlayers.forEach(p => {
       const b = document.createElement('button');
       b.textContent = p.name;
@@ -309,7 +302,6 @@ function showSelection(payload) {
     });
   } 
   else if (payload.type === 'action') {
-    // Pas de changement pour le choix d'action (It's your choice)
     (payload.actions || []).forEach(act => {
       const b = document.createElement('button');
       b.textContent = act;
@@ -327,8 +319,6 @@ function showSelection(payload) {
       elChoice.appendChild(b);
     });
   }
-
-  // Pas de bouton "Annuler" comme demandé
 }
 
 // Affichage question
@@ -436,7 +426,6 @@ function showResults({ correct, message, correction, detail }) {
     </p>
   `;
 
-  // ✅ correction affichée en cas de mauvaise réponse OU timeout
   if (correction) {
     const correctionDiv = document.createElement('div');
     correctionDiv.style.cssText = `
@@ -474,7 +463,6 @@ function renderScoreTable(list) {
     row.onmouseover = () => { row.style.background = '#f0f0f0'; };
     row.onmouseout = () => { row.style.background = ''; };
 
-    // Clic → affiche les catégories
     row.onclick = () => {
       showPlayerCategories(p);
     };
@@ -493,7 +481,6 @@ socket.on('categoriesList', categories => {
   console.log('Catégories requises reçues :', requiredCategories);
 });
 
-// Ajoute cette fonction après renderScoreTable par exemple
 function showPlayerCategories(player) {
   if (!player) return;
 
@@ -501,13 +488,10 @@ function showPlayerCategories(player) {
   console.log("categoriesCompleted reçu :", player.categoriesCompleted);
   console.log("Type :", Array.isArray(player.categoriesCompleted) ? "tableau" : typeof player.categoriesCompleted);
 
-  // Récupère la liste complète envoyée par le serveur
-  // (requiredCategories est une variable globale remplie par socket.on('categoriesList'))
   const allCategories = requiredCategories.length > 0 
     ? requiredCategories 
-    : ["Calcul litteral", "Nombres", "Transformations", "Communiquer", "Géométrie dans l'espace", "Proportionnalité", "Stats ou probas", "Géométrie", "Informatique", "Logique", "Calculs", "Fonctions"]; // fallback temporaire
+    : ["Calcul litteral", "Nombres", "Transformations", "Communiquer", "Géométrie dans l'espace", "Proportionnalité", "Stats ou probas", "Géométrie", "Informatique", "Logique", "Calculs", "Fonctions"]; 
 
-  // player.categoriesCompleted est un tableau (grâce à la sérialisation serveur)
   const completedArray = Array.isArray(player.categoriesCompleted) 
     ? player.categoriesCompleted 
     : [];
@@ -515,7 +499,6 @@ function showPlayerCategories(player) {
   const completed = new Set(completedArray);
   const missing = allCategories.filter(cat => !completed.has(cat));
 
-  // Création de la popup
   const popup = document.createElement('div');
   popup.style.position = 'fixed';
   popup.style.inset = '50% auto auto 50%';
@@ -575,7 +558,6 @@ function showPlayerCategories(player) {
 
   document.body.appendChild(popup);
 
-  // Gestion de la fermeture
   document.getElementById('closePopupBtn').onclick = () => popup.remove();
   popup.addEventListener('click', (e) => {
     if (e.target === popup) popup.remove();
@@ -594,7 +576,7 @@ socket.on('created', code => { room = code; showGame(); });
 socket.on('joined', code => { room = code; showGame(); });
 socket.on('players', list => {
   console.log("Nouvelle liste players reçue :", list);
-  players = list;                     // ← cette ligne est cruciale
+  players = list;                     
   renderScoreTable(players);
   updatePawns(players);
 });
@@ -691,7 +673,6 @@ socket.on('actionClear', () => {
   highlightAction('');
   document.getElementById('currentQuestionInfo').style.display = 'none';
 
-  // 🔑 NE PAS cacher définitivement le bouton
   updateRollButton();
 });
 
@@ -705,23 +686,20 @@ socket.on('joined', () => {
 socket.on('gameEnd', data => {
   console.log("gameEnd reçu :", data);
 
-  // Masquage complet de tous les éléments du jeu actif
-  // 1. Appelle hideQuestion si elle existe (pour la zone question/timer)
   if (typeof hideQuestion === 'function') {
     hideQuestion();
   }
 
-  // 2. Masque les zones principales via leurs IDs (avec vérification)
   const idsToHide = [
-    'diceZone',           // zone du dé
-    'plateauContainer',   // plateau + pions
-    'actionGrid',         // cartes actions
-    'possibleCases',      // cases cliquables
-    'choice',             // popup de sélection
-    'questionBox',        // zone question (au cas où hideQuestion n'a pas tout caché)
-    'resultBox',          // zone résultat
-    'topBar',             // barre du haut (salle + scores)
-    'scoreTable'          // tableau des scores (optionnel, à cacher si tu veux)
+    'diceZone',           
+    'plateauContainer',   
+    'actionGrid',         
+    'possibleCases',      
+    'choice',          
+    'questionBox',       
+    'resultBox',          
+    'topBar',             
+    'scoreTable'          
   ];
 
   idsToHide.forEach(id => {
@@ -732,29 +710,24 @@ socket.on('gameEnd', data => {
     }
   });
 
-  // 3. Optionnel : masque aussi le header / menu si présent
   const header = document.querySelector('header');
   if (header) header.style.display = 'none';
 
   const menu = document.getElementById('menu');
   if (menu) menu.style.display = 'none';
 
-  // 4. Vide ou masque complètement #game pour éviter les restes
   const game = document.getElementById('game');
   if (game) {
-    game.innerHTML = '';           // vide tout ce qui reste dedans
-    game.style.display = 'block';  // garde visible pour afficher l'écran de fin
+    game.innerHTML = '';         
+    game.style.display = 'block';  
   }
 
   const gameContainer = document.getElementById('game');
   if (!gameContainer) return console.error("#game introuvable");
 
-  gameContainer.innerHTML = ''; // Vide le contenu
-
-  // TRI PAR SCORE DESCENDANT (le plus important)
+  gameContainer.innerHTML = ''; 
   const sortedPlayers = [...data.players].sort((a, b) => b.score - a.score);
 
-  // Création de l'écran
   const endScreen = document.createElement('div');
   endScreen.id = 'endScreen';
   endScreen.style.cssText = `
@@ -813,7 +786,6 @@ socket.on('gameEnd', data => {
   console.log("Écran de fin affiché avec classement trié !");
 });
 
-// Resize / load
 window.addEventListener('resize', () => updatePawns(players));
 elPlateau && elPlateau.addEventListener('load', () => updatePawns(players));
 
@@ -833,18 +805,14 @@ function showGame() {
     elRoll.disabled = false;
   }
 
-  // Affiche le bouton Retour quand on est en jeu
   const backBtn = document.getElementById('btnBack');
   if (backBtn) backBtn.style.display = 'inline-block';
-   // Masquer le bouton "Mon Profil" une fois le jeu lancé
   const profileBtn = document.querySelector('header button[onclick*="profile.html"]');
   if (profileBtn) profileBtn.style.display = 'none';
 
-  // Masquer la partie basse de la page (modes solo/revision)
   document.querySelectorAll('hr').forEach(hr => hr.style.display = 'none');
   
   document.querySelectorAll('h2').forEach(h2 => {
-    // On masque uniquement les h2 qui concernent les modes de jeu
     if (h2.textContent.includes('Mode Solo') || h2.textContent.includes('Mode Révision')) {
       h2.style.display = 'none';
     }
@@ -860,6 +828,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
