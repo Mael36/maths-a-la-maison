@@ -569,16 +569,35 @@ socket.on('boardData', b => { board = b; updatePawns(players); createActionCards
 socket.on('yourTurn', data => {
   currentPlayerId = data?.playerId;
 
-  console.log('[yourTurn reçu] Joueur actuel :', currentPlayerId, 'Moi ?', socket.id === currentPlayerId);
+  console.log('[yourTurn reçu]', {
+    currentPlayerId,
+    monId: socket.id,
+    estMonTour: socket.id === currentPlayerId,
+    boutonExistant: !!elRoll
+  });
 
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
+
+    // Reset forcé + reflow pour contourner les bugs d'affichage CSS
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+    void elRoll.offsetHeight;  // force le navigateur à recalculer
+
+    // Applique le nouvel état
     elRoll.style.display = isMyTurn ? 'inline-block' : 'none';
     elRoll.disabled = !isMyTurn;
+
+    console.log('[yourTurn] Bouton mis à jour → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
+  } else {
+    console.warn('[yourTurn] elRoll n’existe pas dans le DOM');
   }
+
+  // Cache le bouton démarrer (si présent)
   if (elStart) {
     elStart.style.display = 'none';
   }
+
   renderScoreTable(players);
 });
 socket.on('rolled', data => {
@@ -867,6 +886,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
