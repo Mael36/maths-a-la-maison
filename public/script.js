@@ -101,7 +101,7 @@ elStart && (elStart.onclick = () => { if (room) socket.emit('start', room); });
 elRoll && (elRoll.onclick = () => {
   if (!room) return;
   socket.emit('roll', room);
-  elRoll.disabled = true;
+  elRoll.disabled = false;
 });
 
 // Envoyer la réponse
@@ -600,7 +600,7 @@ socket.on('yourTurn', data => {
       elRoll.disabled = false;
     } else {
       elRoll.style.display = 'inline-block !important';
-      elRoll.disabled = true;
+      elRoll.disabled = false;
     }
 
     console.log('[yourTurn] État final bouton → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
@@ -653,8 +653,8 @@ socket.on('results', data => {
   stopTimer();
   if (data && data.players) renderScoreTable(data.players);
   if (elRoll) {
-    elRoll.style.display = 'inline-block !important';
-    elRoll.disabled = true;
+    elRoll.style.display = 'none';
+    elRoll.disabled = false;
   }
   const isCorrect = data.correct === true;
 
@@ -727,8 +727,8 @@ socket.on('actionClear', () => {
   elPossible.innerHTML = '';
   elChoice.style.display = 'none';
   if (elRoll) {
-    elRoll.style.display = 'inline-block !important';
-    elRoll.disabled = true;
+    elRoll.style.display = 'none';
+    elRoll.disabled = false;
   }
   hideQuestion();
   highlightAction('');
@@ -868,8 +868,8 @@ function showGame() {
     diceZone.style.display = 'block !important';
   }
   if (elRoll) {
-    elRoll.style.display = 'inline-block !important';
-    elRoll.disabled = true;
+    elRoll.style.display = 'none';
+    elRoll.disabled = false;
   }
 
   // Affiche le bouton Retour quand on est en jeu
@@ -899,6 +899,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
