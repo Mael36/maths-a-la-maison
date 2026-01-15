@@ -568,17 +568,13 @@ socket.on('players', list => {
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
   currentPlayerId = data?.playerId;
-  activePlayers = [currentPlayerId];
+
+  console.log('[yourTurn reçu] Joueur actuel :', currentPlayerId, 'Moi ?', socket.id === currentPlayerId);
+
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
-
-    // Affichage / masquage du bouton
     elRoll.style.display = isMyTurn ? 'inline-block' : 'none';
-
-    // Activation / désactivation
     elRoll.disabled = !isMyTurn;
-
-    console.log('[yourTurn] Joueur actuel :', currentPlayerId, 'Moi ?', socket.id === currentPlayerId);
   }
   if (elStart) {
     elStart.style.display = 'none';
@@ -628,7 +624,10 @@ socket.on('timeOut', d => {
 socket.on('results', data => {
   stopTimer();
   if (data && data.players) renderScoreTable(data.players);
-  if (elRoll) elRoll.style.display = 'none';
+  if (elRoll) {
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+  }
   const isCorrect = data.correct === true;
 
   // Crée la popup de résultat
@@ -699,7 +698,10 @@ socket.on('teleport', payload => {
 socket.on('actionClear', () => {
   elPossible.innerHTML = '';
   elChoice.style.display = 'none';
-  if (elRoll) elRoll.style.display = 'none';
+  if (elRoll) {
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+  }
   hideQuestion();
   highlightAction('');
   document.getElementById('currentQuestionInfo').style.display = 'none';
@@ -865,5 +867,6 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
