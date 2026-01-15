@@ -4,25 +4,10 @@
     "role": "prof",
     "passwordHash": "$2b$10$QqvmMCXGGu5ur.1ZGb1zcOQXSrfKFp5XepmbcERLWehVHbECdkX6e"
   },
-  "eleve": {
-    "username": "eleve",
-    "role": "élève",
-    "passwordHash": "$2b$10$PFLG6BBrGThDK.uoc5OKSuQ8TQp3PWfsVZ1qrTWHs.Sa.F5eYcIU."
-  },
-  "eleve2": {
-    "username": "eleve2",
-    "role": "élève",
-    "passwordHash": "$2b$10$QV4GZnbWnJQZEPMQjyuJ5eI3hLhKC/ZqYVEyfESBqlJ5JQZvXrMOC"
-  },
   "eleve3": {
     "username": "eleve3",
     "role": "élève",
     "passwordHash": "$2b$10$DkcOQ1pPYBK.qljZo0xAO.QDJMP/woWe2TBG8bUHjkJHWfnTnqimG"
-  },
-  "Maël": {
-    "username": "Maël",
-    "role": "élève",
-    "passwordHash": "$2b$10$0SMtaruWbZJOrywziSUIPOtOoeeH03DlEgqNstfJ/3MyXlUVZCSbG"
   },
   "Inaki": {
     "username": "Inaki",

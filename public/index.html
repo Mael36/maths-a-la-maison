@@ -10,7 +10,6 @@
 </head>
 <body>
 <header>
-  <h1>Bienvenue, élève !</h1>
   <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 10px;">
     <button id="btnBack" style="display: none;" onclick="window.location.href='/'">← Retour à l'accueil</button>
     <button onclick="window.location.href='profile.html'">Mon Profil</button>
@@ -51,22 +50,27 @@
         <strong>Question de :</strong> <span id="currentPlayerName"></span><br>
         <strong>Thème :</strong> <span id="currentTheme"></span><br>
         <strong>Question :</strong> <span id="currentQText"></span>
-        <img id="currentQImg" style="max-width: 100%; margin-top: 10px; display: none;" />
+        <img id="currentQImg" style="max-width: 50%; margin: 10px auto; display: none; display: block;" />
       </div>
       <div id="scoreTable"></div>
     </div>
     <div id="diceZone">
       Résultat du dé : <span id="diceResult">-</span>
-      <button id="rollBtn" disabled>Lancer le dé</button>
+      <button id="rollBtn" disabled style="display: none;">Lancer le dé</button>
     </div>
-    <div id="plateauContainer">
-      <img src="assets/plateau.png" id="plateau" alt="Plateau">
-      <div id="pions"></div>
-      <div id="possibleCases"></div>
+    <div id="plateauActionsWrapper">
+      <div id="plateauContainer">
+        <img src="assets/plateau.png" id="plateau" alt="Plateau">
+        <div id="pions"></div>
+        <div id="possibleCases"></div>
+      </div>
+
+      <div id="actionsContainer">
+        <h3>Actions</h3>
+        <div id="actionGrid"></div>
+      </div>
     </div>
 
-    <h3>Actions</h3>
-    <div id="actionGrid"></div>
 
     <div id="questionBox" style="display:none;">
       <h3 id="themeTitle"></h3>

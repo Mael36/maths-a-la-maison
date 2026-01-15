@@ -5,6 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 380px;  /* largeur raisonnable */
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+    input {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px;
+      font-size: 1.1em;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    #error {
+      color: #c0392b;
+      font-weight: bold;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
@@ -15,19 +75,16 @@
       <button type="submit">Se connecter</button>
     </form>
     
-    <!-- Élément pour afficher les erreurs -->
-    <p id="error" style="color: red; text-align: center; margin-top: 15px; font-weight: bold;"></p>
+    <p id="error"></p>
   </div>
 
   <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
-      const errorEl = document.getElementById('error'); // Maintenant existe !
-
-      errorEl.textContent = ''; // Réinitialise le message
+      const errorEl = document.getElementById('error');
+      errorEl.textContent = '';
 
       if (!username || !password) {
         errorEl.textContent = 'Veuillez remplir tous les champs';
@@ -40,21 +97,18 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-
         const data = await res.json();
 
         if (data.success) {
-          // Stocke l'utilisateur dans localStorage
           localStorage.setItem('currentUser', JSON.stringify({
             username: data.username,
             role: data.role
           }));
 
-          // Redirection selon le rôle
           if (data.role === 'prof') {
             window.location.href = '/prof.html';
           } else {
-            window.location.href = '/index.html'; // ou '/solo.html' si tu veux direct solo
+            window.location.href = '/index.html';
           }
         } else {
           errorEl.textContent = data.error || 'Erreur de connexion';

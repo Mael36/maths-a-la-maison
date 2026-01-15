@@ -240,10 +240,10 @@ async function handleAnswer(userAnswer) {
     dailyScore = Math.min(dailyScore + 1, 560);
     totalScore++;
 
-    // === METTRE À JOUR LE HIGHSCORE À CHAQUE BONNE RÉPONSE ===
+    // Mise à jour du highscore quotidien
     if (dailyScore > dailyHighscore) {
       dailyHighscore = dailyScore;
-      console.log('[HIGHSCORE] Nouveau meilleur score du jour :', dailyHighscore);
+      console.log('[HIGHSCORE] Nouveau record quotidien :', dailyHighscore);
     }
   } else {
     lives--;

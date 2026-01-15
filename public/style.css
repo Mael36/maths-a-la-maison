@@ -233,6 +233,30 @@ button.logout-btn:hover {
   transition: 0.25s ease;
 }
 
+#plateauActionsWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* Plateau : AUCUNE taille modifiée */
+#plateauContainer {
+  position: relative;
+}
+
+/* Actions à droite */
+#actionsContainer {
+  width: 260px;
+}
+
+#actionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+
 /* ==========================
    QUESTION BOX & RESULTS
 ========================== */

@@ -277,6 +277,7 @@ function showPossibleCases(currentPos, steps) {
 // Sélection joueur ou action
 function showSelection(payload) {
   elChoice.style.display = 'block';
+  elChoice.style.zIndex = '100000';
   elChoice.innerHTML = '';
 
   const title = document.createElement('div');
@@ -568,7 +569,14 @@ socket.on('boardData', b => { board = b; updatePawns(players); createActionCards
 socket.on('yourTurn', data => {
   currentPlayerId = data && data.playerId;
   activePlayers = [currentPlayerId];
-  if (elRoll) elRoll.disabled = (socket.id !== currentPlayerId);
+  if (elRoll) {
+    const isMyTurn = socket.id === currentPlayerId;
+    elRoll.disabled = !isMyTurn;
+    elRoll.style.display = isMyTurn ? 'inline-block' : 'none';  // ← clé : affiche seulement si c'est notre tour
+  }
+  if (elStart) {
+    elStart.style.display = 'none';
+  }
   renderScoreTable(players);
 });
 socket.on('rolled', data => {
@@ -614,7 +622,7 @@ socket.on('timeOut', d => {
 socket.on('results', data => {
   stopTimer();
   if (data && data.players) renderScoreTable(data.players);
-
+  if (elRoll) elRoll.style.display = 'none';
   const isCorrect = data.correct === true;
 
   // Crée la popup de résultat
@@ -634,7 +642,7 @@ socket.on('results', data => {
   `;
 
   // Si mauvaise réponse → montre correction + détail + timer
-  if (!isCorrect && data.correction) {
+  if (data.correction) {
     const correctionDiv = document.createElement('div');
     correctionDiv.style.cssText = `
       background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left;
@@ -685,6 +693,7 @@ socket.on('teleport', payload => {
 socket.on('actionClear', () => {
   elPossible.innerHTML = '';
   elChoice.style.display = 'none';
+  if (elRoll) elRoll.style.display = 'none';
   hideQuestion();
   highlightAction('');
   document.getElementById('currentQuestionInfo').style.display = 'none';
@@ -818,7 +827,10 @@ function showGame() {
   if (elRoomDisplay) elRoomDisplay.textContent = room;
   socket.emit('requestBoard');
   socket.emit('requestPlayers');
-  if (elRoll) elRoll.disabled = true;
+  if (elRoll) {
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+  }
 
   // Affiche le bouton Retour quand on est en jeu
   const backBtn = document.getElementById('btnBack');

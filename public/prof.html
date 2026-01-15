@@ -7,9 +7,13 @@
   <link rel="stylesheet" href="style.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     h2 { color: #2c3e50; margin-bottom: 10px; }
     h3 { margin-top: 40px; color: #34495e; }
+    h4 { margin-top: 30px; color: #555; }
+    .creation-zone { display: flex; gap: 40px; flex-wrap: wrap; margin-bottom: 40px; }
+    .left-col { flex: 1; min-width: 350px; }
+    .right-col { flex: 1; min-width: 350px; }
     form { display: flex; flex-direction: column; gap: 12px; max-width: 400px; }
     input { padding: 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 6px; }
     button { padding: 12px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; }
@@ -17,24 +21,26 @@
     #createMessage { margin-top: 15px; font-weight: bold; min-height: 20px; }
     .success { color: #27ae60; }
     .error { color: #c0392b; }
+    #studentList { list-style: none; padding: 0; margin: 20px 0; }
+    #studentList li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+    .delete-btn { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    .delete-btn:hover { background: #c0392b; }
     .ranking-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 15px;
     }
     .ranking-table th, .ranking-table td {
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #ddd;
     }
-    .ranking-table th {
-      background: #ecf0f1;
-      color: #2c3e50;
-    }
-    .ranking-table tr:hover {
-      background: #f1f1f1;
-    }
-    .no-data { color: #777; font-style: italic; }
+    .ranking-table th { background: #ecf0f1; color: #2c3e50; }
+    .ranking-table tr:hover { background: #f1f1f1; }
+    .crown { font-size: 1.3em; margin-left: 6px; }
+    .no-data { color: #777; font-style: italic; text-align: center; padding: 20px; }
+    #refreshAll { margin: 20px 0; padding: 10px 20px; background: #7f8c8d; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    #refreshAll:hover { background: #95a5a6; }
   </style>
 </head>
 <body>
@@ -42,44 +48,53 @@
     <h2>Page Professeur</h2>
     <p>Bienvenue, <strong id="profUsername"></strong></p>
 
-    <h3>Créer un élève</h3>
-    <form id="createStudentForm">
-      <input type="text" id="newUsername" placeholder="Nom de l'élève" required>
-      <input type="password" id="newPassword" placeholder="Mot de passe initial" required>
-      <button type="submit">Créer l'élève</button>
-    </form>
-    <p id="createMessage"></p>
+    <!-- Zone création + suppression côte à côte -->
+    <div class="creation-zone">
+      <!-- Colonne gauche : Création -->
+      <div class="left-col">
+        <h3>Créer un élève</h3>
+        <form id="createStudentForm">
+          <input type="text" id="newUsername" placeholder="Nom de l'élève" required>
+          <input type="password" id="newPassword" placeholder="Mot de passe initial" required>
+          <button type="submit">Créer l'élève</button>
+        </form>
+        <p id="createMessage"></p>
+      </div>
+
+      <!-- Colonne droite : Liste élèves avec suppression -->
+      <div class="right-col">
+        <h3>Élèves enregistrés</h3>
+        <ul id="studentList">
+          <li>Chargement...</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Classements en dessous (plein largeur) -->
+    <h3>Classement des élèves</h3>
+    <button id="refreshAll">Rafraîchir tout</button>
+    <div id="ranking"></div>
 
     <br>
     <button id="logoutBtn">Déconnexion</button>
 
-    <div style="margin: 20px;">
-      <button 
-        onclick="window.location.href='editor.html'"
-        style="padding: 12px 24px; font-size: 18px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer;"
-      >
+    <div style="margin: 20px 0;">
+      <button onclick="window.location.href='editor.html'" style="padding: 12px 24px; font-size: 18px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer;">
         Éditer les questions
       </button>
     </div>
-
-    <!-- Classement -->
-    <h3>Classement des élèves</h3>
-    <div id="ranking"></div>
   </div>
 
   <script>
     // Vérification prof
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) {
-      window.location.href = '/login.html';
-    }
-    if (currentUser.role !== 'prof') {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.username || currentUser.role !== 'prof') {
       alert('Accès interdit');
       window.location.href = '/index.html';
     }
     document.getElementById('profUsername').textContent = currentUser.username;
 
-    // Création élève
+    // Création élève + rafraîchissement
     document.getElementById('createStudentForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('newUsername').value.trim();
@@ -99,12 +114,14 @@
           body: JSON.stringify({ username, password })
         });
         const data = await res.json();
+
         if (data.success) {
           messageEl.style.color = 'green';
           messageEl.textContent = `Élève "${username}" créé avec succès !`;
           document.getElementById('newUsername').value = '';
           document.getElementById('newPassword').value = '';
-          loadRanking(); // Rafraîchir le classement après création
+          loadStudentList();
+          loadRanking();
         } else {
           messageEl.style.color = 'red';
           messageEl.textContent = data.error || 'Erreur lors de la création';
@@ -121,82 +138,169 @@
       window.location.href = '/login.html';
     });
 
-    // === CHARGEMENT ET AFFICHAGE DU CLASSEMENT ===
+    // === LISTE ÉLÈVES AVEC BOUTON SUPPRIMER ===
+    async function loadStudentList() {
+      const listEl = document.getElementById('studentList');
+      listEl.innerHTML = '<li>Chargement...</li>';
+
+      try {
+        const res = await fetch('/data/users.json');
+        if (!res.ok) throw new Error('Impossible de charger users.json');
+        const users = await res.json();
+
+        const students = Object.keys(users)
+          .filter(key => users[key].role === 'élève')
+          .map(username => ({ username }));
+
+        if (students.length === 0) {
+          listEl.innerHTML = '<li class="no-data">Aucun élève enregistré</li>';
+          return;
+        }
+
+        listEl.innerHTML = '';
+        students.forEach(student => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${student.username}</span>
+            <button class="delete-btn" data-username="${student.username}">Supprimer</button>
+          `;
+          listEl.appendChild(li);
+        });
+
+        // Écouteurs suppression
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const username = btn.dataset.username;
+            if (!confirm(`Supprimer définitivement "${username}" ?`)) return;
+
+            try {
+              const res = await fetch(`/api/students/${username}`, {
+                method: 'DELETE',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'x-current-user': JSON.stringify(currentUser)
+                }
+              });
+
+              const result = await res.json();
+
+              if (result.success) {
+                alert(`Élève ${username} supprimé`);
+                loadStudentList();
+                loadRanking();
+              } else {
+                alert(result.error || 'Erreur suppression');
+              }
+            } catch (err) {
+              alert('Erreur réseau');
+            }
+          });
+        });
+      } catch (err) {
+        listEl.innerHTML = '<li class="error">Erreur chargement liste élèves</li>';
+        console.error(err);
+      }
+    }
+
+    // === CLASSEMENT (4 classements complets) ===
     async function loadRanking() {
       const rankingDiv = document.getElementById('ranking');
       rankingDiv.innerHTML = '<p>Chargement du classement...</p>';
 
-      const classicPrefix = 'soloClassic_';
-      const infinitePrefix = 'soloInfinite_';
+      try {
+        const usersRes = await fetch('/data/users.json');
+        const users = await usersRes.json();
+        const realStudents = Object.keys(users)
+          .filter(key => users[key].role === 'élève')
+          .map(username => username);
 
-      const allKeys = Object.keys(localStorage);
-      const students = [];
+        const classicPrefix = 'soloClassic_';
+        const infinitePrefix = 'soloInfinite_';
+        const allKeys = Object.keys(localStorage);
+        const students = [];
 
-      allKeys.forEach(key => {
-        if (key.startsWith(classicPrefix)) {
-          const username = key.replace(classicPrefix, '');
-          const classicData = JSON.parse(localStorage.getItem(key) || '{}');
+        allKeys.forEach(key => {
+          if (key.startsWith(classicPrefix)) {
+            const username = key.replace(classicPrefix, '');
+            if (realStudents.includes(username)) {
+              const classicData = JSON.parse(localStorage.getItem(key) || '{}');
+              const infiniteKey = infinitePrefix + username;
+              const infiniteData = JSON.parse(localStorage.getItem(infiniteKey) || '{}');
 
-          const infiniteKey = infinitePrefix + username;
-          const infiniteData = JSON.parse(localStorage.getItem(infiniteKey) || '{}');
+              students.push({
+                username,
+                classicDaily: classicData.dailyScore || 0,
+                classicHigh: classicData.dailyHighscore || 0,
+                classicTotal: classicData.totalScore || 0,
+                infiniteScore: infiniteData.score || 0
+              });
+            }
+          }
+        });
 
-          students.push({
-            username,
-            classicDaily: classicData.dailyScore || 0,
-            classicHigh: classicData.dailyHighscore || 0,
-            classicTotal: classicData.totalScore || 0,
-            infiniteScore: infiniteData.score || 0
-          });
+        if (students.length === 0) {
+          rankingDiv.innerHTML = '<p class="no-data">Aucun élève enregistré ou pas de scores.</p>';
+          return;
         }
-      });
 
-      if (students.length === 0) {
-        rankingDiv.innerHTML = '<p class="no-data">Aucun élève enregistré pour le moment.</p>';
-        return;
+        const rankings = {
+          classicDaily: [...students].sort((a, b) => b.classicDaily - a.classicDaily),
+          classicHigh: [...students].sort((a, b) => b.classicHigh - a.classicHigh),
+          classicTotal: [...students].sort((a, b) => b.classicTotal - a.classicTotal),
+          infinite: [...students].sort((a, b) => b.infiniteScore - a.infiniteScore)
+        };
+
+        let html = '';
+
+        html += '<h4>Score du jour (Classique)</h4>';
+        html += buildTable(rankings.classicDaily, 'classicDaily');
+
+        html += '<h4>Meilleur score du jour (Classique)</h4>';
+        html += buildTable(rankings.classicHigh, 'classicHigh');
+
+        html += '<h4>Score total (Classique)</h4>';
+        html += buildTable(rankings.classicTotal, 'classicTotal');
+
+        html += '<h4>Score total (Infini)</h4>';
+        html += buildTable(rankings.infinite, 'infiniteScore');
+
+        rankingDiv.innerHTML = html;
+      } catch (err) {
+        rankingDiv.innerHTML = '<p class="error">Erreur chargement classement</p>';
+        console.error(err);
       }
-
-      // Tri pour chaque catégorie
-      const rankings = {
-        classicDaily: [...students].sort((a, b) => b.classicDaily - a.classicDaily),
-        classicHigh: [...students].sort((a, b) => b.classicHigh - a.classicHigh),
-        classicTotal: [...students].sort((a, b) => b.classicTotal - a.classicTotal),
-        infinite: [...students].sort((a, b) => b.infiniteScore - a.infiniteScore)
-      };
-
-      let html = '';
-
-      html += '<h4>Score du jour (Classique)</h4>';
-      html += buildTable(rankings.classicDaily, 'classicDaily');
-
-      html += '<h4>Meilleur score du jour (Classique)</h4>';
-      html += buildTable(rankings.classicHigh, 'classicHigh');
-
-      html += '<h4>Score total (Classique)</h4>';
-      html += buildTable(rankings.classicTotal, 'classicTotal');
-
-      html += '<h4>Score total (Infini)</h4>';
-      html += buildTable(rankings.infinite, 'infiniteScore');
-
-      rankingDiv.innerHTML = html;
     }
 
     function buildTable(list, key) {
       if (list.length === 0) return '<p class="no-data">Aucune donnée</p>';
 
       let table = '<table class="ranking-table"><thead><tr><th>Rang</th><th>Élève</th><th>Valeur</th></tr></thead><tbody>';
+
       list.forEach((student, index) => {
+        let nameDisplay = student.username;
+        if (student[key] >= 560 && key.includes('classic')) {
+          nameDisplay += ' <span class="crown">🏆</span>';
+        }
         table += `<tr>
           <td>${index + 1}</td>
-          <td>${student.username}</td>
+          <td>${nameDisplay}</td>
           <td>${student[key]}</td>
         </tr>`;
       });
+
       table += '</tbody></table>';
       return table;
     }
 
-    // Chargement initial du classement
+    // Chargement initial
+    loadStudentList();
     loadRanking();
+
+    // Rafraîchissement manuel
+    document.getElementById('refreshAll').addEventListener('click', () => {
+      loadStudentList();
+      loadRanking();
+    });
   </script>
 </body>
 </html>

@@ -155,7 +155,8 @@ app.post('/api/login', async (req, res) => {
   res.json({
     success: true,
     username: user.username,
-    role: user.role
+    role: user.role,
+    dailyHighScore: user.dailyHighScore || 0
   });
 });
 
@@ -189,6 +190,32 @@ app.post('/api/create-user', async (req, res) => {
     console.error('[PROF] Erreur création élève :', err);
     res.status(500).json({ error: 'Erreur serveur' });
   }
+});
+
+// Suppression d'un élève (seulement accessible au prof)
+app.delete('/api/students/:username', (req, res) => {
+  // Sécurité : vérifier que c'est un prof (tu peux ajouter une vérif de session ou token si tu veux)
+  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}'); // exemple simple via header
+  if (!currentUser || currentUser.role !== 'prof') {
+    return res.status(403).json({ error: 'Accès interdit' });
+  }
+
+  const usernameToDelete = req.params.username;
+  const users = loadUsers();
+
+  if (!users[usernameToDelete]) {
+    return res.status(404).json({ error: 'Élève non trouvé' });
+  }
+
+  if (usernameToDelete === currentUser.username) {
+    return res.status(403).json({ error: 'Impossible de supprimer son propre compte' });
+  }
+
+  delete users[usernameToDelete];
+  saveUsers(users);
+
+  console.log(`[PROF] Élève supprimé : ${usernameToDelete}`);
+  res.json({ success: true, message: `Élève ${usernameToDelete} supprimé` });
 });
 
 app.post('/api/change-password', async (req, res) => {
@@ -552,11 +579,19 @@ io.on('connection', socket => {
     const actionName = room.currentAction && room.currentAction.name;
 
     // helper to conclude
-    function conclude(correctFlag, message) {
+    function conclude(correctFlag) {
       clearRoomTimer(room);
-      io.to(room.code).emit('results', { correct: correctFlag, players: room.players, message });
+
+      io.to(room.code).emit('results', {
+        correct: correctFlag,
+        players: room.players,
+        message: correctFlag ? 'Bonne réponse' : 'Mauvaise réponse',
+        correction: room.currentCorrection || null
+      });
+
       endTurn(room);
     }
+
 
     // logic per action
     switch (actionName) {
@@ -578,10 +613,10 @@ io.on('connection', socket => {
           player.score = (player.score || 0) + 1;
           if (checkVictory(room, player, room.currentQuestionCategory)) return;
           io.to(room.code).emit('players', serializePlayers(room.players));
-          conclude(true, 'Un joueur a répondu correctement');
+          conclude(true);
         } else {
           // if all active players have answered and none correct, finish false
-          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false, 'Personne n’a répondu correctement');
+          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false);
         }
         break;
 
@@ -593,7 +628,7 @@ io.on('connection', socket => {
           io.to(room.code).emit('players', serializePlayers(room.players));
           conclude(true, 'Victoire au battle');
         } else {
-          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false, 'Aucun correct');
+          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false);
         }
         break;
 
@@ -607,9 +642,9 @@ io.on('connection', socket => {
           if (friend) friend.score = (friend.score || 0) + 1;
           if (checkVictory(room, initiator, room.currentQuestionCategory)) return;
           io.to(room.code).emit('players', serializePlayers(room.players));
-          conclude(true, 'Call a friend: bonne réponse');
+          conclude(true);
         } else {
-          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false, 'Call a friend: personne n’a répondu correctement');
+          if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false);
         }
         break;
 
@@ -620,9 +655,9 @@ io.on('connection', socket => {
           if (initiator) initiator.score = (initiator.score || 0) + 1;
           if (checkVictory(room, initiator, room.currentQuestionCategory)) return;
           io.to(room.code).emit('players', serializePlayers(room.players));
-          conclude(true, 'For you: bonne réponse');
+          conclude(true);
         } else {
-          conclude(false, 'For you: mauvaise réponse');
+          conclude(false);
         }
         break;
 
@@ -676,8 +711,11 @@ io.on('connection', socket => {
       io.to(room.code).emit('results', {
         correct: false,
         players: room.players,
-        message: 'Temps écoulé - Double or quits perdu'
+        message: 'Mauvaise réponse',
+        correction: room.currentCorrection || '',
+        detail: room.currentQuestionDetail || null
       });
+
       endTurn(room); // ← important
       return;
     }
@@ -688,16 +726,46 @@ io.on('connection', socket => {
   });
 
   socket.on('disconnect', () => {
-    // remove from rooms
     Object.values(rooms).forEach(room => {
       const idx = room.players.findIndex(p => p.id === socket.id);
       if (idx !== -1) {
+        const disconnectedPlayer = room.players[idx];
         room.players.splice(idx, 1);
+
         io.to(room.code).emit('players', serializePlayers(room.players));
-        if (room.host === socket.id && room.players.length > 0) room.host = room.players[0].id;
-        if (room.players.length === 0) delete rooms[room.code];
-        else if (room.state === 'finished') {
-          delete rooms[room.code]; // Supprime la room si finie et joueur déconnecté
+
+        // Si c'était l'hôte, passe à un autre
+        if (room.host === socket.id && room.players.length > 0) {
+          room.host = room.players[0].id;
+        }
+
+        // Si c'était le joueur en cours ET qu'il reste au moins un joueur
+        if (room.currentIndex === idx && room.players.length > 0) {
+          // Ajuste l'index pour éviter out-of-bounds
+          room.currentIndex = room.currentIndex % room.players.length;
+          if (room.currentIndex < 0) room.currentIndex = 0; // sécurité
+
+          const next = room.players[room.currentIndex];
+          if (next) {  // ← vérification cruciale
+            console.log(`[DISCONNECT] Tour passé au joueur ${next.name} après déconnexion de ${disconnectedPlayer.name}`);
+            io.to(room.code).emit('yourTurn', { playerId: next.id });
+            io.to(next.id).emit('yourTurn', { playerId: next.id });
+          }
+        } else if (room.currentIndex > idx && room.players.length > 0) {
+          room.currentIndex--;
+        }
+
+        // Force fin du tour si on était en train de jouer
+        if (room.state === 'playing') {
+          endTurn(room);
+        }
+
+        // Nettoyage final
+        if (room.players.length === 0) {
+          delete rooms[room.code];
+          console.log(`[ROOM] Room ${room.code} supprimée (vide)`);
+        } else if (room.state === 'finished') {
+          delete rooms[room.code];
         }
       }
     });
@@ -954,9 +1022,18 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
 
   function finalizeFalse(room) {
     clearRoomTimer(room);
-    io.to(room.code).emit('results', { correct: false, players: room.players, message: 'Mauvaise réponse / Temps écoulé' });
+
+    io.to(room.code).emit('results', {
+      correct: false,
+      players: room.players,
+      message: 'Mauvaise réponse',
+      correction: room.currentCorrection || '',
+      detail: room.currentQuestionDetail || null
+    });
+
     endTurn(room);
   }
+
 
   function clearRoomTimer(room) {
     if (!room) return;

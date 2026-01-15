@@ -71,19 +71,30 @@
     }
     .success { color: #27ae60; }
     .error { color: #c0392b; }
+    #usernameDisplay {
+      font-size: 1.6em;
+      color: #2c3e50;
+    }
+    #crown {
+      margin-left: 1px;
+      font-size: 1.6em;
+    }
   </style>
 </head>
 <body>
   <div class="profile-container">
     <h1>Mon Profil</h1>
-    <p>Bienvenue, <strong id="username"></strong> !</p>
+    <p>Bienvenue, 
+      <strong id="username">Chargement...</strong>
+      <span id="crown" style="display: none;">👑</span>
+    </p>
 
-    <h2>Mode Classique</h2>
+    <h2>Solo Classique</h2>
     <div class="stat">Score du jour : <strong id="dailyScore">0</strong> / 560</div>
     <div class="stat">Meilleur score du jour : <strong id="dailyHighscore">0</strong></div>
-    <div class="stat">Score total (classique) : <strong id="totalScore">0</strong></div>
+    <div class="stat">Score total : <strong id="totalScore">0</strong></div>
 
-    <h2>Mode Infini</h2>
+    <h2>Solo Infini</h2>
     <div class="stat">Score total : <strong id="infiniteScore">0</strong></div>
 
     <h2>Changer mon mot de passe</h2>
@@ -93,54 +104,106 @@
       <input type="password" id="confirmPassword" placeholder="Confirmer le nouveau" required>
       <button type="submit">Modifier le mot de passe</button>
     </form>
-    <p id="message"></p>
 
+    <p id="message"></p>
     <button onclick="window.location.href='/index.html'">Retour au menu principal</button>
   </div>
 
   <script>
-    // Vérification connexion
+    // Chargement sécurisé des données utilisateur
     const currentUserData = localStorage.getItem('currentUser');
     if (!currentUserData) {
       alert('Vous devez être connecté pour voir votre profil.');
       window.location.href = '/login.html';
     }
 
-    const user = JSON.parse(currentUserData);
-    document.getElementById('username').textContent = user.username;
+    let user;
+    try {
+      user = JSON.parse(currentUserData);
+    } catch (e) {
+      console.error('Erreur parsing currentUser:', e);
+      alert('Session invalide. Veuillez vous reconnecter.');
+      window.location.href = '/login.html';
+    }
 
-    // === Stats Mode Classique ===
-    const classicKey = 'soloClassic_' + user.username;
-    const classicSaved = localStorage.getItem(classicKey);
-    if (classicSaved) {
-      const data = JSON.parse(classicSaved);
-      const today = new Date().toISOString().slice(0, 10);
+    // Affichage pseudo + couronne
+    const usernameEl = document.getElementById('username');
+    const crownEl = document.getElementById('crown');
 
-      let displayDaily = data.dailyScore || 0;
-      let displayHigh = data.dailyHighscore || 0;
+    if (usernameEl) {
+      usernameEl.textContent = user.username;
 
-      // Simulation reset pour affichage (nouveau jour = score jour à 0)
-      if (data.lastResetDate !== today) {
-        displayDaily = 0;
+      // Easter egg couronne
+      const classicKey = 'soloClassic_' + user.username;
+      const savedData = localStorage.getItem(classicKey);
+      if (savedData) {
+        try {
+          const data = JSON.parse(savedData);
+          if (data.dailyHighscore >= 560) {
+            crownEl.style.display = 'inline';
+            usernameEl.title = "Score maximum du jour (560) atteint ! 🏆";
+          }
+        } catch (e) {
+          console.error('Erreur parsing soloClassic data:', e);
+        }
+      }
+    }
+
+    // Fonction pour rafraîchir toutes les stats
+    function refreshStats() {
+      // Mode Classique
+      const classicKey = 'soloClassic_' + user.username;
+      const classicSaved = localStorage.getItem(classicKey);
+      if (classicSaved) {
+        try {
+          const data = JSON.parse(classicSaved);
+          const today = new Date().toISOString().slice(0, 10);
+
+          let displayDaily = data.dailyScore || 0;
+          let displayHigh = data.dailyHighscore || 0;
+
+          // Reset affichage si nouveau jour
+          if (data.lastResetDate !== today) {
+            displayDaily = 0;
+          }
+
+          document.getElementById('dailyScore').textContent = displayDaily;
+          document.getElementById('dailyHighscore').textContent = displayHigh;
+          document.getElementById('totalScore').textContent = data.totalScore || 0;
+        } catch (e) {
+          console.error('Erreur parsing stats classique:', e);
+        }
+      } else {
+        // Valeurs par défaut si pas de données
+        document.getElementById('dailyScore').textContent = '0';
+        document.getElementById('dailyHighscore').textContent = '0';
+        document.getElementById('totalScore').textContent = '0';
       }
 
-      document.getElementById('dailyScore').textContent = displayDaily;
-      document.getElementById('dailyHighscore').textContent = displayHigh;
-      document.getElementById('totalScore').textContent = data.totalScore || 0;
+      // Mode Infini
+      const infiniteKey = 'soloInfinite_' + user.username;
+      const infiniteSaved = localStorage.getItem(infiniteKey);
+      if (infiniteSaved) {
+        try {
+          const data = JSON.parse(infiniteSaved);
+          document.getElementById('infiniteScore').textContent = data.score || 0;
+        } catch (e) {
+          console.error('Erreur parsing stats infini:', e);
+        }
+      } else {
+        document.getElementById('infiniteScore').textContent = '0';
+      }
     }
 
-    // === Stats Mode Infini (uniquement score total) ===
-    const infiniteKey = 'soloInfinite_' + user.username;
-    const infiniteSaved = localStorage.getItem(infiniteKey);
-    if (infiniteSaved) {
-      const data = JSON.parse(infiniteSaved);
-      document.getElementById('infiniteScore').textContent = data.score || 0;
-    }
+    // Appel initial au chargement
+    refreshStats();
 
-    // === Changement mot de passe ===
+    // Recharger les stats quand on revient sur la page (ex: via bouton Retour)
+    window.addEventListener('focus', refreshStats);
+
+    // Changement mot de passe
     document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const oldPass = document.getElementById('oldPassword').value;
       const newPass = document.getElementById('newPassword').value;
       const confirmPass = document.getElementById('confirmPassword').value;
