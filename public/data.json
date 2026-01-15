@@ -351,8 +351,8 @@
 
         {"id":297,"q":"Qu’est-ce que l’étendue d’une série ?","a":"La différence entre la valeur maximale et la valeur minimale"},
         {"id":298,"q":"Températures : 13°C ; 21°C ; 19°C ; 18°C ; 27°C ; 15°C\nQuelle est l’étendue ? Interpréter.","a":"14 °C","d":"Max = 27°C ; Min = 13°C → étendue = 27 − 13 = 14 °C\nÉcart de 14 °C entre la température la plus haute et la plus basse."},
-        {"id":299,"q":"Même série de températures.\nTempérature médiane ? Interpréter.","a":"18,5 °C","d":"Série triée : 13 ; 15 ; 18 ; 19 ; 21 ; 27\nMédiane = (18 + 19)/2 = 18,5 °C\nAutant de relevés ≤ 18,5 °C que ≥ 18,5 °C."},
-        {"id":300,"q":"Même série (28°C au lieu de 27°C).\nTempérature moyenne ?","a":"19 °C","d":"(13 + 21 + 19 + 18 + 28 + 15)/6 = 114/6 = 19 °C"},
+        {"id":299,"q":"Températures : 13°C ; 21°C ; 19°C ; 18°C ; 27°C ; 15°C\nTempérature médiane ? Interpréter.","a":"18,5 °C","d":"Série triée : 13 ; 15 ; 18 ; 19 ; 21 ; 27\nMédiane = (18 + 19)/2 = 18,5 °C\nAutant de relevés ≤ 18,5 °C que ≥ 18,5 °C."},
+        {"id":300,"q":"Températures : 13°C ; 21°C ; 19°C ; 18°C ; 28°C ; 15°C\nTempérature moyenne ?","a":"19 °C","d":"(13 + 21 + 19 + 18 + 28 + 15)/6 = 114/6 = 19 °C"},
         {"id":301,"q":"Toutes les notes d’Éléonore sont entre 8 et 12. Sa moyenne est…\na/ 12   b/ 4   c/ 10   d/ comprise entre 8 et 12","a":"d/ comprise entre 8 et 12"},
         {"id":302,"q":"Vrai ou faux ? « Si on ajoute 5 à chaque valeur d’une série, son étendue augmente de 5 »","a":"Faux","d":"L’étendue reste identique car max et min augmentent tous les deux de 5."},
         {"id":303,"q":"Vrai ou faux ? « Si on ajoute 5 à chaque valeur d’une série, sa moyenne augmente de 5 »","a":"Vrai"},
@@ -675,6 +675,7 @@
 
     ]
 }
+
 
 
 
