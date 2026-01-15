@@ -588,10 +588,8 @@ socket.on('yourTurn', data => {
       parent = parent.parentElement;
     }
 
-    // Reset + force affichage du bouton
-    elRoll.style.cssText = ''; // efface tout inline précédent
     elRoll.style.display = 'inline-block !important';
-    elRoll.disabled = true;
+    elRoll.disabled = false;
     void elRoll.offsetHeight;
 
     if (isMyTurn) {
@@ -901,6 +899,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
