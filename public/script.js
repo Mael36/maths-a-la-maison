@@ -579,29 +579,33 @@ socket.on('yourTurn', data => {
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
 
-    // Force la visibilité du parent diceZone (clé !)
-    const diceZone = document.getElementById('diceZone');
-    if (diceZone) {
-      diceZone.style.display = 'block !important';
-      diceZone.style.visibility = 'visible !important';
+    // Force visibilité de tous les parents (solution radicale mais efficace)
+    let parent = elRoll;
+    while (parent && parent !== document.body) {
+      parent.style.display = 'block !important';
+      parent.style.visibility = 'visible !important';
+      parent.style.opacity = '1 !important';
+      parent = parent.parentElement;
     }
 
-    // Reset complet du bouton
-    elRoll.style.cssText = ''; // efface tous les styles inline précédents
+    // Reset + force affichage du bouton
+    elRoll.style.cssText = ''; // efface tout inline précédent
     elRoll.style.display = 'none';
     elRoll.disabled = true;
-    void elRoll.offsetHeight; // reflow forcé
+    void elRoll.offsetHeight;
 
-    // Applique l’état final
-    elRoll.style.display = isMyTurn ? 'inline-block !important' : 'none';
-    elRoll.style.visibility = isMyTurn ? 'visible !important' : 'hidden';
-    elRoll.style.opacity = isMyTurn ? '1 !important' : '0';
-    elRoll.style.pointerEvents = isMyTurn ? 'auto !important' : 'none';
-    elRoll.disabled = !isMyTurn;
+    if (isMyTurn) {
+      elRoll.style.display = 'inline-block !important';
+      elRoll.style.visibility = 'visible !important';
+      elRoll.style.opacity = '1 !important';
+      elRoll.style.pointerEvents = 'auto !important';
+      elRoll.disabled = false;
+    } else {
+      elRoll.style.display = 'none';
+      elRoll.disabled = true;
+    }
 
     console.log('[yourTurn] État final bouton → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
-  } else {
-    console.warn('[yourTurn] elRoll n’existe pas');
   }
 
   if (elStart) elStart.style.display = 'none';
@@ -861,6 +865,10 @@ function showGame() {
   if (elRoomDisplay) elRoomDisplay.textContent = room;
   socket.emit('requestBoard');
   socket.emit('requestPlayers');
+  const diceZone = document.getElementById('diceZone');
+  if (diceZone) {
+    diceZone.style.display = 'block !important';
+  }
   if (elRoll) {
     elRoll.style.display = 'none';
     elRoll.disabled = true;
@@ -893,6 +901,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
