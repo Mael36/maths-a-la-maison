@@ -588,18 +588,18 @@ socket.on('yourTurn', data => {
       parent = parent.parentElement;
     }
 
-    elRoll.style.display = 'inline-block !important';
+    elRoll.style.display = 'inline-block';
     elRoll.disabled = false;
     void elRoll.offsetHeight;
 
     if (isMyTurn) {
-      elRoll.style.display = 'inline-block !important';
+      elRoll.style.display = 'inline-block';
       elRoll.style.visibility = 'visible !important';
       elRoll.style.opacity = '1 !important';
       elRoll.style.pointerEvents = 'auto !important';
       elRoll.disabled = false;
     } else {
-      elRoll.style.display = 'inline-block !important';
+      elRoll.style.display = 'inline-block';
       elRoll.disabled = false;
     }
 
@@ -899,6 +899,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
