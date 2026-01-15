@@ -601,12 +601,10 @@ socket.on('players', list => {
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
   currentPlayerId = data.playerId;
-
   updateRollButton();
-
-  if (elStart) elStart.style.display = 'none';
   renderScoreTable(players);
 });
+
 
 socket.on('rolled', data => {
   if (!data) return;
@@ -689,14 +687,14 @@ socket.on('teleport', payload => {
 socket.on('actionClear', () => {
   elPossible.innerHTML = '';
   elChoice.style.display = 'none';
-  if (elRoll) {
-    elRoll.style.display = 'none';
-    elRoll.disabled = false;
-  }
   hideQuestion();
   highlightAction('');
   document.getElementById('currentQuestionInfo').style.display = 'none';
+
+  // 🔑 NE PAS cacher définitivement le bouton
+  updateRollButton();
 });
+
 
 // Demande board/players après join
 socket.on('joined', () => {
@@ -862,6 +860,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
