@@ -1058,15 +1058,21 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     room.actionMeta = null;
     room.secondLifeRetry = false;
     room.waitingForSelection = null;
-
+  
     if (room.players && room.players.length > 0) {
       room.currentIndex = (room.currentIndex + 1) % room.players.length;
       const next = room.players[room.currentIndex];
+  
+      // Mise à jour visuelle des joueurs
       io.to(room.code).emit('players', serializePlayers(room.players));
-      io.to(next.id).emit('yourTurn', { playerId: next.id });
+  
+      // Envoi explicite du tour au joueur suivant (et à tous pour cohérence)
       io.to(room.code).emit('yourTurn', { playerId: next.id });
-      // clear action highlight & possible cases
+      io.to(next.id).emit('yourTurn', { playerId: next.id });
+  
+      // Nettoyage interface
       io.to(room.code).emit('actionClear');
+      io.to(room.code).emit('results', { reset: true }); // optionnel, pour cacher les popups
     }
   }
 
@@ -1232,4 +1238,5 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
     console.error('Erreur save data.json:', err);
     res.status(500).json({ error: 'Erreur serveur lors de la sauvegarde.' });
   }
+
 });
