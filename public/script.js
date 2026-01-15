@@ -582,9 +582,9 @@ socket.on('yourTurn', data => {
     // Force visibilité de tous les parents (solution radicale mais efficace)
     let parent = elRoll;
     while (parent && parent !== document.body) {
-      parent.style.display = 'block !important';
-      parent.style.visibility = 'visible !important';
-      parent.style.opacity = '1 !important';
+      parent.style.display = 'block';
+      parent.style.visibility = 'visible';
+      parent.style.opacity = '1';
       parent = parent.parentElement;
     }
 
@@ -594,9 +594,9 @@ socket.on('yourTurn', data => {
 
     if (isMyTurn) {
       elRoll.style.display = 'inline-block';
-      elRoll.style.visibility = 'visible !important';
-      elRoll.style.opacity = '1 !important';
-      elRoll.style.pointerEvents = 'auto !important';
+      elRoll.style.visibility = 'visible';
+      elRoll.style.opacity = '1';
+      elRoll.style.pointerEvents = 'auto';
       elRoll.disabled = false;
     } else {
       elRoll.style.display = 'inline-block';
@@ -865,7 +865,7 @@ function showGame() {
   socket.emit('requestPlayers');
   const diceZone = document.getElementById('diceZone');
   if (diceZone) {
-    diceZone.style.display = 'block !important';
+    diceZone.style.display = 'block';
   }
   if (elRoll) {
     elRoll.style.display = 'none';
@@ -899,6 +899,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
