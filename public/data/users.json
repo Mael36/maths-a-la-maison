@@ -4,11 +4,6 @@
     "role": "prof",
     "passwordHash": "$2b$10$QqvmMCXGGu5ur.1ZGb1zcOQXSrfKFp5XepmbcERLWehVHbECdkX6e"
   },
-  "eleve3": {
-    "username": "eleve3",
-    "role": "élève",
-    "passwordHash": "$2b$10$DkcOQ1pPYBK.qljZo0xAO.QDJMP/woWe2TBG8bUHjkJHWfnTnqimG"
-  },
   "Inaki": {
     "username": "Inaki",
     "role": "élève",
@@ -18,5 +13,10 @@
     "username": "Emmeran",
     "role": "élève",
     "passwordHash": "$2b$10$r4C4xRLgI0/E7qUztE86luucDgc/LxVemjmlK5vitDikULz928Dx6"
+  },
+  "Maël": {
+    "username": "Maël",
+    "role": "élève",
+    "passwordHash": "$2b$10$hGhN3ncuqq.LXVLa1SDYGeRW9SLhJF640gnOKRvxmypUg0jKXWIkO"
   }
 }
