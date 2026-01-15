@@ -567,12 +567,18 @@ socket.on('players', list => {
 });
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
-  currentPlayerId = data && data.playerId;
+  currentPlayerId = data?.playerId;
   activePlayers = [currentPlayerId];
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
+
+    // Affichage / masquage du bouton
+    elRoll.style.display = isMyTurn ? 'inline-block' : 'none';
+
+    // Activation / désactivation
     elRoll.disabled = !isMyTurn;
-    elRoll.style.display = isMyTurn ? 'inline-block' : 'none';  // ← clé : affiche seulement si c'est notre tour
+
+    console.log('[yourTurn] Joueur actuel :', currentPlayerId, 'Moi ?', socket.id === currentPlayerId);
   }
   if (elStart) {
     elStart.style.display = 'none';
@@ -859,4 +865,5 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
