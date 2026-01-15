@@ -590,7 +590,7 @@ socket.on('yourTurn', data => {
 
     // Reset + force affichage du bouton
     elRoll.style.cssText = ''; // efface tout inline précédent
-    elRoll.style.display = 'none';
+    elRoll.style.display = 'inline-block !important';
     elRoll.disabled = true;
     void elRoll.offsetHeight;
 
@@ -601,7 +601,7 @@ socket.on('yourTurn', data => {
       elRoll.style.pointerEvents = 'auto !important';
       elRoll.disabled = false;
     } else {
-      elRoll.style.display = 'none';
+      elRoll.style.display = 'inline-block !important';
       elRoll.disabled = true;
     }
 
@@ -901,6 +901,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
