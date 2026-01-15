@@ -1,6 +1,5 @@
-// public/editor.js
 const container = document.getElementById('editorContainer');
-let data = {}; // Données chargées (objet {category: [questions]})
+let data = {};
 let currentCategoryForAdd = ''; // Pour savoir dans quelle cat ajouter
 
 fetch('/data.json')
@@ -14,7 +13,7 @@ fetch('/data.json')
   });
 
 function buildEditor() {
-  container.innerHTML = ''; // Clear
+  container.innerHTML = '';
   Object.entries(data).forEach(([category, questions]) => {
     const cat = document.createElement('div');
     cat.className = 'category';
@@ -143,7 +142,7 @@ function createFileInput(labelText) {
 function openAddModal(category) {
   currentCategoryForAdd = category;
   document.getElementById('addQuestionModal').style.display = 'block';
-  document.getElementById('addQuestionForm').reset(); // Clear form
+  document.getElementById('addQuestionForm').reset();
 }
 
 // Fermer modal
@@ -252,4 +251,5 @@ document.getElementById('save-all-btn').addEventListener('click', async () => {
   } else {
     alert(result.error || 'Erreur lors de la sauvegarde.');
   }
+
 });
