@@ -653,7 +653,7 @@ socket.on('results', data => {
   stopTimer();
   if (data && data.players) renderScoreTable(data.players);
   if (elRoll) {
-    elRoll.style.display = 'none';
+    elRoll.style.display = 'inline-block !important';
     elRoll.disabled = true;
   }
   const isCorrect = data.correct === true;
@@ -727,7 +727,7 @@ socket.on('actionClear', () => {
   elPossible.innerHTML = '';
   elChoice.style.display = 'none';
   if (elRoll) {
-    elRoll.style.display = 'none';
+    elRoll.style.display = 'inline-block !important';
     elRoll.disabled = true;
   }
   hideQuestion();
@@ -868,7 +868,7 @@ function showGame() {
     diceZone.style.display = 'block !important';
   }
   if (elRoll) {
-    elRoll.style.display = 'none';
+    elRoll.style.display = 'inline-block !important';
     elRoll.disabled = true;
   }
 
@@ -899,6 +899,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
