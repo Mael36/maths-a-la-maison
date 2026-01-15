@@ -579,12 +579,14 @@ socket.on('yourTurn', data => {
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
 
-    // Reset forcé + reflow pour contourner les bugs d'affichage CSS
+    // Reset forcé (cache tout d'abord)
     elRoll.style.display = 'none';
     elRoll.disabled = true;
-    void elRoll.offsetHeight;  // force le navigateur à recalculer
 
-    // Applique le nouvel état
+    // Force le navigateur à appliquer le changement (reflow)
+    void elRoll.offsetHeight;
+
+    // Applique l’état final
     elRoll.style.display = isMyTurn ? 'inline-block' : 'none';
     elRoll.disabled = !isMyTurn;
 
@@ -886,6 +888,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
