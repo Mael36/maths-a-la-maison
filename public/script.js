@@ -579,21 +579,32 @@ socket.on('yourTurn', data => {
   if (elRoll) {
     const isMyTurn = socket.id === currentPlayerId;
 
+    // Force la visibilité du parent diceZone (clé !)
+    const diceZone = document.getElementById('diceZone');
+    if (diceZone) {
+      diceZone.style.display = 'block !important';
+      diceZone.style.visibility = 'visible !important';
+    }
+
+    // Reset complet du bouton
+    elRoll.style.cssText = ''; // efface tous les styles inline précédents
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+    void elRoll.offsetHeight; // reflow forcé
 
     // Applique l’état final
-    elRoll.style.display = 'inline-block';
-    elRoll.disabled = 'false';
+    elRoll.style.display = isMyTurn ? 'inline-block !important' : 'none';
+    elRoll.style.visibility = isMyTurn ? 'visible !important' : 'hidden';
+    elRoll.style.opacity = isMyTurn ? '1 !important' : '0';
+    elRoll.style.pointerEvents = isMyTurn ? 'auto !important' : 'none';
+    elRoll.disabled = !isMyTurn;
 
-    console.log('[yourTurn] Bouton mis à jour → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
+    console.log('[yourTurn] État final bouton → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
   } else {
-    console.warn('[yourTurn] elRoll n’existe pas dans le DOM');
+    console.warn('[yourTurn] elRoll n’existe pas');
   }
 
-  // Cache le bouton démarrer (si présent)
-  if (elStart) {
-    elStart.style.display = 'none';
-  }
-
+  if (elStart) elStart.style.display = 'none';
   renderScoreTable(players);
 });
 socket.on('rolled', data => {
@@ -882,6 +893,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
