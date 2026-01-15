@@ -363,6 +363,21 @@ function showQuestion(payload) {
   startTimer(payload.timer || 60);
 }
 
+function updateRollButton() {
+  if (!elRoll) return;
+
+  const isMyTurn = socket.id === currentPlayerId;
+
+  if (isMyTurn) {
+    elRoll.style.display = 'inline-block';
+    elRoll.disabled = false;
+  } else {
+    elRoll.style.display = 'none';
+    elRoll.disabled = true;
+  }
+}
+
+
 // Cacher question
 function hideQuestion() {
   $('questionBox').style.display = 'none';
@@ -396,36 +411,54 @@ function stopTimer() {
 }
 
 // Résultats
-function showResults(correct, message, correction = '', detail = '') {
+function showResults({ correct, message, correction, detail }) {
   const popup = document.createElement('div');
   popup.style.cssText = `
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    z-index: 1000; max-width: 500px; text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    z-index: 1000;
+    max-width: 500px;
+    text-align: center;
   `;
 
   popup.innerHTML = `
-    <h2 style="color: ${correct ? '#2e7d32' : '#c62828'};">${correct ? 'Bonne réponse !' : 'Mauvaise réponse'}</h2>
-    <p style="font-size: 1.2em; margin: 20px 0;">${message || ''}</p>
-    ${!correct ? `
-      <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left;">
-        <strong>Bonne réponse :</strong> ${correction || 'Non disponible'}<br><br>
-        ${detail ? `<strong>Détail :</strong> ${detail}` : ''}
-      </div>
-    ` : ''}
-    <button id="closeResultPopup" style="margin-top: 20px; padding: 10px 25px; background: #1976d2; color: white; border: none; border-radius: 6px; cursor: pointer;">
-      Passer au tour suivant
-    </button>
+    <h2 style="color: ${correct ? '#2e7d32' : '#c62828'};">
+      ${correct ? 'Bonne réponse !' : 'Mauvaise réponse'}
+    </h2>
+    <p style="font-size: 1.2em; margin: 15px 0;">
+      ${message || ''}
+    </p>
   `;
+
+  // ✅ correction affichée en cas de mauvaise réponse OU timeout
+  if (correction) {
+    const correctionDiv = document.createElement('div');
+    correctionDiv.style.cssText = `
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+      margin-top: 20px;
+      font-size: 1.1em;
+    `;
+    correctionDiv.innerHTML = `
+      <strong>Bonne réponse :</strong> ${correction}<br><br>
+      ${detail ? `<strong>Détail :</strong> ${detail}` : ''}
+    `;
+    popup.appendChild(correctionDiv);
+  }
 
   document.body.appendChild(popup);
 
-  document.getElementById('closeResultPopup').onclick = () => {
-    popup.remove();
-    // Optionnel : demander au serveur de passer au suivant
-    if (room) socket.emit('acknowledgeResults', { code: room });
-  };
+  setTimeout(() => popup.remove(), correct ? 2500 : 5000);
 }
+
 
 // Tableau des scores
 function renderScoreTable(list) {
@@ -567,53 +600,28 @@ socket.on('players', list => {
 });
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
-  currentPlayerId = data?.playerId;
+  currentPlayerId = data.playerId;
 
-  console.log('[yourTurn reçu]', {
-    currentPlayerId,
-    monId: socket.id,
-    estMonTour: socket.id === currentPlayerId,
-    boutonExistant: !!elRoll
-  });
-
-  if (elRoll) {
-    const isMyTurn = socket.id === currentPlayerId;
-
-    // Force visibilité de tous les parents (solution radicale mais efficace)
-    let parent = elRoll;
-    while (parent && parent !== document.body) {
-      parent.style.display = 'block';
-      parent.style.visibility = 'visible';
-      parent.style.opacity = '1';
-      parent = parent.parentElement;
-    }
-
-    elRoll.style.display = 'inline-block';
-    elRoll.disabled = false;
-    void elRoll.offsetHeight;
-
-    if (isMyTurn) {
-      elRoll.style.display = 'inline-block';
-      elRoll.style.visibility = 'visible';
-      elRoll.style.opacity = '1';
-      elRoll.style.pointerEvents = 'auto';
-      elRoll.disabled = false;
-    } else {
-      elRoll.style.display = 'inline-block';
-      elRoll.disabled = false;
-    }
-
-    console.log('[yourTurn] État final bouton → display:', elRoll.style.display, 'disabled:', elRoll.disabled);
-  }
+  updateRollButton();
 
   if (elStart) elStart.style.display = 'none';
   renderScoreTable(players);
 });
+
 socket.on('rolled', data => {
   if (!data) return;
-  if (elDiceResult) elDiceResult.textContent = data.roll;
-  if (socket.id === currentPlayerId) showPossibleCases(data.currentPos, data.roll);
+
+  if (elDiceResult) {
+    elDiceResult.textContent = data.roll;
+  }
+
+  if (socket.id === currentPlayerId) {
+    showPossibleCases(data.currentPos, data.roll);
+  }
+
+  updateRollButton();
 });
+
 socket.on("actionDrawn", data => {
   if (!data || !data.action) return;
   document.querySelectorAll('.actionCard').forEach(c => c.classList.remove("activeAction"));
@@ -645,80 +653,35 @@ socket.on('requestSelection', payload => {
   showSelection(payload);
 });
 socket.on('question', payload => showQuestion(payload));
-socket.on('timeOut', d => {
+socket.on('timeOut', data => {
   stopTimer();
-  showResults(false, d && d.message ? d.message : 'Temps écoulé');
+
+  showResults({
+    correct: false,
+    message: data?.message || 'Temps écoulé',
+    correction: data?.correction,
+    detail: data?.detail
+  });
 });
+
 socket.on('results', data => {
   stopTimer();
-  if (data && data.players) renderScoreTable(data.players);
-  if (elRoll) {
-    elRoll.style.display = 'none';
-    elRoll.disabled = false;
-  }
-  const isCorrect = data.correct === true;
 
-  // Crée la popup de résultat
-  const popup = document.createElement('div');
-  popup.style.cssText = `
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 30px; border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4); z-index: 1000;
-    max-width: 500px; text-align: center;
-  `;
-
-  popup.innerHTML = `
-    <h2 style="color: ${isCorrect ? '#2e7d32' : '#c62828'}; margin-bottom: 15px;">
-      ${isCorrect ? 'Bonne réponse !' : 'Mauvaise réponse'}
-    </h2>
-    <p style="font-size: 1.2em; margin: 15px 0;">${data.message || ''}</p>
-  `;
-
-  // Si mauvaise réponse → montre correction + détail + timer
-  if (data.correction) {
-    const correctionDiv = document.createElement('div');
-    correctionDiv.style.cssText = `
-      background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left;
-      margin: 20px 0; font-size: 1.1em;
-    `;
-    correctionDiv.innerHTML = `
-      <strong>Bonne réponse :</strong> ${data.correction || 'Non disponible'}<br><br>
-      ${data.detail ? `<strong>Détail :</strong> ${data.detail}` : ''}
-    `;
-    popup.appendChild(correctionDiv);
-
-    // Timer 5 secondes + message
-    const timerDiv = document.createElement('div');
-    timerDiv.style.marginTop = '20px';
-    timerDiv.style.fontSize = '1.1em';
-    timerDiv.style.color = '#555';
-    popup.appendChild(timerDiv);
-
-    let remaining = 5;
-    timerDiv.textContent = `Prochain tour dans ${remaining} secondes...`;
-
-    const interval = setInterval(() => {
-      remaining--;
-      timerDiv.textContent = `Prochain tour dans ${remaining} secondes...`;
-      if (remaining <= 0) {
-        clearInterval(interval);
-        popup.remove();
-      }
-    }, 1000);
-
-    // Auto-fermeture après 5s
-    setTimeout(() => {
-      clearInterval(interval);
-      popup.remove();
-    }, 5000);
-  } else {
-    // Bonne réponse → disparaît après 2.5s (comme avant)
-    setTimeout(() => popup.remove(), 2500);
+  if (data?.players) {
+    renderScoreTable(data.players);
   }
 
-  document.body.appendChild(popup);
+  showResults({
+    correct: data.correct === true,
+    message: data.message || '',
+    correction: data.correction,
+    detail: data.detail
+  });
+
+  updateRollButton();
   document.getElementById('currentQuestionInfo').style.display = 'none';
 });
+
 
 socket.on('teleport', payload => {
   console.log('teleported to', payload.pos);
@@ -899,6 +862,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
