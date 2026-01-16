@@ -1,4 +1,3 @@
-// public/solo-infinite.js
 console.log('🟢 solo-infinite.js chargé');
 
 let questions = [];
@@ -157,7 +156,6 @@ async function handleAnswer(userAnswer) {
   if (isCorrect) {
     score++;
   }
-  // Mauvaise réponse → rien, on continue
 
   currentIndex++;
   saveAllData();
@@ -193,7 +191,7 @@ function showResult(correct, correction = '', detail = '') {
 
   document.body.appendChild(popup);
 
-  setTimeout(() => popup.remove(), correct ? 2000 : 5000); // plus long si correction
+  setTimeout(() => popup.remove(), correct ? 2000 : 5000);
 }
 function updateStats() {
   document.getElementById('levelDisplay').textContent = currentIndex + 1;
@@ -221,3 +219,4 @@ document.addEventListener('DOMContentLoaded', () => {
   loadQuestions();
 
 });
+
