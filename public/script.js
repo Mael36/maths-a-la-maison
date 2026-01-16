@@ -191,7 +191,7 @@ function createActionCards() {
   const actions = [
     "Flash","Battle on left","Battle on right","Call a friend","For you",
     "Second life","No way","Double","Téléportation","+1 ou -1",
-    "Everybody","Double or quits","It's your choice","Quadruple"
+    "Everybody","It's your choice","Quadruple"
   ];
   actions.forEach(a => {
     const c = document.createElement('div');
@@ -828,6 +828,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
