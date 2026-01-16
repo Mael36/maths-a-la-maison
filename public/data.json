@@ -345,9 +345,9 @@
         {"id":291,"q":"Comment calcule-t-on la moyenne d’une série statistique ?","a":"Somme de toutes les valeurs ÷ effectif total"},
         {"id":292,"q":"Notes : 15 ; 12 ; 3 ; 14 ; 5 ; 11 ; 10\nMoyenne ? Que signifie-t-elle ? Calculatrice autorisée.","a":"10","d":"Somme = 70 → moyenne = 70/7 = 10\nS’il avait eu la même note partout, il aurait eu 10/20."},
         {"id":293,"q":"Comment détermine-t-on la médiane d’une série statistique ?","a":"Classer dans l’ordre croissant ; valeur centrale si effectif impair, moyenne des deux centrales si effectif pair"},
-        {"id":294,"q":"Même série de notes.\nMédiane ? Que signifie-t-elle ?","a":"11","d":"Série triée : 3 ; 5 ; 10 ; 11 ; 12 ; 14 ; 15\nMédiane = 11\nAutant de notes ≤ 11 que ≥ 11."},
+        {"id":294,"q":"Notes : 15 ; 12 ; 3 ; 14 ; 5 ; 11\nMédiane ? Que signifie-t-elle ?","a":"11","d":"Série triée : 3 ; 5 ; 10 ; 11 ; 12 ; 14 ; 15\nMédiane = 11\nAutant de notes ≤ 11 que ≥ 11."},
         {"id":295,"q":"Répartition des âges d’un club de voile juniors.\nÂge médian ? Interprétation.","img":"./image/Question295.png","a":"15 ans","d":"Effectif total 50 → 25e et 26e valeurs = 15 ans\nAutant de membres de 15 ans ou moins que de 15 ans ou plus."},
-        {"id":296,"q":"Même diagramme.\nÂge moyen des membres ? Calculatrice autorisée.","img":"./image/Question296.png","a":"17 ans","d":"(13×6 + 15×5 + 16×10 + 18×14 + 19×15)/50 = 850/50 = 17 ans"},
+        {"id":296,"q":"Âge moyen des membres ? Calculatrice autorisée.","img":"./image/Question296.png","a":"17 ans","d":"(13×6 + 15×5 + 16×10 + 18×14 + 19×15)/50 = 850/50 = 17 ans"},
 
         {"id":297,"q":"Qu’est-ce que l’étendue d’une série ?","a":"La différence entre la valeur maximale et la valeur minimale"},
         {"id":298,"q":"Températures : 13°C ; 21°C ; 19°C ; 18°C ; 27°C ; 15°C\nQuelle est l’étendue ? Interpréter.","a":"14 °C","d":"Max = 27°C ; Min = 13°C → étendue = 27 − 13 = 14 °C\nÉcart de 14 °C entre la température la plus haute et la plus basse."},
@@ -377,9 +377,9 @@
         {"id":328,"q":"Si la probabilité d’un évènement est 0,6, quelle est la probabilité de son contraire ?","a":"0,4","d":"P(contrarie) = 1 − 0,6 = 0,4"},
 
         {"id":329,"q":"Sac opaque : 3 boules bleues (1 à 3) + 5 boules vertes (1 à 5), indiscernables au toucher.\nProbabilité d’obtenir un numéro pair ?","a":"3/8","d":"Numéros pairs : bleu 2 (1 boule) + vert 2 et 4 (2 boules) → 3 boules favorables\nTotal : 8 boules → P = 3/8"},
-        {"id":330,"q":"Même sac.\nProbabilité d’obtenir un numéro impair ?","a":"5/8","d":"Numéros impairs : bleu 1 et 3 (2 boules) + vert 1, 3, 5 (3 boules) → 5 boules favorables\nTotal : 8 boules → P = 5/8"},
-        {"id":331,"q":"Même sac.\nProbabilité d’obtenir une boule verte ?","a":"5/8","d":"5 boules vertes sur 8 boules au total → P = 5/8"},
-        {"id":332,"q":"Même sac.\nProbabilité d’obtenir le numéro 4 ?","a":"1/8","d":"Une seule boule porte le numéro 4 → P = 1/8"},
+        {"id":330,"q":"Sac opaque : 3 boules bleues (1 à 3) + 5 boules vertes (1 à 5), indiscernables au toucher.\nProbabilité d’obtenir un numéro impair ?","a":"5/8","d":"Numéros impairs : bleu 1 et 3 (2 boules) + vert 1, 3, 5 (3 boules) → 5 boules favorables\nTotal : 8 boules → P = 5/8"},
+        {"id":331,"q":"Sac opaque : 3 boules bleues (1 à 3) + 5 boules vertes (1 à 5), indiscernables au toucher.\nProbabilité d’obtenir une boule verte ?","a":"5/8","d":"5 boules vertes sur 8 boules au total → P = 5/8"},
+        {"id":332,"q":"Sac opaque : 3 boules bleues (1 à 3) + 5 boules vertes (1 à 5), indiscernables au toucher.\nProbabilité d’obtenir le numéro 4 ?","a":"1/8","d":"Une seule boule porte le numéro 4 → P = 1/8"},
         {"id":333,"q":"Sac : 2 boules bleues (1-2) + 3 boules vertes (1-3). On tire deux boules sans remise et on regarde les couleurs.\nProbabilité d’avoir deux couleurs différentes ?","a":"3/5","d":"Total possibilités : 5 × 4 = 20\nCas deux couleurs différentes :\n- 1re bleu puis verte : 2/5 × 3/4 = 6/20\n- 1re verte puis bleu : 3/5 × 2/4 = 6/20\nTotal : 12/20 = 3/5"},
         {"id":334,"q":"Jetons indiscernables : P, Y, T, H, A, G, O, R, E\nProbabilité d’obtenir une voyelle ?","a":"4/9","d":"Voyelles : Y, A, O, E → 4 voyelles sur 9 jetons → P = 4/9"},
         {"id":335,"q":"Jetons indiscernables : M, A, T, H, E, M, A, T, I, Q, U, E, S\nProbabilité d’obtenir une consonne ?","a":"7/13","d":"Total 13 jetons\nVoyelles : A, A, E, E, I, U → 6 voyelles\nConsonnes : 13 − 6 = 7 → P = 7/13"},
@@ -675,6 +675,7 @@
 
     ]
 }
+
 
 
 
