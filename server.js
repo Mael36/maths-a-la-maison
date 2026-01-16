@@ -1,14 +1,13 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
-const fse = require('fs-extra');           // ← ajouté pour writeJson avec { spaces: 4 }
-const multer = require('multer');           // ← ajouté pour gérer l’upload d’images
-const upload = multer({ dest: 'public/uploads/' });  // ← temp dir pour images
+const fse = require('fs-extra');         
+const multer = require('multer');          
+const upload = multer({ dest: 'public/uploads/' }); 
 const { Server } = require('socket.io');
-const fetch = require('node-fetch'); // si Node 22, fetch est global, sinon installer node-fetch
+const fetch = require('node-fetch');
 const MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x";
 
 const app = express();
@@ -19,33 +18,27 @@ const io = new Server(server);
 app.use(express.json());
 
 
-// Route racine : sert index.html directement
-// La vérification "connecté ou pas" se fait côté client dans index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Sauvegarde complète de data.json depuis l'éditeur
 app.post('/save-questions', (req, res) => {
   const newData = req.body;
   const filePath = path.join(__dirname, 'public', 'data.json');
 
   try {
-    // Validation minimale
     if (typeof newData !== 'object' || newData === null || Array.isArray(newData)) {
       return res.status(400).json({ error: 'Données invalides : doit être un objet {catégorie: [questions]}' });
     }
 
-    // Optionnel : on peut ajouter une validation plus stricte si besoin
     for (const [cat, questions] of Object.entries(newData)) {
       if (!Array.isArray(questions)) {
         return res.status(400).json({ error: `Catégorie "${cat}" doit être un tableau de questions.` });
       }
     }
 
-    // Écriture du fichier (avec indentation pour lisibilité)
     fs.writeFileSync(filePath, JSON.stringify(newData, null, 2), 'utf-8');
 
     console.log('data.json mis à jour via éditeur');
@@ -57,7 +50,6 @@ app.post('/save-questions', (req, res) => {
   }
 });
 
-// Endpoint upload + sauvegarde question
 app.post('/save-question', upload.fields([{ name: 'img' }, { name: 'imgrep' }]), async (req, res) => {
   const { category, q, a, d, isEdit, index } = req.body;
   const filePath = path.join(__dirname, 'public', 'data.json');
@@ -82,7 +74,6 @@ app.post('/save-question', upload.fields([{ name: 'img' }, { name: 'imgrep' }]),
 
   const newQ = { id: questionId, q: q || '', a: a || '', d: d || undefined };
 
-  // Image question
   if (req.files['img'] && req.files['img'].length) {
     const file = req.files['img'][0];
     const ext = path.extname(file.originalname) || '.png';
@@ -92,7 +83,6 @@ app.post('/save-question', upload.fields([{ name: 'img' }, { name: 'imgrep' }]),
     newQ.img = `./image/${name}`;
   }
 
-  // Image réponse
   if (req.files['imgrep'] && req.files['imgrep'].length) {
     const file = req.files['imgrep'][0];
     const ext = path.extname(file.originalname) || '.png';
@@ -141,7 +131,7 @@ app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const users = loadUsers();
 
-  const user = users[username]; // clé = username
+  const user = users[username];
 
   if (!user) {
     return res.status(401).json({ error: 'Utilisateur inconnu' });
@@ -169,7 +159,6 @@ app.post('/api/create-user', async (req, res) => {
 
   const users = loadUsers();
 
-  // Vérifie si l'utilisateur existe déjà (clé = username recommandé)
   if (users[username]) {
     return res.status(400).json({ error: 'Utilisateur déjà existant' });
   }
@@ -192,10 +181,8 @@ app.post('/api/create-user', async (req, res) => {
   }
 });
 
-// Suppression d'un élève (seulement accessible au prof)
 app.delete('/api/students/:username', (req, res) => {
-  // Sécurité : vérifier que c'est un prof (tu peux ajouter une vérif de session ou token si tu veux)
-  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}'); // exemple simple via header
+  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}');
   if (!currentUser || currentUser.role !== 'prof') {
     return res.status(403).json({ error: 'Accès interdit' });
   }
@@ -363,7 +350,7 @@ const ACTIONS = [
   { name: "Quadruple" }
 ];
 
-const rooms = {}; // code -> room
+const rooms = {};
 
 function genCode() {
   let c;
@@ -463,7 +450,6 @@ io.on('connection', socket => {
     if (!room) return;
     if (room.host !== socket.id) return socket.emit('error', 'Tu n’es pas l’hôte');
     room.state = 'playing';
-    // Liste des catégories requises (on envoie uniquement les noms)
     const categoryNames = Array.from(REQUIRED_CATEGORIES);
     io.to(code).emit('categoriesList', categoryNames);
     room.currentIndex = 0;
@@ -490,13 +476,11 @@ io.on('connection', socket => {
     const current = room.players[room.currentIndex];
     if (!current || current.id !== socket.id) return;
 
-    // Position EXACTE envoyée par le client
-    current.pos = Math.max(0, Math.min(pos, room.board.positions.length - 1)); // pos est déjà 0-based
+    current.pos = Math.max(0, Math.min(pos, room.board.positions.length - 1));
     console.log('[moveTo] Position reçue (0-based) :', pos, '→ case ID:', current.pos);
 
     io.to(code).emit('players', serializePlayers(room.players));
-
-    // Tirage d'une action aléatoire
+    
     const action = ACTIONS[Math.floor(Math.random() * ACTIONS.length)];
     room.currentAction = action;
     room.pendingAnswers = new Map();
@@ -507,7 +491,6 @@ io.on('connection', socket => {
 
     io.to(code).emit('actionDrawn', { action: action.name, timer: action.timer || null });
 
-    // Demande sélection si nécessaire
     if (action.needPlayer) {
       room.waitingForSelection = { type: 'player', initiator: current.id, action: action.name };
       io.to(current.id).emit('requestSelection', {
@@ -530,7 +513,6 @@ io.on('connection', socket => {
       return;
     }
 
-    // Passe directement à la question si pas de sélection requise
     proceedToQuestion(room, current, action);
   });
 
@@ -553,7 +535,6 @@ io.on('connection', socket => {
     const initiator = room.players[room.currentIndex];
     if (!initiator || initiator.id !== socket.id) return;
     room.waitingForSelection = null;
-    // find matching action object if exists
     const found = ACTIONS.find(a => a.name.toLowerCase() === (chosenAction || '').toLowerCase());
     room.currentAction = found || { name: chosenAction };
     proceedToQuestion(room, initiator, room.currentAction);
@@ -577,7 +558,6 @@ io.on('connection', socket => {
 
     const actionName = room.currentAction && room.currentAction.name;
 
-    // helper to conclude
     function conclude(correctFlag) {
       clearRoomTimer(room);
 
@@ -592,7 +572,6 @@ io.on('connection', socket => {
     }
 
 
-    // logic per action
     switch (actionName) {
       case 'Flash':
       case 'Téléportation':
@@ -601,19 +580,16 @@ io.on('connection', socket => {
       case 'Quadruple':
       case 'No way':
       case 'Second life':
-        // single player actions: resolve immediately with resolveSinglePlayerAction
         resolveSinglePlayerAction(room, player, correct, actionName);
         break;
 
       case 'Everybody':
         if (correct) {
-          // give point to the player who answered correctly
           player.score = (player.score || 0) + 1;
           if (checkVictory(room, player, room.currentQuestionCategory)) return;
           io.to(room.code).emit('players', serializePlayers(room.players));
           conclude(true);
         } else {
-          // if all active players have answered and none correct, finish false
           if (room.pendingAnswers.size >= room.activePlayers.length) conclude(false);
         }
         break;
@@ -632,7 +608,6 @@ io.on('connection', socket => {
 
       case 'Call a friend':
         if (correct) {
-          // both initiator and friend get +1
           const initiator = room.players[room.currentIndex];
           const friendId = room.actionMeta && room.actionMeta.selectedPlayer;
           const friend = room.players.find(p => p.id === friendId);
@@ -660,7 +635,6 @@ io.on('connection', socket => {
         break;
 
       default:
-        // fallback
         if (correct) {
           player.score = (player.score || 0) + 1;
           if (checkVictory(room, player, room.currentQuestionCategory)) return;
@@ -679,8 +653,6 @@ io.on('connection', socket => {
     console.log(`[TIMEOUT] Timer expiré dans room ${code}, action: ${room.currentAction?.name || 'aucune'}`);
 
     const actionName = room.currentAction?.name || '';
-
-    // Cas spéciaux
     if (actionName === 'Second life') {
       if (!room.secondLifeRetry) {
         room.secondLifeRetry = true;
@@ -695,16 +667,13 @@ io.on('connection', socket => {
         clearRoomTimer(room);
         room.timer = setTimeout(() => {
           finalizeFalse(room);
-          endTurn(room); // ← force endTurn même en retry
+          endTurn(room);
         }, 60000);
         return;
       }
-      // Si déjà retry → on tombe dans le cas général
     }
-
-    // Cas général : timeout = faux → finalise et termine le tour
     finalizeFalse(room);
-    endTurn(room); // ← force toujours la fin du tour ici
+    endTurn(room);
   });
 
   socket.on('disconnect', () => {
@@ -716,19 +685,15 @@ io.on('connection', socket => {
 
         io.to(room.code).emit('players', serializePlayers(room.players));
 
-        // Si c'était l'hôte, passe à un autre
         if (room.host === socket.id && room.players.length > 0) {
           room.host = room.players[0].id;
         }
-
-        // Si c'était le joueur en cours ET qu'il reste au moins un joueur
         if (room.currentIndex === idx && room.players.length > 0) {
-          // Ajuste l'index pour éviter out-of-bounds
           room.currentIndex = room.currentIndex % room.players.length;
-          if (room.currentIndex < 0) room.currentIndex = 0; // sécurité
+          if (room.currentIndex < 0) room.currentIndex = 0;
 
           const next = room.players[room.currentIndex];
-          if (next) {  // ← vérification cruciale
+          if (next) {
             console.log(`[DISCONNECT] Tour passé au joueur ${next.name} après déconnexion de ${disconnectedPlayer.name}`);
             io.to(room.code).emit('yourTurn', { playerId: next.id });
             io.to(next.id).emit('yourTurn', { playerId: next.id });
@@ -737,12 +702,10 @@ io.on('connection', socket => {
           room.currentIndex--;
         }
 
-        // Force fin du tour si on était en train de jouer
         if (room.state === 'playing') {
           endTurn(room);
         }
 
-        // Nettoyage final
         if (room.players.length === 0) {
           delete rooms[room.code];
           console.log(`[ROOM] Room ${room.code} supprimée (vide)`);
@@ -754,12 +717,10 @@ io.on('connection', socket => {
     console.log('disconnect', socket.id);
   });
 
-  // Helpers
   function proceedToQuestion(room, initiator, action, meta = {}) {
   room.actionMeta = meta;
   room.currentAction = action;
 
-  // --- TELEPORTATION : effet immédiat ---
   if (action && action.name === 'Téléportation') {
     const randPos = Math.floor(Math.random() * room.board.positions.length);
     initiator.pos = randPos;
@@ -769,16 +730,12 @@ io.on('connection', socket => {
       playerId: initiator.id,
       pos: randPos
     });
-    // on continue volontairement vers la question
   }
-  // Récupérer la position actuelle (après téléportation éventuelle)
   const currentPos = initiator.pos;
   const currentCase = room.board.positions[currentPos];
 
-  // Catégorie de la case actuelle (vide pour case 72)
   const category = currentCase?.category || "";
 
-  // Tirer la question selon la catégorie
   const q = pickQuestion(category);
   if (!q) {
     io.to(room.code).emit('error', 'Aucune question disponible');
@@ -788,7 +745,7 @@ io.on('connection', socket => {
 
   room.currentQuestion = q.question;
   room.currentQuestionCategory = q.category;
-  room.currentQuestionDetail = q.d || null;  // ← pour afficher le détail en cas d’erreur
+  room.currentQuestionDetail = q.d || null;
   room.currentCorrection = (q.correction || '')
     .toString()
     .trim()
@@ -841,7 +798,7 @@ io.on('connection', socket => {
     id: initiator.id,
     name: initiator.name,
     pos: initiator.pos,
-    question: room.currentQuestion,  // la question visible pour tous
+    question: room.currentQuestion,
     theme: q.category || 'Général',
     img: q.img || null,
     timer: timerSec
@@ -855,8 +812,8 @@ io.on('connection', socket => {
     question: room.currentQuestion,
     timer: timerSec,
     recipients,
-    img: q.img || null,        // <-- ajouté pour que le client voie l'image
-    detail: q.detail || null   // <-- optionnel, pour texte explicatif
+    img: q.img || null,      
+    detail: q.detail || null  
   });
 });
 
@@ -893,7 +850,6 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
   function resolveSinglePlayerAction(room, player, correct, actionName) {
     const code = room.code;
 
-    // Cas spécial : Second life
     if (actionName === 'Second life') {
       if (correct) {
         player.score = (player.score || 0) + 1;
@@ -938,7 +894,6 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
       return;
     }
 
-    // Calcul du changement de score selon l’action
     let scoreChange = 0;
 
     switch (actionName) {
@@ -963,15 +918,12 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
         scoreChange = correct ? 1 : 0;
     }
 
-    // Applique le changement
     player.score = (player.score || 0) + scoreChange;
 
-    // Vérifie victoire
     if (correct && checkVictory(room, player, room.currentQuestionCategory)) {
       return;
     }
 
-    // Mise à jour et résultats
     io.to(code).emit('players', serializePlayers(room.players));
     clearRoomTimer(room);
 
@@ -1018,7 +970,6 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     if (room.timer) { clearTimeout(room.timer); room.timer = null; }
   }
 
-  // Helper pour sérialiser les players (convertit Set en Array pour Socket.IO)
   function serializePlayers(players) {
     return players.map(p => ({
       ...p,
@@ -1041,16 +992,12 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
       room.currentIndex = (room.currentIndex + 1) % room.players.length;
       const next = room.players[room.currentIndex];
     
-      // 1. Mise à jour globale de la liste des joueurs
       io.to(room.code).emit('players', serializePlayers(room.players));
     
-      // 2. Envoi yourTurn à TOUTE la room (important !)
       io.to(room.code).emit('yourTurn', { playerId: next.id });
     
-      // 3. Envoi spécifique au joueur suivant (redondance)
       io.to(next.id).emit('yourTurn', { playerId: next.id });
     
-      // Nettoyage interface pour tout le monde
       io.to(room.code).emit('actionClear');
     }
   }
@@ -1073,29 +1020,24 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
     }
     return false;
   }
-}); // end connection
+});
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => console.log('Serveur lancé sur le port', PORT));
 
-// Route pour servir data.json (déjà implicite via static, mais au cas où)
 app.get('/data.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/data.json'));
 });
 
-// Nouvel endpoint pour sauvegarder data.json
 app.post('/save-data', async (req, res) => {
   const newData = req.body;
   const filePath = path.join(__dirname, 'public/data.json');
   try {
-    // Validation basique : doit être un objet avec des arrays pour les cats
     if (typeof newData !== 'object' || newData === null || Array.isArray(newData)) {
       return res.status(400).json({ error: 'Données invalides : doit être un objet avec catégories.' });
     }
-    // Écrit le JSON pretty-print
     await fs.writeJson(filePath, newData, { spaces: 4 });
     res.json({ success: true });
-    // Optionnel : Broadcast via Socket.io pour notifier les clients connectés
     io.emit('dataUpdated');
   } catch (err) {
     console.error('Erreur save data.json:', err);
@@ -1103,33 +1045,13 @@ app.post('/save-data', async (req, res) => {
   }
 });
 
-// Socket.io logic (basé sur tes fichiers comme script.js et data.js)
-// Ajoute ton code existant ici, par ex :
-io.on('connection', (socket) => {
-  console.log('Un user connecté');
-  
-  // Exemples d'events de ton script.js
-  socket.on('create', (name) => { /* ton code pour créer room */ });
-  socket.on('join', (data) => { /* ton code */ });
-  // ... Ajoute tous tes socket.on existants
-  
-  // Nouveau : Pour request board/players, etc.
-  socket.on('requestBoard', () => { /* envoie board */ });
-  socket.on('requestPlayers', () => { /* envoie players */ });
-  
-  socket.on('disconnect', () => { console.log('User déconnecté'); });
-});
-
-// Nouvel endpoint pour sauvegarder data.json (évite conflit avec /save-data existant)
 app.post('/save-questions', async (req, res) => {
   const newData = req.body;
   const filePath = path.join(__dirname, 'public/data.json');
   try {
-    // Validation basique : doit être un objet avec des arrays pour les catégories
     if (typeof newData !== 'object' || newData === null || Array.isArray(newData)) {
       return res.status(400).json({ error: 'Données invalides : doit être un objet avec catégories.' });
     }
-    // Validation supplémentaire : check que chaque catégorie est un array d'objets avec id, q, a
     for (const [cat, questions] of Object.entries(newData)) {
       if (!Array.isArray(questions)) {
         return res.status(400).json({ error: `Catégorie "${cat}" invalide : doit être un array de questions.` });
@@ -1140,10 +1062,8 @@ app.post('/save-questions', async (req, res) => {
         }
       });
     }
-    // Écrit le JSON pretty-print (spaces: 4 comme dans ton exemple)
     await fse.writeJson(filePath, newData, { spaces: 4 });
     res.json({ success: true });
-    // Broadcast via Socket.io pour notifier les clients connectés (ex: refresh revision)
     io.emit('dataUpdated');
   } catch (err) {
     console.error('Erreur save data.json:', err);
@@ -1151,7 +1071,6 @@ app.post('/save-questions', async (req, res) => {
   }
 });
 
-// Nouvelle route pour upload + save question
 app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'imgrep' }]), async (req, res) => {
   const { category, q, a, d, isEdit, index } = req.body;
   const filePath = path.join(__dirname, 'public', 'data.json');
@@ -1170,7 +1089,6 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
   if (isEdit === 'true' && !isNaN(qIndex)) {
     questionId = jsonData[category][qIndex].id;
   } else {
-    // Nouveau ID : max global +1
     let maxId = 0;
     Object.values(jsonData).flat().forEach(q => { if (q.id > maxId) maxId = q.id; });
     questionId = maxId + 1;
@@ -1178,8 +1096,6 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
 
   const newQ = { id: questionId, q, a };
   if (d && d.trim()) newQ.d = d;
-
-  // Gérer img
   if (req.files['img'] && req.files['img'][0]) {
     const file = req.files['img'][0];
     const ext = path.extname(file.originalname) || '.png';
@@ -1188,10 +1104,9 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
     await fse.move(file.path, dest, { overwrite: true });
     newQ.img = `./image/${name}`;
   } else if (isEdit === 'true' && jsonData[category][qIndex].img) {
-    newQ.img = jsonData[category][qIndex].img; // Garder existant si pas remplacé
+    newQ.img = jsonData[category][qIndex].img;
   }
 
-  // Gérer imgrep
   if (req.files['imgrep'] && req.files['imgrep'][0]) {
     const file = req.files['imgrep'][0];
     const ext = path.extname(file.originalname) || '.png';
@@ -1211,7 +1126,7 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
 
   try {
     await fse.writeJson(filePath, jsonData, { spaces: 4 });
-    io.emit('dataUpdated'); // Pour refresh live
+    io.emit('dataUpdated');
     res.json({ success: true });
   } catch (err) {
     console.error('Erreur save data.json:', err);
@@ -1219,6 +1134,7 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
   }
 
 });
+
 
 
 
