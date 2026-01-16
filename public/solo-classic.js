@@ -1,4 +1,3 @@
-// public/solo-classic.js
 console.log('🟢 solo-classic.js chargé au', new Date().toLocaleString());
 
 let questions = [];
@@ -70,7 +69,6 @@ function loadCurrentUser() {
   console.log('[LOAD USER] lastResetDate sauvegardée :', lastResetDate);
   console.log('[LOAD USER] Vies actuelles :', lives);
 
-  // === BLOCAGE STRICT SI 0 VIE LE MÊME JOUR ===
   if (lives <= 0 && lastResetDate === today) {
     console.log('[BLOCAGE] 0 vie détectée et même jour → REDIRECTION FORCÉE');
     alert('💀 Tu n’as plus de vies aujourd’hui ! Reviens demain pour une nouvelle tentative.');
@@ -78,7 +76,6 @@ function loadCurrentUser() {
     return false;
   }
 
-  // Reset quotidien si nouveau jour
   if (lastResetDate !== today) {
     console.log('[RESET] Nouveau jour détecté → reset vies et score');
     lives = 3;
@@ -281,7 +278,7 @@ function showResult(correct, correction = '', detail = '') {
 
   document.body.appendChild(popup);
 
-  setTimeout(() => popup.remove(), correct ? 2000 : 5000); // plus long si correction
+  setTimeout(() => popup.remove(), correct ? 2000 : 5000);
 }
 
 function updateStats() {
@@ -322,4 +319,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadQuestions();
 
 });
+
 
