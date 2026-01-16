@@ -158,9 +158,9 @@ async function handleAnswer(userAnswer) {
   }
 
   currentIndex++;
+  showResult(isCorrect, currentQuestion.a);
   saveAllData();
   showQuestion();
-  showResult(isCorrect, currentQuestion.a);
   updateStats();
 }
 
@@ -219,4 +219,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadQuestions();
 
 });
+
 
