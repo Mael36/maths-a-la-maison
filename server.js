@@ -600,7 +600,6 @@ io.on('connection', socket => {
       case '+1 ou -1':
       case 'Quadruple':
       case 'No way':
-      case 'Double or quits':
       case 'Second life':
         // single player actions: resolve immediately with resolveSinglePlayerAction
         resolveSinglePlayerAction(room, player, correct, actionName);
@@ -701,22 +700,6 @@ io.on('connection', socket => {
         return;
       }
       // Si déjà retry → on tombe dans le cas général
-    }
-
-    if (actionName === 'Double or quits') {
-      const pl = room.players[room.currentIndex];
-      pl.score = 0;
-      clearRoomTimer(room);
-      io.to(room.code).emit('results', {
-        correct: false,
-        players: room.players,
-        message: 'Mauvaise réponse',
-        correction: room.currentCorrection || '',
-        detail: room.currentQuestionDetail || null
-      });
-
-      endTurn(room); // ← important
-      return;
     }
 
     // Cas général : timeout = faux → finalise et termine le tour
@@ -971,10 +954,6 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
       case 'No way':
         if (correct) scoreChange = 1;
         else room.players.forEach(p => { if (p.id !== player.id) p.score = (p.score || 0) + 1; });
-        break;
-      case 'Double or quits':
-        if (correct) player.score = (player.score || 0) * 2;
-        else player.score = 0;
         break;
       case 'Téléportation':
       case 'Flash':
@@ -1240,5 +1219,6 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
   }
 
 });
+
 
 
