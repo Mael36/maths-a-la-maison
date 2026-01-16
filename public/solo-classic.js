@@ -247,7 +247,6 @@ async function handleAnswer(userAnswer) {
     }
   } else {
     lives--;
-    alert(`📌 Correction : ${currentQuestion.d}`);
   }
 
   saveAllData();
@@ -323,3 +322,4 @@ document.addEventListener('DOMContentLoaded', () => {
   loadQuestions();
 
 });
+
