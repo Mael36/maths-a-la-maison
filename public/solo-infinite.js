@@ -162,19 +162,39 @@ async function handleAnswer(userAnswer) {
   currentIndex++;
   saveAllData();
   showQuestion();
-  showResult(isCorrect);
+  showResult(isCorrect, currentQuestion.a);
   updateStats();
 }
 
-function showResult(correct) {
-  const box = document.getElementById('resultBox');
-  const text = document.getElementById('resultText');
-  text.textContent = correct ? '✅ Bonne réponse' : '❌ Mauvaise réponse';
-  text.style.color = correct ? '#2e7d32' : '#c62828';
-  box.style.display = 'block';
-  setTimeout(() => box.style.display = 'none', 1200);
-}
+function showResult(correct, correction = '', detail = '') {
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: white; padding: 30px; border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4); z-index: 1000;
+    max-width: 500px; text-align: center;
+  `;
 
+  popup.innerHTML = `
+    <h2 style="color: ${correct ? '#2e7d32' : '#c62828'};">${correct ? 'Bonne réponse !' : 'Mauvaise réponse'}</h2>
+    <p style="font-size: 1.2em; margin: 15px 0;">${correct ? 'Bravo !' : ''}</p>
+  `;
+
+  if (!correct) {
+    if (correction) {
+      popup.innerHTML += `
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; text-align: left; margin: 20px 0;">
+          <strong>Bonne réponse :</strong> ${correction}<br><br>
+          ${detail ? `<strong>Détail :</strong> ${detail}` : ''}
+        </div>
+      `;
+    }
+  }
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => popup.remove(), correct ? 2000 : 5000); // plus long si correction
+}
 function updateStats() {
   document.getElementById('levelDisplay').textContent = currentIndex + 1;
   document.getElementById('livesDisplay').textContent = '∞';
@@ -199,4 +219,5 @@ document.getElementById('sendAnswerBtn')?.addEventListener('click', async () => 
 document.addEventListener('DOMContentLoaded', () => {
   if (!loadCurrentUser()) return;
   loadQuestions();
+
 });
