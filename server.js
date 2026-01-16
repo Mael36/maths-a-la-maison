@@ -359,7 +359,6 @@ const ACTIONS = [
   { name: "Téléportation" },
   { name: "+1 ou -1" },
   { name: "Everybody" },
-  { name: "Double or quits" },
   { name: "It's your choice", needActionChoice: true },
   { name: "Quadruple" }
 ];
@@ -1241,4 +1240,5 @@ app.post('/upload-and-save-question', upload.fields([{ name: 'img' }, { name: 'i
   }
 
 });
+
 
