@@ -95,8 +95,8 @@ elStart && (elStart.onclick = () => { if (room) socket.emit('start', room); });
 // Lancer le dé
 elRoll && (elRoll.onclick = () => {
   if (!room) return;
+  elRoll.disabled = true; // désactive immédiatement
   socket.emit('roll', room);
-  elRoll.disabled = false;
 });
 
 // Envoyer la réponse
@@ -840,6 +840,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
