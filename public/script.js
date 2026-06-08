@@ -89,8 +89,14 @@ elJoin.onclick = () => {
   socket.emit('join', { code, name: currentUser.username });
 };
 
-// Démarrer la partie
-elStart && (elStart.onclick = () => { if (room) socket.emit('start', room); });
+elStart && (elStart.onclick = () => {
+  if (!room) return;
+  if (players.length < 2) {
+    alert('Il faut au moins 2 joueurs pour démarrer la partie !');
+    return;
+  }
+  socket.emit('start', room);
+});
 
 let hasRolled = false;
 
