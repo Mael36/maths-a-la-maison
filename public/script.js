@@ -92,10 +92,12 @@ elJoin.onclick = () => {
 // Démarrer la partie
 elStart && (elStart.onclick = () => { if (room) socket.emit('start', room); });
 
-// Lancer le dé
+let hasRolled = false;
+
 elRoll && (elRoll.onclick = () => {
-  if (!room) return;
-  elRoll.disabled = true; // désactive immédiatement
+  if (!room || hasRolled) return;
+  hasRolled = true;
+  elRoll.disabled = true;
   socket.emit('roll', room);
 });
 
@@ -595,6 +597,7 @@ socket.on('players', list => {
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
   currentPlayerId = data.playerId;
+  hasRolled = false; // reset pour le nouveau tour
   updateRollButton();
   renderScoreTable(players);
 });
