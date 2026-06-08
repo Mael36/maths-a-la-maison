@@ -17,20 +17,6 @@
   </div>
 </header>
 
-  <script>
-    // Gestion des boutons header
-    document.getElementById('btnProfile').addEventListener('click', () => {
-      window.location.href = '/profile.html';
-    });
-
-    document.getElementById('btnLogout').addEventListener('click', () => {
-      if (confirm('Veux-tu vraiment te déconnecter ?')) {
-        localStorage.removeItem('currentUser');
-        window.location.href = '/login.html';
-      }
-    });
-  </script>
-
    <div id="menu">
     <h1>Maths à la Maison</h1>
     
@@ -50,7 +36,7 @@
         <strong>Question de :</strong> <span id="currentPlayerName"></span><br>
         <strong>Thème :</strong> <span id="currentTheme"></span><br>
         <strong>Question :</strong> <span id="currentQText"></span>
-        <img id="currentQImg" style="max-width: 50%; margin: 10px auto; display: none; display: block;" />
+        <img id="currentQImg" style="max-width: 50%; margin: 10px auto; display: none;" />
       </div>
       <div id="scoreTable"></div>
     </div>
@@ -90,30 +76,25 @@
     <div id="choice" style="display:none; position:fixed; bottom:20px; left:20px; background:#fff; padding:10px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2);"></div>
   </div>
 
-  <hr style="margin:30px 0">
+  <div id="homeContent">
+    <h2>Mode Solo Classique</h2>
+    <p>3 vies par jour · Ordre identique pour toute la classe · Score max 560/jour</p>
+    <button onclick="window.location.href='solo-classic.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+      Lancer le Parcours Brevet Classique
+    </button>
 
-  <hr style="margin:30px 0">
-  <h2>Mode Solo Classique</h2>
-  <p>3 vies par jour · Ordre identique pour toute la classe · Score max 560/jour</p>
-  <button onclick="window.location.href='solo-classic.html'" style="font-size:1.2em; padding:15px; margin:10px;">
-    Lancer le Parcours Brevet Classique
-  </button>
+    <h2>Mode Solo Infini</h2>
+    <p>Sans limite de vies · Score illimité · Ordre aléatoire</p>
+    <button onclick="window.location.href='solo-infinite.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+      Lancer le Parcours Brevet Infini
+    </button>
 
-  <h2>Mode Solo Infini</h2>
-  <p>Sans limite de vies · Score illimité · Ordre aléatoire</p>
-  <button onclick="window.location.href='solo-infinite.html'" style="font-size:1.2em; padding:15px; margin:10px;">
-    Lancer le Parcours Brevet Infini
-  </button>
-
-  <h2>Mode Révision</h2>
-  <button onclick="window.location.href='revision.html'" style="font-size:1.2em; padding:15px; margin:10px;">
-    Parcours Brevet
-  </button>
+    <h2>Mode Révision</h2>
+    <button onclick="window.location.href='revision.html'" style="font-size:1.2em; padding:15px; margin:10px;">
+      Parcours Brevet
+    </button>
+  </div>
 
   <script src="script.js"></script>
 </body>
-
-
 </html>
-
-
