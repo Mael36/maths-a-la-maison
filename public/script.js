@@ -597,9 +597,13 @@ socket.on('players', list => {
 socket.on('boardData', b => { board = b; updatePawns(players); createActionCards(); });
 socket.on('yourTurn', data => {
   currentPlayerId = data.playerId;
-  hasRolled = false; // reset pour le nouveau tour
+  hasRolled = false;
   updateRollButton();
   renderScoreTable(players);
+  
+  // Cache le bouton Démarrer dès que la partie commence
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) startBtn.style.display = 'none';
 });
 
 
