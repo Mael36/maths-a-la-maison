@@ -6,7 +6,6 @@ let currentPlayerId = null;
 let activePlayers = [];
 let clientTimer = null;
 let requiredCategories = [];
-
 let currentUser = null;
 try {
   const userData = localStorage.getItem('currentUser');
@@ -461,7 +460,7 @@ function renderScoreTable(list) {
     row.style.borderRadius = '6px';
     row.style.transition = 'background 0.15s';
     row.onmouseover = () => { row.style.background = '#f0f0f0'; };
-    row.onmouseout = () => { row.style.background = ''; };
+    row.onmouseout = () => { row.style.background = p.id === currentPlayerId ? '#e3f2fd' : ''; };
 
     row.onclick = () => {
       showPlayerCategories(p);
@@ -481,16 +480,18 @@ socket.on('categoriesList', categories => {
   console.log('Catégories requises reçues :', requiredCategories);
 });
 
+const CATEGORIES_POPUP_ID = 'categoriesPopupUnique';
+
 function showPlayerCategories(player) {
   if (!player) return;
 
-  console.log("Joueur cliqué :", player.name);
-  console.log("categoriesCompleted reçu :", player.categoriesCompleted);
-  console.log("Type :", Array.isArray(player.categoriesCompleted) ? "tableau" : typeof player.categoriesCompleted);
+  // Fermer et supprimer toute popup déjà ouverte avant d'en créer une nouvelle
+  const existing = document.getElementById(CATEGORIES_POPUP_ID);
+  if (existing) existing.remove();
 
   const allCategories = requiredCategories.length > 0 
     ? requiredCategories 
-    : ["Calcul litteral", "Nombres", "Transformations", "Communiquer", "Géométrie dans l'espace", "Proportionnalité", "Stats ou probas", "Géométrie", "Informatique", "Logique", "Calculs", "Fonctions"]; 
+    : ["Calcul litteral", "Nombres", "Transformations", "Communiquer", "Géométrie dans l'espace", "Proportionnalité", "Stats ou probas", "Géométrie", "Informatique", "Logique", "Calculs", "Fonctions"];
 
   const completedArray = Array.isArray(player.categoriesCompleted) 
     ? player.categoriesCompleted 
@@ -500,20 +501,29 @@ function showPlayerCategories(player) {
   const missing = allCategories.filter(cat => !completed.has(cat));
 
   const popup = document.createElement('div');
+  popup.id = CATEGORIES_POPUP_ID;
   popup.style.position = 'fixed';
-  popup.style.inset = '50% auto auto 50%';
-  popup.style.transform = 'translate(-50%, -50%)';
-  popup.style.background = 'white';
-  popup.style.padding = '30px';
-  popup.style.borderRadius = '12px';
-  popup.style.boxShadow = '0 8px 30px rgba(0,0,0,0.4)';
-  popup.style.zIndex = '1000';
-  popup.style.maxWidth = '420px';
-  popup.style.textAlign = 'center';
-  popup.style.fontFamily = 'Arial, sans-serif';
-  popup.style.lineHeight = '1.5';
+  popup.style.inset = '0';
+  popup.style.display = 'flex';
+  popup.style.alignItems = 'center';
+  popup.style.justifyContent = 'center';
+  popup.style.background = 'rgba(0,0,0,0.4)';
+  popup.style.zIndex = '999999';
 
-  popup.innerHTML = `
+  const inner = document.createElement('div');
+  inner.style.background = 'white';
+  inner.style.padding = '30px';
+  inner.style.borderRadius = '12px';
+  inner.style.boxShadow = '0 8px 30px rgba(0,0,0,0.4)';
+  inner.style.maxWidth = '420px';
+  inner.style.width = '90%';
+  inner.style.textAlign = 'center';
+  inner.style.fontFamily = 'Arial, sans-serif';
+  inner.style.lineHeight = '1.5';
+  inner.style.maxHeight = '80vh';
+  inner.style.overflowY = 'auto';
+
+  inner.innerHTML = `
     <h3 style="margin: 0 0 24px; color: #1a237e;">${player.name}</h3>
     
     <div style="margin-bottom: 20px;">
@@ -525,7 +535,7 @@ function showPlayerCategories(player) {
           ? Array.from(completed).map(cat => `
               <li style="margin: 6px 0; color: #2e7d32;">✓ ${cat}</li>
             `).join('')
-          : '<li style="color: #757575; font-style: italic;">Aucune catégorie validée pour l’instant</li>'}
+          : '<li style="color: #757575; font-style: italic;">Aucune catégorie validée pour l\'instant</li>'}
       </ul>
     </div>
 
@@ -550,15 +560,17 @@ function showPlayerCategories(player) {
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s;
     ">
       Fermer
     </button>
   `;
 
+  popup.appendChild(inner);
   document.body.appendChild(popup);
 
+  // Clic sur le bouton Fermer
   document.getElementById('closePopupBtn').onclick = () => popup.remove();
+  // Clic sur l'overlay (hors du cadre) = fermeture aussi
   popup.addEventListener('click', (e) => {
     if (e.target === popup) popup.remove();
   });
@@ -828,6 +840,7 @@ function showGame() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
