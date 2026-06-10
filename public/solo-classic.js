@@ -160,13 +160,18 @@ async function loadQuestions() {
 
 function shuffleArray(array, seed) {
   const arr = [...array];
-  let m = arr.length, i;
-  let s = seed;
-  while (m) {
-    s = Math.sin(s) * 10000;
-    i = Math.floor((s - Math.floor(s)) * m--);
-    [arr[m], arr[i]] = [arr[i], arr[m]];
+  let s = seed >>> 0; // force en entier non signé
+
+  function nextRand() {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0; // LCG standard
+    return s / 0x100000000; // valeur entre 0 et 1
   }
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRand() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
   return arr;
 }
 
