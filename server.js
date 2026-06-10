@@ -9,6 +9,7 @@ const upload = multer({ dest: 'public/uploads/' });
 const { Server } = require('socket.io');
 const fetch = require('node-fetch');
 const MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x";
+const userSockets = {}; // username → socket.id
 
 const app = express();
 const server = http.createServer(app);
@@ -481,8 +482,41 @@ io.on('connection', socket => {
     const room = rooms[code];
     if (!room) return socket.emit('error', 'Salle inexistante');
     if (room.players.length >= 6) return socket.emit('error', 'Salle pleine');
+  
+    // Vérifier si le joueur existait déjà dans la room (reconnexion)
+    const existing = room.players.find(p => p.name === name);
+    if (existing) {
+      // Réattribuer le socket
+      existing.id = socket.id;
+      existing.disconnected = false;
+      socket.join(code);
+      socket.emit('joined', code);
+      socket.emit('boardData', room.board);
+      io.to(code).emit('players', serializePlayers(room.players));
+  
+      // Si c'était son tour, lui renvoyer yourTurn
+      const current = room.players[room.currentIndex];
+      if (current && current.id === socket.id) {
+        socket.emit('yourTurn', { playerId: socket.id });
+      }
+  
+      // Si une question est en cours et qu'il en fait partie
+      if (room.currentQuestion && room.activePlayers.includes(socket.id)) {
+        socket.emit('question', {
+          theme: room.currentQuestionCategory || 'Général',
+          question: room.currentQuestion,
+          timer: 60,
+          recipients: room.activePlayers
+        });
+      }
+  
+      console.log(`[RECONNECT] ${name} a réintégré la room ${code}`);
+      return;
+    }
+  
+    // Nouveau joueur
     if (room.state !== 'waiting') return socket.emit('error', 'Partie déjà commencée');
-    room.players.push({ id: socket.id, name: name || 'Hôte', pos: 0, score: 0, categoriesCompleted: new Set() });
+    room.players.push({ id: socket.id, name: name || 'Joueur', pos: 0, score: 0, categoriesCompleted: new Set(), disconnected: false });
     socket.join(code);
     socket.emit('joined', code);
     io.to(code).emit('players', serializePlayers(room.players));
@@ -520,6 +554,12 @@ io.on('connection', socket => {
     if (!current || current.id !== socket.id) return;
     const roll = Math.floor(Math.random() * 6) + 1;
     io.to(code).emit('rolled', { roll, currentPos: current.pos });
+  });
+
+  socket.on('auth', username => {
+    userSockets[username] = socket.id;
+    socket.username = username;
+    console.log(`[AUTH] ${username} → ${socket.id}`);
   });
 
   socket.on('moveTo', ({ code, pos }) => {
@@ -732,41 +772,36 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     Object.values(rooms).forEach(room => {
       const idx = room.players.findIndex(p => p.id === socket.id);
-      if (idx !== -1) {
-        const disconnectedPlayer = room.players[idx];
-        room.players.splice(idx, 1);
-
+      if (idx === -1) return;
+  
+      const player = room.players[idx];
+  
+      if (room.state === 'playing') {
+        // Marquer comme déconnecté mais garder dans la room
+        player.disconnected = true;
         io.to(room.code).emit('players', serializePlayers(room.players));
-
-        if (room.host === socket.id && room.players.length > 0) {
-          room.host = room.players[0].id;
-        }
-        if (room.currentIndex === idx && room.players.length > 0) {
-          room.currentIndex = room.currentIndex % room.players.length;
-          if (room.currentIndex < 0) room.currentIndex = 0;
-
-          const next = room.players[room.currentIndex];
-          if (next) {
-            console.log(`[DISCONNECT] Tour passé au joueur ${next.name} après déconnexion de ${disconnectedPlayer.name}`);
-            io.to(room.code).emit('yourTurn', { playerId: next.id });
-            io.to(next.id).emit('yourTurn', { playerId: next.id });
-          }
-        } else if (room.currentIndex > idx && room.players.length > 0) {
-          room.currentIndex--;
-        }
-
-        if (room.state === 'playing') {
+        console.log(`[DISCONNECT] ${player.name} marqué déconnecté, conservé dans room ${room.code}`);
+  
+        // Si c'était son tour, passer au suivant
+        if (room.currentIndex === idx) {
           endTurn(room);
         }
-
+      } else {
+        // En attente → on retire vraiment
+        room.players.splice(idx, 1);
+        io.to(room.code).emit('players', serializePlayers(room.players));
+  
         if (room.players.length === 0) {
-          delete rooms[room.code];
-          console.log(`[ROOM] Room ${room.code} supprimée (vide)`);
-        } else if (room.state === 'finished') {
           delete rooms[room.code];
         }
       }
     });
+  
+    // Nettoyer userSockets
+    Object.keys(userSockets).forEach(u => {
+      if (userSockets[u] === socket.id) delete userSockets[u];
+    });
+  
     console.log('disconnect', socket.id);
   });
 
@@ -1026,7 +1061,8 @@ console.log(`[Question envoyée] à ${recipients.length} joueurs :`, {
   function serializePlayers(players) {
     return players.map(p => ({
       ...p,
-      categoriesCompleted: Array.from(p.categoriesCompleted || [])  // transforme Set → tableau
+      categoriesCompleted: Array.from(p.categoriesCompleted || []),
+      disconnected: p.disconnected || false
     }));
   }
 
