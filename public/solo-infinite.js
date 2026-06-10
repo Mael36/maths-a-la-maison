@@ -43,10 +43,22 @@ function loadSaveData() {
     currentIndex = data.currentIndex || 0;
   }
 }
-
 function saveAllData() {
   const key = STORAGE_KEY + currentUser;
   localStorage.setItem(key, JSON.stringify({ score, currentIndex }));
+
+  // Sauvegarde serveur
+  fetch('/api/solo/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: currentUser,
+      mode: 'infinite',
+      dailyScore: 0,
+      dailyHighscore: 0,
+      totalScore: score
+    })
+  }).catch(e => console.error('[SAVE SERVER] Erreur:', e));
 }
 
 // =====================
