@@ -96,16 +96,21 @@ function loadCurrentUser() {
 // =====================
 function saveAllData() {
   const key = STORAGE_KEY + currentUser;
-  const dataToSave = {
-    level: currentLevel,
-    lives,
-    dailyScore,
-    dailyHighscore,
-    totalScore,
-    lastResetDate
-  };
-  console.log('[SAVE] Sauvegarde des données dans localStorage clé', key, ':', dataToSave);
+  const dataToSave = { level: currentLevel, lives, dailyScore, dailyHighscore, totalScore, lastResetDate };
   localStorage.setItem(key, JSON.stringify(dataToSave));
+
+  // Sauvegarde serveur
+  fetch('/api/solo/score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: currentUser,
+      mode: 'classic',
+      dailyScore,
+      dailyHighscore,
+      totalScore
+    })
+  }).catch(e => console.error('[SAVE SERVER] Erreur:', e));
 }
 
 // =====================
