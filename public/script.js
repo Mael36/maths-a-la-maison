@@ -462,7 +462,7 @@ function renderScoreTable(list) {
   elScoreTable.innerHTML = '<b>Scores</b><br>';
   (players || []).forEach((p, i) => {
     const row = document.createElement('div');
-    row.textContent = `${i+1}. ${p.name} — ${p.score || 0} pts`;
+    row.textContent = `${i+1}. ${p.name} — ${p.score || 0} pts${p.disconnected ? ' 🔴' : ''}`;
     row.style.cursor = 'pointer';
     row.style.padding = '8px';
     row.style.borderRadius = '6px';
