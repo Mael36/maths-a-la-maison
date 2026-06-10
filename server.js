@@ -125,6 +125,26 @@ function saveUsers(users) {
   }
 }
 
+const SCORES_FILE = path.join(__dirname, 'public', 'data', 'scores.json');
+
+function loadScores() {
+  if (!fs.existsSync(SCORES_FILE)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(SCORES_FILE, 'utf-8'));
+  } catch (e) {
+    console.error('Erreur lecture scores.json:', e.message);
+    return {};
+  }
+}
+
+function saveScores(scores) {
+  try {
+    fs.writeFileSync(SCORES_FILE, JSON.stringify(scores, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Erreur écriture scores.json:', e.message);
+  }
+}
+
 
 // --- ROUTES LOGIN / USERS ---
 app.post('/api/login', async (req, res) => {
@@ -288,6 +308,39 @@ app.post('/api/solo/check', async (req, res) => {
     console.error('[SOLO] Erreur vérification:', e.message);
     res.status(500).json({ correct: false });
   }
+});
+
+app.post('/api/solo/score', (req, res) => {
+  const { username, mode, dailyScore, dailyHighscore, totalScore } = req.body;
+  if (!username || !mode) return res.status(400).json({ error: 'Données manquantes' });
+
+  const scores = loadScores();
+  if (!scores[username]) scores[username] = {};
+
+  scores[username][mode] = {
+    dailyScore: dailyScore || 0,
+    dailyHighscore: dailyHighscore || 0,
+    totalScore: totalScore || 0,
+    updatedAt: new Date().toISOString().slice(0, 10)
+  };
+
+  saveScores(scores);
+  res.json({ success: true });
+});
+
+app.get('/api/scores', (req, res) => {
+  const scores = loadScores();
+  const users = loadUsers();
+
+  // Ne retourner que les élèves réels
+  const result = {};
+  Object.keys(scores).forEach(username => {
+    if (users[username] && users[username].role === 'élève') {
+      result[username] = scores[username];
+    }
+  });
+
+  res.json(result);
 });
 
 // --- LOAD BOARD ---
