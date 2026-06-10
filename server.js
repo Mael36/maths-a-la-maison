@@ -486,18 +486,18 @@ io.on('connection', socket => {
     // Vérifier si le joueur existait déjà dans la room (reconnexion)
     const existing = room.players.find(p => p.name === name);
     if (existing) {
-      // Réattribuer le socket
       existing.id = socket.id;
       existing.disconnected = false;
+    
       socket.join(code);
       socket.emit('joined', code);
       socket.emit('boardData', room.board);
       io.to(code).emit('players', serializePlayers(room.players));
-  
-      // Si c'était son tour, lui renvoyer yourTurn
+    
+      // Indiquer au joueur reconnecté qui joue actuellement
       const current = room.players[room.currentIndex];
-      if (current && current.id === socket.id) {
-        socket.emit('yourTurn', { playerId: socket.id });
+      if (current) {
+        socket.emit('yourTurn', { playerId: current.id, playerName: current.name });
       }
   
       // Si une question est en cours et qu'il en fait partie
