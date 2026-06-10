@@ -208,34 +208,41 @@
       rankingDiv.innerHTML = '<p>Chargement du classement...</p>';
     
       try {
-        const res = await fetch('/api/scores');
-        const scores = await res.json();
+        const [scoresRes, usersRes] = await Promise.all([
+          fetch('/api/scores'),
+          fetch('/data/users.json')
+        ]);
+        const scores = await scoresRes.json();
+        const users = await usersRes.json();
     
-        const students = Object.entries(scores).map(([username, data]) => ({
-          username,
-          classicDaily: data.classic?.dailyScore || 0,
-          classicHigh: data.classic?.dailyHighscore || 0,
-          classicTotal: data.classic?.totalScore || 0,
-          infiniteScore: data.infinite?.totalScore || 0
-        }));
+        // Tous les élèves, même sans score
+        const allStudents = Object.keys(users)
+          .filter(username => users[username].role === 'élève')
+          .map(username => ({
+            username,
+            classicDaily:  scores[username]?.classic?.dailyScore    || 0,
+            classicHigh:   scores[username]?.classic?.dailyHighscore || 0,
+            classicTotal:  scores[username]?.classic?.totalScore     || 0,
+            infiniteScore: scores[username]?.infinite?.totalScore    || 0
+          }));
     
-        if (students.length === 0) {
-          rankingDiv.innerHTML = '<p class="no-data">Aucun score enregistré.</p>';
+        if (allStudents.length === 0) {
+          rankingDiv.innerHTML = '<p class="no-data">Aucun élève enregistré.</p>';
           return;
         }
     
         const rankings = {
-          classicDaily: [...students].sort((a, b) => b.classicDaily - a.classicDaily),
-          classicHigh:  [...students].sort((a, b) => b.classicHigh  - a.classicHigh),
-          classicTotal: [...students].sort((a, b) => b.classicTotal - a.classicTotal),
-          infinite:     [...students].sort((a, b) => b.infiniteScore - a.infiniteScore)
+          classicDaily: [...allStudents].sort((a, b) => b.classicDaily  - a.classicDaily),
+          classicHigh:  [...allStudents].sort((a, b) => b.classicHigh   - a.classicHigh),
+          classicTotal: [...allStudents].sort((a, b) => b.classicTotal  - a.classicTotal),
+          infinite:     [...allStudents].sort((a, b) => b.infiniteScore - a.infiniteScore)
         };
     
         let html = '';
-        html += '<h4>Score du jour (Classique)</h4>'  + buildTable(rankings.classicDaily, 'classicDaily');
-        html += '<h4>Meilleur score du jour (Classique)</h4>' + buildTable(rankings.classicHigh, 'classicHigh');
-        html += '<h4>Score total (Classique)</h4>'    + buildTable(rankings.classicTotal, 'classicTotal');
-        html += '<h4>Score total (Infini)</h4>'       + buildTable(rankings.infinite, 'infiniteScore');
+        html += '<h4>Score du jour (Classique)</h4>'         + buildTable(rankings.classicDaily, 'classicDaily');
+        html += '<h4>Meilleur score du jour (Classique)</h4>' + buildTable(rankings.classicHigh,  'classicHigh');
+        html += '<h4>Score total (Classique)</h4>'            + buildTable(rankings.classicTotal, 'classicTotal');
+        html += '<h4>Score total (Infini)</h4>'               + buildTable(rankings.infinite,     'infiniteScore');
     
         rankingDiv.innerHTML = html;
       } catch (err) {
