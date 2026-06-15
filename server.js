@@ -8,7 +8,28 @@ const multer = require('multer');
 const upload = multer({ dest: 'public/uploads/' }); 
 const { Server } = require('socket.io');
 const fetch = require('node-fetch');
-const MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x";
+const MISTRAL_KEY_FILE = path.join(__dirname, 'public', 'data', 'mistral.json');
+
+function loadMistralKey() {
+  try {
+    if (fs.existsSync(MISTRAL_KEY_FILE)) {
+      return JSON.parse(fs.readFileSync(MISTRAL_KEY_FILE, 'utf-8')).key;
+    }
+  } catch (e) {
+    console.error('Erreur lecture mistral.json:', e.message);
+  }
+  return "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x";
+}
+
+function saveMistralKey(key) {
+  try {
+    fs.writeFileSync(MISTRAL_KEY_FILE, JSON.stringify({ key }, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Erreur écriture mistral.json:', e.message);
+  }
+}
+
+let MISTRAL_API_KEY = loadMistralKey();
 const userSockets = {}; // username → socket.id
 
 const app = express();
@@ -342,6 +363,23 @@ app.get('/api/scores', (req, res) => {
   });
 
   res.json(result);
+});
+
+app.get('/api/mistral-key', (req, res) => {
+  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}');
+  if (!currentUser || currentUser.role !== 'prof') return res.status(403).json({ error: 'Accès interdit' });
+  res.json({ key: MISTRAL_API_KEY });
+});
+
+app.post('/api/mistral-key', (req, res) => {
+  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}');
+  if (!currentUser || currentUser.role !== 'prof') return res.status(403).json({ error: 'Accès interdit' });
+  const { key } = req.body;
+  if (!key || typeof key !== 'string' || key.trim() === '') return res.status(400).json({ error: 'Clé invalide' });
+  MISTRAL_API_KEY = key.trim();
+  saveMistralKey(MISTRAL_API_KEY);
+  console.log('[PROF] Clé Mistral mise à jour et sauvegardée');
+  res.json({ success: true });
 });
 
 // --- LOAD BOARD ---
