@@ -1,8 +1,17 @@
 import json
 import requests
-import os
+import json, os
 
-MISTRAL_API_KEY = "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x"  
+def load_mistral_key():
+    key_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'mistral.json')
+    try:
+        with open(key_file, 'r', encoding='utf-8') as f:
+            return json.load(f).get('key', '')
+    except Exception as e:
+        print(f"Impossible de lire mistral.json : {e}")
+        return ''
+
+MISTRAL_API_KEY = load_mistral_key()
 
 API_URL = "https://api.mistral.ai/v1/chat/completions"
 
@@ -90,7 +99,14 @@ Aucune explication. Un seul mot : true ou false.
 
     try:
         response = requests.post(API_URL, headers=headers, json=payload, timeout=15)
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code in (401, 403):
+                print("❌ Clé API invalide — contactez votre professeur.")
+            else:
+                print(f"❌ Erreur HTTP : {e}")
+            return None
 
         result = response.json()
         answer = result["choices"][0]["message"]["content"].strip().lower()
