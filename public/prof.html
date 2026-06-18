@@ -293,36 +293,28 @@
       loadRanking();
     });
     async function loadMistralKey() {
-      const res = await fetch('/api/mistral-key', {
-        headers: { 'x-current-user': JSON.stringify(currentUser) }
-      });
-      const data = await res.json();
-      if (data.key) {
-        const last4 = data.key.slice(-4);
+      const headers = { 'x-current-user': JSON.stringify(currentUser) };
+    
+      const [keyRes, statusRes] = await Promise.all([
+        fetch('/api/mistral-key', { headers }),
+        fetch('/api/mistral-key/status', { headers })
+      ]);
+    
+      const keyData = await keyRes.json();
+      const statusData = await statusRes.json();
+    
+      if (keyData.key) {
+        const last4 = keyData.key.slice(-4);
         document.getElementById('mistralKeyInput').value = `**********${last4}`;
       }
-    }
     
-    document.getElementById('saveMistralKey').addEventListener('click', async () => {
-      const key = document.getElementById('mistralKeyInput').value.trim();
       const msgEl = document.getElementById('mistralKeyMessage');
-      if (!key) {
+      if (!statusData.valid) {
         msgEl.style.color = 'red';
-        msgEl.textContent = 'Clé vide';
-        return;
-      }
-      const res = await fetch('/api/mistral-key', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-current-user': JSON.stringify(currentUser) },
-        body: JSON.stringify({ key })
-      });
-      const data = await res.json();
-      if (data.success) {
-        msgEl.style.color = 'green';
-        msgEl.textContent = 'Clé mise à jour !';
+        msgEl.textContent = `⚠️ ${statusData.reason} — les corrections se font sans IA.`;
       } else {
-        msgEl.style.color = 'red';
-        msgEl.textContent = data.error || 'Erreur';
+        msgEl.style.color = 'green';
+        msgEl.textContent = '✅ Clé valide — Mistral AI actif.';
       }
     });
     
