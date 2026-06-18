@@ -297,7 +297,10 @@
         headers: { 'x-current-user': JSON.stringify(currentUser) }
       });
       const data = await res.json();
-      if (data.key) document.getElementById('mistralKeyInput').value = data.key;
+      if (data.key) {
+        const last4 = data.key.slice(-4);
+        document.getElementById('mistralKeyInput').value = `**********${last4}`;
+      }
     }
     
     document.getElementById('saveMistralKey').addEventListener('click', async () => {
