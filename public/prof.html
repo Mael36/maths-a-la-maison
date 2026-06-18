@@ -292,32 +292,40 @@
       loadStudentList();
       loadRanking();
     });
-    async function loadMistralKey() {
-      const headers = { 'x-current-user': JSON.stringify(currentUser) };
+   async function loadMistralKey() {
+      try {
+        const headers = { 'x-current-user': JSON.stringify(currentUser) };
     
-      const [keyRes, statusRes] = await Promise.all([
-        fetch('/api/mistral-key', { headers }),
-        fetch('/api/mistral-key/status', { headers })
-      ]);
+        const keyRes = await fetch('/api/mistral-key', { headers });
+        if (!keyRes.ok) {
+          console.error('[Mistral] Erreur clé :', keyRes.status);
+          return;
+        }
+        const keyData = await keyRes.json();
+        if (keyData.key) {
+          const last4 = keyData.key.slice(-4);
+          document.getElementById('mistralKeyInput').value = `**********${last4}`;
+        }
     
-      const keyData = await keyRes.json();
-      const statusData = await statusRes.json();
+        const statusRes = await fetch('/api/mistral-key/status', { headers });
+        if (!statusRes.ok) {
+          console.error('[Mistral] Erreur status :', statusRes.status);
+          return;
+        }
+        const statusData = await statusRes.json();
     
-      if (keyData.key) {
-        const last4 = keyData.key.slice(-4);
-        document.getElementById('mistralKeyInput').value = `**********${last4}`;
+        const msgEl = document.getElementById('mistralKeyMessage');
+        if (!statusData.valid) {
+          msgEl.style.color = 'red';
+          msgEl.textContent = `⚠️ ${statusData.reason} — les corrections se font sans IA.`;
+        } else {
+          msgEl.style.color = 'green';
+          msgEl.textContent = '✅ Clé valide — Mistral AI actif.';
+        }
+      } catch (e) {
+        console.error('[Mistral] Erreur loadMistralKey :', e);
       }
-    
-      const msgEl = document.getElementById('mistralKeyMessage');
-      if (!statusData.valid) {
-        msgEl.style.color = 'red';
-        msgEl.textContent = `⚠️ ${statusData.reason} — les corrections se font sans IA.`;
-      } else {
-        msgEl.style.color = 'green';
-        msgEl.textContent = '✅ Clé valide — Mistral AI actif.';
-      }
-    });
-    
+    }    
     loadMistralKey();
   </script>
 </body>
