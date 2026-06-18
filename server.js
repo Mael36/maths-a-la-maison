@@ -18,7 +18,7 @@ function loadMistralKey() {
   } catch (e) {
     console.error('Erreur lecture mistral.json:', e.message);
   }
-  return "UgqBwDkleUS5rgEDyCnWYoZOhEHH916x";
+  return "";
 }
 
 function saveMistralKey(key) {
