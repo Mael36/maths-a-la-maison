@@ -192,6 +192,29 @@ app.post('/api/login', async (req, res) => {
   });
 });
 
+app.get('/api/mistral-key/status', async (req, res) => {
+  const currentUser = JSON.parse(req.headers['x-current-user'] || '{}');
+  if (!currentUser || currentUser.role !== 'prof') return res.status(403).json({ error: 'Accès interdit' });
+
+  if (!MISTRAL_API_KEY) return res.json({ valid: false, reason: 'Clé absente' });
+
+  try {
+    const test = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${MISTRAL_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'mistral-small-latest',
+        messages: [{ role: 'user', content: 'true' }],
+        max_tokens: 1
+      })
+    });
+    if (test.status === 401 || test.status === 403) return res.json({ valid: false, reason: 'Clé invalide' });
+    res.json({ valid: true });
+  } catch (e) {
+    res.json({ valid: false, reason: 'Erreur réseau' });
+  }
+});
+
 app.post('/api/create-user', async (req, res) => {
   const { username, password } = req.body;
 
