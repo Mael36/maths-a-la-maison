@@ -266,7 +266,19 @@ app.post('/api/change-password', async (req, res) => {
   res.json({ success: true });
 });
 
+function compareSimple(userAnswer, expectedAnswer) {
+  const normalize = s => s.trim().toLowerCase()
+    .replace(',', '.')
+    .replace(/\s+/g, '');
+  return normalize(userAnswer) === normalize(expectedAnswer);
+}
+
 async function checkWithMistral(userAnswer, expectedAnswer) {
+  if (!MISTRAL_API_KEY) {
+    console.warn('[Mistral] Clé absente → comparaison simple');
+    return compareSimple(userAnswer, expectedAnswer);
+  }
+
   try {
     const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
@@ -280,13 +292,10 @@ async function checkWithMistral(userAnswer, expectedAnswer) {
           role: 'user',
           content: `
 Compare deux réponses de mathématiques.
-
 Réponse attendue :
 ${expectedAnswer}
-
 Réponse utilisateur :
 ${userAnswer}
-
 Règles :
 - Réponds UNIQUEMENT par "true" ou "false"
 - true si les réponses sont équivalentes mathématiquement ou sémantiquement
@@ -294,7 +303,6 @@ Règles :
 - false si l'utilisateur répond par des phrases vagues comme :
   "c'est la même réponse", "idem", "voir question", etc.
 - false si l'utilisateur reformule la question au lieu de répondre
-
 Aucune explication. Un seul mot : true ou false.
 `
         }],
@@ -303,12 +311,23 @@ Aucune explication. Un seul mot : true ou false.
       })
     });
 
+    if (res.status === 401 || res.status === 403) {
+      console.warn('[Mistral] Clé invalide → comparaison simple');
+      return compareSimple(userAnswer, expectedAnswer);
+    }
+
     const data = await res.json();
     const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase();
+
+    if (answer !== 'true' && answer !== 'false') {
+      console.warn('[Mistral] Réponse inattendue → comparaison simple');
+      return compareSimple(userAnswer, expectedAnswer);
+    }
+
     return answer === 'true';
   } catch (e) {
-    console.error('Erreur Mistral:', e.message);
-    return false;
+    console.error('[Mistral] Erreur réseau → comparaison simple :', e.message);
+    return compareSimple(userAnswer, expectedAnswer);
   }
 }
 
@@ -324,7 +343,7 @@ app.post('/api/solo/check', async (req, res) => {
     }
 
     const correct = await checkWithMistral(answer, expected);
-
+    if (correct === null) return res.status(503).json({ correct: false, apiError: true, message: "Clé API invalide — contactez votre professeur." });
     res.json({ correct });
   } catch (e) {
     console.error('[SOLO] Erreur vérification:', e.message);
@@ -684,6 +703,17 @@ io.on('connection', socket => {
       answer,
       room.currentCorrection
     );
+
+    if (correct === null) {
+      io.to(room.code).emit('results', {
+        correct: false,
+        players: room.players,
+        message: "Clé API invalide — contactez votre professeur.",
+        correction: null
+      });
+      endTurn(room);
+      return;
+    }
 
     room.pendingAnswers.set(socket.id, { correct, playerId: socket.id });
 
