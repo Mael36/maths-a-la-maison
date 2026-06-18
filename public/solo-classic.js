@@ -241,28 +241,33 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
 async function handleAnswer(userAnswer) {
   const result = await checkAnswerWithBackend(userAnswer, currentQuestion.a);
   const isCorrect = result.correct === true;
+
   if (result.apiError) {
     showResult(false, '', '', result.message);
     return;
   }
 
-  if (isCorrect) {
-    currentLevel++;
-    dailyScore = Math.min(dailyScore + 1, 560);
-    totalScore++;
+  // Toujours passer à la question suivante, même en cas de mauvaise réponse
+  currentLevel++;
 
-    // Mise à jour du highscore quotidien
-    if (dailyScore > dailyHighscore) {
-      dailyHighscore = dailyScore;
-      console.log('[HIGHSCORE] Nouveau record quotidien :', dailyHighscore);
-    }
-  } else {
+  // Toujours ajouter 1 point, même en cas de mauvaise réponse
+  dailyScore = Math.min(dailyScore + 1, 560);
+  totalScore++;
+
+  // Mise à jour du highscore quotidien
+  if (dailyScore > dailyHighscore) {
+    dailyHighscore = dailyScore;
+    console.log('[HIGHSCORE] Nouveau record quotidien :', dailyHighscore);
+  }
+
+  // Perdre une vie uniquement en cas de mauvaise réponse
+  if (!isCorrect) {
     lives--;
   }
 
   saveAllData();
   showQuestion();
-  showResult(isCorrect,currentQuestion.a);
+  showResult(isCorrect, currentQuestion.a);
 }
 
 function showResult(correct, correction = '', detail = '', apiMessage = '') {
