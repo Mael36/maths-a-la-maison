@@ -223,13 +223,12 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
         expected: expectedAnswer.trim()
       })
     });
+    const data = await res.json();
     if (!res.ok) {
       console.error('[MISTRAL] Erreur HTTP :', res.status);
-      return false;
+      return { correct: false, apiError: data.apiError || false, message: data.message || '' };
     }
-    const data = await res.json();
-    console.log('[MISTRAL] Réponse correct :', data.correct);
-    return data.correct === true;
+    return { correct: data.correct === true };
   } catch (e) {
     console.error('[MISTRAL] Erreur réseau :', e);
     return false;
@@ -240,7 +239,12 @@ async function checkAnswerWithBackend(userAnswer, expectedAnswer) {
 // Gestion réponse (corrigée)
 // =====================
 async function handleAnswer(userAnswer) {
-  const isCorrect = await checkAnswerWithBackend(userAnswer, currentQuestion.a);
+  const result = await checkAnswerWithBackend(userAnswer, currentQuestion.a);
+  const isCorrect = result.correct === true;
+  if (result.apiError) {
+    showResult(false, '', '', result.message);
+    return;
+  }
 
   if (isCorrect) {
     currentLevel++;
@@ -261,7 +265,7 @@ async function handleAnswer(userAnswer) {
   showResult(isCorrect,currentQuestion.a);
 }
 
-function showResult(correct, correction = '', detail = '') {
+function showResult(correct, correction = '', detail = '', apiMessage = '') {
   const popup = document.createElement('div');
   popup.style.cssText = `
     position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -271,8 +275,10 @@ function showResult(correct, correction = '', detail = '') {
   `;
 
   popup.innerHTML = `
-    <h2 style="color: ${correct ? '#2e7d32' : '#c62828'};">${correct ? 'Bonne réponse !' : 'Mauvaise réponse'}</h2>
-    <p style="font-size: 1.2em; margin: 15px 0;">${correct ? 'Bravo !' : ''}</p>
+    <h2 style="color: ${correct ? '#2e7d32' : apiMessage ? '#e65100' : '#c62828'};">
+      ${correct ? 'Bonne réponse !' : apiMessage ? '⚠️ Erreur' : 'Mauvaise réponse'}
+    </h2>
+    <p style="font-size: 1.2em; margin: 15px 0;">${correct ? 'Bravo !' : apiMessage || ''}</p>
   `;
 
   if (!correct) {
