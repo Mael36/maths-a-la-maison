@@ -123,7 +123,12 @@ Aucune explication. Un seul mot : true ou false.
         print(f"❌ Erreur API Mistral : {e}")
         return None
 
-
+def comparer_simple(reponse_utilisateur, reponse_attendue):
+    """Comparaison basique sans IA : normalisation et comparaison de chaînes"""
+    def normalize(s):
+        return s.strip().lower().replace(',', '.').replace(' ', '')
+    return normalize(reponse_utilisateur) == normalize(reponse_attendue)
+    
 # ===============================
 # Programme principal
 # ===============================
@@ -166,16 +171,20 @@ def main():
         print("\n⚠️ Pas de comparaison possible (réponse attendue absente)")
         return
 
-    print("\n🔄 Comparaison en cours avec Mistral AI...")
-    resultat = comparer_reponses(user_answer, expected_answer)
+    resultat = None
 
-    if resultat is True:
+    if MISTRAL_API_KEY:
+        print("\n🔄 Comparaison en cours avec Mistral AI...")
+        resultat = comparer_reponses(user_answer, expected_answer)
+
+    if resultat is None:
+        print("⚠️ Mistral indisponible → comparaison textuelle simple")
+        resultat = comparer_simple(user_answer, expected_answer)
+
+    if resultat:
         print("✅ Résultat : true")
-    elif resultat is False:
-        print("❌ Résultat : false")
-        # Plus tard tu pourras afficher `detail` ici
     else:
-        print("⚠️ Résultat indéterminé")
+        print("❌ Résultat : false")
 
 
 if __name__ == "__main__":
