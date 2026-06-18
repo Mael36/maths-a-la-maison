@@ -318,14 +318,16 @@
         if (!statusData.valid) {
           msgEl.style.color = 'red';
           msgEl.textContent = `⚠️ ${statusData.reason} — les corrections se font sans IA.`;
+          setTimeout(() => { msgEl.textContent = ''; }, 3000);
         } else {
           msgEl.style.color = 'green';
           msgEl.textContent = '✅ Clé valide — Mistral AI actif.';
+          setTimeout(() => { msgEl.textContent = ''; }, 3000);
         }
       } catch (e) {
         console.error('[Mistral] Erreur loadMistralKey :', e);
       }
-    } 
+    }
     // Enregistrement de la clé Mistral
     document.getElementById('saveMistralKey').addEventListener('click', async () => {
       const keyInput = document.getElementById('mistralKeyInput').value.trim();
@@ -334,6 +336,7 @@
       if (!keyInput) {
         messageEl.style.color = 'red';
         messageEl.textContent = 'Veuillez entrer une clé API.';
+        setTimeout(() => { messageEl.textContent = ''; }, 3000);
         return;
       }
     
@@ -354,15 +357,17 @@
         if (data.success) {
           messageEl.style.color = 'green';
           messageEl.textContent = '✅ Clé enregistrée avec succès !';
-          // Recharge le statut de la clé pour vérifier sa validité
+          setTimeout(() => { messageEl.textContent = ''; }, 3000);
           loadMistralKey();
         } else {
           messageEl.style.color = 'red';
           messageEl.textContent = `❌ Erreur : ${data.error || 'Impossible d\'enregistrer la clé.'}`;
+          setTimeout(() => { messageEl.textContent = ''; }, 3000);
         }
       } catch (err) {
         messageEl.style.color = 'red';
         messageEl.textContent = '❌ Erreur réseau. Réessayez.';
+        setTimeout(() => { messageEl.textContent = ''; }, 3000);
         console.error(err);
       }
     });
