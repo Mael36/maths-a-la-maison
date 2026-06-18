@@ -317,7 +317,7 @@
         const msgEl = document.getElementById('mistralKeyMessage');
         if (!statusData.valid) {
           msgEl.style.color = 'red';
-          msgEl.textContent = `⚠️ ${statusData.reason} — les corrections se font sans IA.`;
+          msgEl.textContent = `⚠️ ${statusData.reason} `;
           setTimeout(() => { msgEl.textContent = ''; }, 3000);
         } else {
           msgEl.style.color = 'green';
