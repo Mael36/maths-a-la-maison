@@ -325,7 +325,47 @@
       } catch (e) {
         console.error('[Mistral] Erreur loadMistralKey :', e);
       }
-    }    
+    } 
+    // Enregistrement de la clé Mistral
+    document.getElementById('saveMistralKey').addEventListener('click', async () => {
+      const keyInput = document.getElementById('mistralKeyInput').value.trim();
+      const messageEl = document.getElementById('mistralKeyMessage');
+    
+      if (!keyInput) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = 'Veuillez entrer une clé API.';
+        return;
+      }
+    
+      try {
+        const headers = {
+          'Content-Type': 'application/json',
+          'x-current-user': JSON.stringify(currentUser)
+        };
+    
+        const res = await fetch('/api/mistral-key', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ key: keyInput })
+        });
+    
+        const data = await res.json();
+    
+        if (data.success) {
+          messageEl.style.color = 'green';
+          messageEl.textContent = '✅ Clé enregistrée avec succès !';
+          // Recharge le statut de la clé pour vérifier sa validité
+          loadMistralKey();
+        } else {
+          messageEl.style.color = 'red';
+          messageEl.textContent = `❌ Erreur : ${data.error || 'Impossible d\'enregistrer la clé.'}`;
+        }
+      } catch (err) {
+        messageEl.style.color = 'red';
+        messageEl.textContent = '❌ Erreur réseau. Réessayez.';
+        console.error(err);
+      }
+    });
     loadMistralKey();
   </script>
 </body>
