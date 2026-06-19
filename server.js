@@ -41,7 +41,7 @@ app.use(express.json());
 
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.redirect('/login.html');
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
