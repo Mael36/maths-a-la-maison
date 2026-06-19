@@ -173,7 +173,10 @@
       try {
         const res = await fetch('/api/update-account', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-current-user': JSON.stringify(currentUser)
+          },
           body: JSON.stringify({ newUsername, currentPassword, newPassword })
         });
         const data = await res.json();
@@ -182,7 +185,6 @@
           msgEl.style.color = 'green';
           msgEl.textContent = 'Compte mis à jour avec succès !';
     
-          // Mettre à jour le localStorage / affichage
           currentUser.username = data.username;
           localStorage.setItem('currentUser', JSON.stringify(currentUser));
           document.getElementById('profUsername').textContent = data.username;
