@@ -64,6 +64,20 @@
       margin-top: 15px;
       min-height: 20px;
     }
+    .credits {
+      position: fixed;
+      bottom: 12px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 0.75em;
+      color: #c9c9c9;
+      letter-spacing: 0.5px;
+      user-select: none;
+    }
+    .credits span {
+      margin: 0 6px;
+    }
   </style>
 </head>
 <body>
@@ -78,6 +92,10 @@
     <p id="error"></p>
   </div>
 
+  <div class="credits">
+    <span>Réalisé par Maël Beltrame, Iñaki Gomez--Jego et Emmeran Dittberner</span>
+  </div>
+
   <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -85,12 +103,10 @@
       const password = document.getElementById('password').value;
       const errorEl = document.getElementById('error');
       errorEl.textContent = '';
-
       if (!username || !password) {
         errorEl.textContent = 'Veuillez remplir tous les champs';
         return;
       }
-
       try {
         const res = await fetch('/api/login', {
           method: 'POST',
@@ -98,13 +114,11 @@
           body: JSON.stringify({ username, password })
         });
         const data = await res.json();
-
         if (data.success) {
           localStorage.setItem('currentUser', JSON.stringify({
             username: data.username,
             role: data.role
           }));
-
           if (data.role === 'prof') {
             window.location.href = '/prof.html';
           } else {
