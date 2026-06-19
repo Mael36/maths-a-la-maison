@@ -192,6 +192,34 @@ app.post('/api/login', async (req, res) => {
   });
 });
 
+app.post('/api/students/:username/reset-password', async (req, res) => {
+  const currentUserData = JSON.parse(req.headers['x-current-user'] || '{}');
+  if (!currentUserData || currentUserData.role !== 'prof') {
+    return res.status(403).json({ error: 'Accès interdit' });
+  }
+
+  const username = req.params.username;
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.trim() === '') {
+    return res.status(400).json({ error: 'Mot de passe requis' });
+  }
+
+  const users = loadUsers();
+  if (!users[username]) {
+    return res.status(404).json({ error: 'Élève non trouvé' });
+  }
+  if (users[username].role !== 'élève') {
+    return res.status(403).json({ error: 'Impossible de modifier ce compte' });
+  }
+
+  users[username].passwordHash = await bcrypt.hash(newPassword.trim(), 10);
+  saveUsers(users);
+
+  console.log(`[PROF] Mot de passe réinitialisé pour : ${username}`);
+  res.json({ success: true });
+});
+
 app.get('/api/mistral-key/status', async (req, res) => {
   const currentUser = JSON.parse(req.headers['x-current-user'] || '{}');
   if (!currentUser || currentUser.role !== 'prof') return res.status(403).json({ error: 'Accès interdit' });
