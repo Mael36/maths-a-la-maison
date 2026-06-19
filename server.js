@@ -392,6 +392,41 @@ app.post('/api/solo/score', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/api/update-account', requireAuth(), async (req, res) => {
+  const { newUsername, currentPassword, newPassword } = req.body;
+  const sessionUsername = req.session.user.username;
+  const users = loadUsers();
+  const user = users[sessionUsername];
+
+  if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+
+  const ok = await bcrypt.compare(currentPassword || '', user.passwordHash);
+  if (!ok) return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
+
+  // Changement de username
+  if (newUsername && newUsername.trim() !== '' && newUsername.trim() !== sessionUsername) {
+    const cleanUsername = newUsername.trim().toLowerCase();
+    if (users[cleanUsername]) return res.status(400).json({ error: 'Ce nom d\'utilisateur est déjà pris' });
+
+    users[cleanUsername] = { ...user, username: cleanUsername };
+    delete users[sessionUsername];
+
+    // Mettre à jour la session
+    req.session.user.username = cleanUsername;
+  }
+
+  const finalUsername = req.session.user.username;
+
+  // Changement de mot de passe
+  if (newPassword && newPassword.trim() !== '') {
+    users[finalUsername].passwordHash = await bcrypt.hash(newPassword.trim(), 10);
+  }
+
+  saveUsers(users);
+  console.log(`[PROF] Compte mis à jour : ${sessionUsername} → ${finalUsername}`);
+  res.json({ success: true, username: finalUsername });
+});
+
 app.get('/api/scores', (req, res) => {
   const scores = loadScores();
   const users = loadUsers();
