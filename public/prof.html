@@ -226,7 +226,10 @@
           const li = document.createElement('li');
           li.innerHTML = `
             <span>${student.username}</span>
-            <button class="delete-btn" data-username="${student.username}">Supprimer</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="reset-pwd-btn" data-username="${student.username}" style="background: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Réinitialiser mdp</button>
+              <button class="delete-btn" data-username="${student.username}">Supprimer</button>
+            </div>
           `;
           listEl.appendChild(li);
         });
@@ -254,6 +257,34 @@
                 loadRanking();
               } else {
                 alert(result.error || 'Erreur suppression');
+              }
+            } catch (err) {
+              alert('Erreur réseau');
+            }
+          });
+        });
+        // Écouteurs réinitialisation mot de passe
+        document.querySelectorAll('.reset-pwd-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const username = btn.dataset.username;
+            const newPassword = prompt(`Nouveau mot de passe pour "${username}" :`);
+            if (!newPassword || newPassword.trim() === '') return;
+        
+            try {
+              const res = await fetch(`/api/students/${username}/reset-password`, {
+                method: 'POST',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'x-current-user': JSON.stringify(currentUser)
+                },
+                body: JSON.stringify({ newPassword: newPassword.trim() })
+              });
+              const result = await res.json();
+        
+              if (result.success) {
+                alert(`Mot de passe de "${username}" réinitialisé avec succès !`);
+              } else {
+                alert(result.error || 'Erreur lors de la réinitialisation');
               }
             } catch (err) {
               alert('Erreur réseau');
