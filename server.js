@@ -392,9 +392,13 @@ app.post('/api/solo/score', (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/api/update-account', requireAuth(), async (req, res) => {
+app.post('/api/update-account', async (req, res) => {
   const { newUsername, currentPassword, newPassword } = req.body;
-  const sessionUsername = req.session.user.username;
+  const currentUserData = JSON.parse(req.headers['x-current-user'] || '{}');
+  const sessionUsername = currentUserData.username;
+
+  if (!sessionUsername) return res.status(401).json({ error: 'Non connecté' });
+
   const users = loadUsers();
   const user = users[sessionUsername];
 
@@ -403,6 +407,8 @@ app.post('/api/update-account', requireAuth(), async (req, res) => {
   const ok = await bcrypt.compare(currentPassword || '', user.passwordHash);
   if (!ok) return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
 
+  let finalUsername = sessionUsername;
+
   // Changement de username
   if (newUsername && newUsername.trim() !== '' && newUsername.trim() !== sessionUsername) {
     const cleanUsername = newUsername.trim().toLowerCase();
@@ -410,12 +416,8 @@ app.post('/api/update-account', requireAuth(), async (req, res) => {
 
     users[cleanUsername] = { ...user, username: cleanUsername };
     delete users[sessionUsername];
-
-    // Mettre à jour la session
-    req.session.user.username = cleanUsername;
+    finalUsername = cleanUsername;
   }
-
-  const finalUsername = req.session.user.username;
 
   // Changement de mot de passe
   if (newPassword && newPassword.trim() !== '') {
