@@ -95,6 +95,16 @@
       <p id="mistralKeyMessage" style="min-height: 20px; font-weight: bold;"></p>
     </div>
   </div>
+  <div style="margin: 20px 0;">
+    <h3>Modifier mon compte professeur</h3>
+    <div style="max-width: 500px; display: flex; flex-direction: column; gap: 12px;">
+      <input type="text" id="newProfUsername" placeholder="Nouveau nom d'utilisateur (laisser vide pour ne pas changer)" style="padding: 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 6px;">
+      <input type="password" id="currentProfPassword" placeholder="Mot de passe actuel (requis)" required style="padding: 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 6px;">
+      <input type="password" id="newProfPassword" placeholder="Nouveau mot de passe (laisser vide pour ne pas changer)" style="padding: 10px; font-size: 1em; border: 1px solid #ccc; border-radius: 6px;">
+      <button id="updateProfAccountBtn" style="padding: 10px 20px;">Mettre à jour mon compte</button>
+    </div>
+    <p id="updateProfMessage" style="min-height: 20px; font-weight: bold;"></p>
+  </div>
 
   <script>
     // Vérification prof
@@ -147,6 +157,47 @@
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.removeItem('currentUser');
       window.location.href = '/login.html';
+    });
+    document.getElementById('updateProfAccountBtn').addEventListener('click', async () => {
+      const newUsername = document.getElementById('newProfUsername').value.trim();
+      const currentPassword = document.getElementById('currentProfPassword').value;
+      const newPassword = document.getElementById('newProfPassword').value.trim();
+      const msgEl = document.getElementById('updateProfMessage');
+    
+      if (!currentPassword) {
+        msgEl.style.color = 'red';
+        msgEl.textContent = 'Le mot de passe actuel est requis';
+        return;
+      }
+    
+      try {
+        const res = await fetch('/api/update-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newUsername, currentPassword, newPassword })
+        });
+        const data = await res.json();
+    
+        if (data.success) {
+          msgEl.style.color = 'green';
+          msgEl.textContent = 'Compte mis à jour avec succès !';
+    
+          // Mettre à jour le localStorage / affichage
+          currentUser.username = data.username;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          document.getElementById('profUsername').textContent = data.username;
+    
+          document.getElementById('newProfUsername').value = '';
+          document.getElementById('currentProfPassword').value = '';
+          document.getElementById('newProfPassword').value = '';
+        } else {
+          msgEl.style.color = 'red';
+          msgEl.textContent = data.error || 'Erreur lors de la mise à jour';
+        }
+      } catch (err) {
+        msgEl.style.color = 'red';
+        msgEl.textContent = 'Erreur serveur';
+      }
     });
 
     // === LISTE ÉLÈVES AVEC BOUTON SUPPRIMER ===
